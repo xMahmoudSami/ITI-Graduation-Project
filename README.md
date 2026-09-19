@@ -27,5 +27,4 @@ Welcome to the official repository for **Team 03** graduation project at the **I
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/YourUsername/ITI-Graduation-Project-Team3.git](https://github.com/YourUsername/ITI-Graduation-Project-Team3.git)
-   ```
+   git clone [https://github.com/xMahmoudSami/ITI-Graduation-Project.git](https://github.com/xMahmoudSami/ITI-Graduation-Project.git)
