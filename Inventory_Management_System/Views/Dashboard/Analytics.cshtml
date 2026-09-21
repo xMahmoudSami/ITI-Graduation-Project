@@ -1,0 +1,343 @@
+﻿@model Inventory_Management_System.ViewModels.DashboardViewModels
+
+@{
+    ViewData["Title"] = "Analytics Dashboard";
+}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Analytics Dashboard</h1>
+    </div>
+
+    <!-- 1. KPI Cards Row -->
+    <div class="row">
+
+        <!-- Total Products Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Products</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalProducts</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-boxes fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Categories Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Categories</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalCategories</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Sales Revenue Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Sales Revenue</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.TotalSalesRevenue.ToString("N2")</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Alerts Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Low Stock Items</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.LowStockCount</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 2. Interactive Charts Row -->
+    <div class="row">
+
+        <!-- Sales vs Purchases Overview Chart -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Sales vs Purchases (Current Year)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area" style="position: relative; height: 320px;">
+                        <canvas id="salesVsPurchasesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Distribution Donut Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Category Share</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2" style="position: relative; height: 280px;">
+                        <canvas id="categoryDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3. Tables & Data Feed Row -->
+    <div class="row">
+
+        <!-- Low Stock Warning Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Low Stock Alerts</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                    <th>Threshold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.LowStockProducts.Any())
+                                {
+                                    @foreach (var item in Model.LowStockProducts)
+                                    {
+                                        <tr>
+                                            <td>@item.SKU</td>
+                                            <td>@item.ProductName</td>
+                                            <td>@item.CategoryName</td>
+                                            <td><span class="badge badge-danger">@item.StockQuantity</span></td>
+                                            <td>@item.LowStockThreshold</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No low stock items found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Selling Products Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Top Selling Products</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Units Sold</th>
+                                    <th>Total Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.TopSellingProducts.Any())
+                                {
+                                    @foreach (var item in Model.TopSellingProducts)
+                                    {
+                                        <tr>
+                                            <td>@item.ProductName</td>
+                                            <td>@item.TotalQuantitySold</td>
+                                            <td>$@item.TotalRevenue.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">No sales records available.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 4. Recent Transactions Feed -->
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Transactions Log</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Ref ID</th>
+                                    <th>Date</th>
+                                    <th>Entity / Customer</th>
+                                    <th>Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.RecentActivities.Any())
+                                {
+                                    @foreach (var activity in Model.RecentActivities)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (activity.ActivityType == "Sale")
+                                                {
+                                                    <span class="badge badge-success">Sale</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-primary">Purchase</span>
+                                                }
+                                            </td>
+                                            <td>#@activity.ReferenceID</td>
+                                            <td>@activity.ActivityDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                            <td>@activity.EntityInfo</td>
+                                            <td>$@activity.TotalAmount.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No recent transactions found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <!-- Chart.js Library -->
+    <script src="~/vendor/chart.js/Chart.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Load Sales vs Purchases Line/Bar Chart
+            $.ajax({
+                url: '/Dashboard/GetSalesVsPurchasesChartData',
+                type: 'GET',
+                success: function (data) {
+                    var ctx = document.getElementById("salesVsPurchasesChart").getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: "Sales ($)",
+                                    lineTension: 0.3,
+                                    backgroundColor: "rgba(28, 200, 138, 0.05)",
+                                    borderColor: "rgba(28, 200, 138, 1)",
+                                    pointRadius: 3,
+                                    pointBackgroundColor: "rgba(28, 200, 138, 1)",
+                                    data: data.salesData
+                                },
+                                {
+                                    label: "Purchases ($)",
+                                    lineTension: 0.3,
+                                    backgroundColor: "rgba(78, 115, 223, 0.05)",
+                                    borderColor: "rgba(78, 115, 223, 1)",
+                                    pointRadius: 3,
+                                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                                    data: data.purchasesData
+                                }
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            responsive: true
+                        }
+                    });
+                }
+            });
+
+            // Load Category Distribution Doughnut Chart
+            $.ajax({
+                url: '/Dashboard/GetCategoryDistributionChartData',
+                type: 'GET',
+                success: function (data) {
+                    var ctx = document.getElementById("categoryDistributionChart").getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.categoryNames,
+                            datasets: [{
+                                data: data.productCounts,
+                                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'],
+                                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9caf', '#dda20a', '#be2617', '#60616f'],
+                                hoverBorderColor: "rgba(234, 236, 244, 1)",
+                            }]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            responsive: true,
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

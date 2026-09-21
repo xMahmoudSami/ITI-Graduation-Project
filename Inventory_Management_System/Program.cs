@@ -2,29 +2,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler("/Dashboard/Error");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapStaticAssets();
 
-// TODO: Change this to our actual Landing Page controller/action when we start building pages
-// app.MapControllerRoute(
-    // name: "default",
-    // pattern: "{controller=Home}/{action=Index}/{id?}")
-    // .WithStaticAssets();
-
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Dashboard}/{action=Analytics}/{id?}")
+    .WithStaticAssets();
 
 app.Run();
