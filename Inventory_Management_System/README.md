@@ -7,9 +7,7 @@ Welcome to the official repository for **Team 03** graduation project at the **I
 ## 👥 Team Members
 
 - **Abdulrahman Hani Mahmoud Ali**
-- **Fares Karam Ali Elmoazen**
 - **Mahmoud Sami Abdullah SayedAhmed**
-- **Mohammed Osama Abdelhamid Abdelkarem**
 - **Shimaa Reda Elsayed Elmorshedy**
 - **Youssef Ali Abo Khallaf**
 
