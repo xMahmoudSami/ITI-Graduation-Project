@@ -1,0 +1,105 @@
+@model Inventory_Management_System.ViewModels.SupplierProductFormViewModel
+
+@{
+    ViewData["Title"] = "Add Supplier-Product Mapping";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Supplier Mappings</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add Mapping</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-link mr-2"></i>Map Supplier to Product
+                </h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="SupplierID" class="font-weight-bold">
+                                    Supplier <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="SupplierID" asp-items="Model.Suppliers" class="custom-select" autofocus>
+                                    <option value="0">— Select Supplier —</option>
+                                </select>
+                                <span asp-validation-for="SupplierID" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ProductID" class="font-weight-bold">
+                                    Product <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="ProductID" asp-items="Model.Products" class="custom-select">
+                                    <option value="0">— Select Product —</option>
+                                </select>
+                                <span asp-validation-for="ProductID" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="SupplierSKU" class="font-weight-bold">
+                            Supplier SKU / Part Number <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="SupplierSKU" class="form-control" placeholder="e.g. VEN-SKU-9921" />
+                        <small class="form-text text-muted">The vendor's catalog or part identifier for this product.</small>
+                        <span asp-validation-for="SupplierSKU" class="text-danger small font-weight-bold"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ContractPrice" class="font-weight-bold">
+                                    Contract Price ($) <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="ContractPrice" class="form-control" type="number" step="0.01" min="0.01" placeholder="0.00" />
+                                <small class="form-text text-muted">Agreed purchase price per unit from this supplier.</small>
+                                <span asp-validation-for="ContractPrice" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="LeadTimeDays" class="font-weight-bold">
+                                    Lead Time (Days) <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="LeadTimeDays" class="form-control" type="number" min="1" max="365" placeholder="7" />
+                                <small class="form-text text-muted">Estimated days between order and delivery.</small>
+                                <span asp-validation-for="LeadTimeDays" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Mappings
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save mr-1"></i> Save Mapping
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

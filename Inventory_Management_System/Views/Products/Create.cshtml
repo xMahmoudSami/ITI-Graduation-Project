@@ -1,0 +1,113 @@
+@model Inventory_Management_System.ViewModels.ProductFormViewModel
+
+@{
+    ViewData["Title"] = "Add Product";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Add Product</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-box mr-2"></i>Create New Product
+                </h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="SKU" class="font-weight-bold">
+                                    SKU Code <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="SKU" class="form-control" placeholder="e.g. SKU-001" autofocus />
+                                <small class="form-text text-muted">Unique product identifier (up to 50 characters).</small>
+                                <span asp-validation-for="SKU" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ProductName" class="font-weight-bold">
+                                    Product Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="ProductName" class="form-control" placeholder="e.g. Wireless Mouse" />
+                                <small class="form-text text-muted">Descriptive product name (up to 100 characters).</small>
+                                <span asp-validation-for="ProductName" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="CategoryID" class="font-weight-bold">
+                            Category <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="CategoryID" asp-items="Model.Categories" class="custom-select">
+                            <option value="0">— Select Category —</option>
+                        </select>
+                        <small class="form-text text-muted">Select the product category.</small>
+                        <span asp-validation-for="CategoryID" class="text-danger small font-weight-bold"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="UnitPrice" class="font-weight-bold">
+                                    Unit Price ($) <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="UnitPrice" class="form-control" type="number" step="0.01" min="0.01" placeholder="0.00" />
+                                <span asp-validation-for="UnitPrice" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="StockQuantity" class="font-weight-bold">
+                                    Stock Quantity <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="StockQuantity" class="form-control" type="number" min="0" placeholder="0" />
+                                <span asp-validation-for="StockQuantity" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label asp-for="LowStockThreshold" class="font-weight-bold">
+                                    Low Stock Threshold <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="LowStockThreshold" class="form-control" type="number" min="0" placeholder="10" />
+                                <small class="form-text text-muted">Alert when stock falls to this level.</small>
+                                <span asp-validation-for="LowStockThreshold" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Products
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save mr-1"></i> Save Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

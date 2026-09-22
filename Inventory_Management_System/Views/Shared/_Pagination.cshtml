@@ -1,0 +1,132 @@
+@model Inventory_Management_System.ViewModels.IPaginationInfo
+
+@{
+    var query = Context.Request.Query;
+    string GetPageUrl(int targetPage, int? targetPageSize = null)
+    {
+        var dict = new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>();
+        foreach (var kvp in query)
+        {
+            dict[kvp.Key] = kvp.Value;
+        }
+        dict["page"] = targetPage.ToString();
+        if (targetPageSize.HasValue)
+        {
+            dict["pageSize"] = targetPageSize.Value.ToString();
+        }
+        else if (!dict.ContainsKey("pageSize"))
+        {
+            dict["pageSize"] = Model.PageSize.ToString();
+        }
+
+        var queryString = Microsoft.AspNetCore.Http.QueryString.Create(
+            dict.SelectMany(kvp => kvp.Value.Select(v => new KeyValuePair<string, string?>(kvp.Key, v)))
+        );
+        return $"{Context.Request.Path}{queryString}";
+    }
+
+    int current = Model.PageNumber;
+    int total = Math.Max(1, Model.TotalPages);
+    int window = 2;
+    int start = Math.Max(1, current - window);
+    int end = Math.Min(total, current + window);
+}
+
+<div class="row align-items-center mt-3 pt-3 border-top">
+    <!-- Showing info & Page Size Selector -->
+    <div class="col-sm-12 col-md-5 d-flex align-items-center mb-3 mb-md-0">
+        <span class="text-muted mr-3">
+            @if (Model.TotalItems == 0)
+            {
+                <text>Showing 0 of 0 entries</text>
+            }
+            else
+            {
+                <text>Showing <strong>@Model.StartItemIndex</strong>–<strong>@Model.EndItemIndex</strong> of <strong>@Model.TotalItems</strong> entries</text>
+            }
+        </span>
+
+        <div class="d-inline-flex align-items-center">
+            <label for="pageSizeSelect" class="small text-muted mb-0 mr-1">Show:</label>
+            <select id="pageSizeSelect" class="custom-select custom-select-sm form-control form-control-sm" style="width: auto;" onchange="window.location.href=this.value;">
+                <option value="@GetPageUrl(1, 10)" selected="@(Model.PageSize == 10)">10</option>
+                <option value="@GetPageUrl(1, 25)" selected="@(Model.PageSize == 25)">25</option>
+                <option value="@GetPageUrl(1, 50)" selected="@(Model.PageSize == 50)">50</option>
+                <option value="@GetPageUrl(1, 100)" selected="@(Model.PageSize == 100)">100</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Pagination Navigation Buttons -->
+    <div class="col-sm-12 col-md-7">
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                    <!-- First Page -->
+                    <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="page-link" href="@(Model.HasPreviousPage ? GetPageUrl(1) : "#")" tabindex="@(!Model.HasPreviousPage ? "-1" : "0")" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo; First</span>
+                        </a>
+                    </li>
+
+                    <!-- Previous Page -->
+                    <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <a class="page-link" href="@(Model.HasPreviousPage ? GetPageUrl(current - 1) : "#")" tabindex="@(!Model.HasPreviousPage ? "-1" : "0")" aria-label="Previous">
+                            <span aria-hidden="true">&laquo; Prev</span>
+                        </a>
+                    </li>
+
+                    <!-- First Page + Ellipsis if window shifted -->
+                    @if (start > 1)
+                    {
+                        <li class="page-item"><a class="page-link" href="@GetPageUrl(1)">1</a></li>
+                        @if (start > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                        }
+                    }
+
+                    <!-- Windowed Page Numbers -->
+                    @for (int p = start; p <= end; p++)
+                    {
+                        if (p == current)
+                        {
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">@p <span class="sr-only">(current)</span></span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item"><a class="page-link" href="@GetPageUrl(p)">@p</a></li>
+                        }
+                    }
+
+                    <!-- Ellipsis + Last Page if window ended early -->
+                    @if (end < total)
+                    {
+                        @if (end < total - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">&hellip;</span></li>
+                        }
+                        <li class="page-item"><a class="page-link" href="@GetPageUrl(total)">@total</a></li>
+                    }
+
+                    <!-- Next Page -->
+                    <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="page-link" href="@(Model.HasNextPage ? GetPageUrl(current + 1) : "#")" tabindex="@(!Model.HasNextPage ? "-1" : "0")" aria-label="Next">
+                            <span aria-hidden="true">Next &raquo;</span>
+                        </a>
+                    </li>
+
+                    <!-- Last Page -->
+                    <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                        <a class="page-link" href="@(Model.HasNextPage ? GetPageUrl(total) : "#")" tabindex="@(!Model.HasNextPage ? "-1" : "0")" aria-label="Last">
+                            <span aria-hidden="true">Last &raquo;&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+</div>

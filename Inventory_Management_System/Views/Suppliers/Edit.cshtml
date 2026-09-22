@@ -1,0 +1,102 @@
+@model Inventory_Management_System.ViewModels.SupplierFormViewModel
+
+@{
+    ViewData["Title"] = "Edit Supplier";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Suppliers</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-edit mr-2"></i>Edit Supplier
+                </h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="SupplierID" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="SupplierName" class="font-weight-bold">
+                                    Supplier Name <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="SupplierName" class="form-control" placeholder="e.g. Acme Supplies Inc." />
+                                <small class="form-text text-muted">Company or business name (2–100 characters).</small>
+                                <span asp-validation-for="SupplierName" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="ContactName" class="font-weight-bold">
+                                    Contact Person <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="ContactName" class="form-control" placeholder="e.g. John Smith" />
+                                <small class="form-text text-muted">Primary contact person name.</small>
+                                <span asp-validation-for="ContactName" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Phone" class="font-weight-bold">
+                                    Phone Number <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Phone" class="form-control" placeholder="e.g. +1-555-123-4567" type="tel" />
+                                <span asp-validation-for="Phone" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Email" class="font-weight-bold">
+                                    Email Address <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Email" class="form-control" placeholder="e.g. contact@supplier.com" type="email" />
+                                <span asp-validation-for="Email" class="text-danger small font-weight-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Address" class="font-weight-bold">
+                            Address <span class="text-danger">*</span>
+                        </label>
+                        <textarea asp-for="Address" class="form-control" rows="3" placeholder="Full mailing address..."></textarea>
+                        <small class="form-text text-muted">Up to 200 characters.</small>
+                        <span asp-validation-for="Address" class="text-danger small font-weight-bold"></span>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Suppliers
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save mr-1"></i> Update Supplier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

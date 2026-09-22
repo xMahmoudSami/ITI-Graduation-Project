@@ -1,0 +1,175 @@
+@model Inventory_Management_System.ViewModels.ProductDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.ProductName;
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.ProductName</li>
+    </ol>
+</nav>
+
+<!-- Product Info Card -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-box mr-2"></i>Product Information
+                </h6>
+                <div class="btn-group btn-group-sm">
+                    <a asp-action="Edit" asp-route-id="@Model.ProductID" class="btn btn-outline-primary" title="Edit">
+                        <i class="fas fa-edit mr-1"></i> Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.ProductID" class="btn btn-outline-danger" title="Delete">
+                        <i class="fas fa-trash mr-1"></i> Delete
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-gray-600">SKU</dt>
+                    <dd class="col-sm-8"><code class="font-weight-bold">@Model.SKU</code></dd>
+
+                    <dt class="col-sm-4 text-gray-600">Product Name</dt>
+                    <dd class="col-sm-8 font-weight-bold text-gray-800">@Model.ProductName</dd>
+
+                    <dt class="col-sm-4 text-gray-600">Category</dt>
+                    <dd class="col-sm-8">
+                        <a asp-controller="Categories" asp-action="Details" asp-route-id="@Model.CategoryID">
+                            <i class="fas fa-folder text-primary mr-1"></i>@Model.CategoryName
+                        </a>
+                    </dd>
+
+                    <dt class="col-sm-4 text-gray-600">Unit Price</dt>
+                    <dd class="col-sm-8 font-weight-bold text-gray-800">$@Model.UnitPrice.ToString("N2")</dd>
+
+                    <dt class="col-sm-4 text-gray-600">Stock Quantity</dt>
+                    <dd class="col-sm-8">
+                        <span class="font-weight-bold">@Model.StockQuantity</span>
+                        <small class="text-muted ml-2">(Threshold: @Model.LowStockThreshold)</small>
+                    </dd>
+
+                    <dt class="col-sm-4 text-gray-600">Stock Status</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge @Model.StockBadgeClass px-3 py-1">@Model.StockStatus</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="col-lg-4">
+        <div class="card border-left-info shadow-sm mb-3">
+            <div class="card-body py-3">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Suppliers</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Suppliers.Count</div>
+                    </div>
+                    <div class="col-auto"><i class="fas fa-truck fa-2x text-gray-300"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="card border-left-success shadow-sm mb-3">
+            <div class="card-body py-3">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Purchase Records</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.PurchaseItemsCount</div>
+                    </div>
+                    <div class="col-auto"><i class="fas fa-shopping-cart fa-2x text-gray-300"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="card border-left-warning shadow-sm mb-3">
+            <div class="card-body py-3">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Sales Records</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.SaleItemsCount</div>
+                    </div>
+                    <div class="col-auto"><i class="fas fa-receipt fa-2x text-gray-300"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <a asp-controller="SupplierProducts" asp-action="Create" asp-route-productId="@Model.ProductID" class="btn btn-sm btn-info btn-block mb-3">
+            <i class="fas fa-link mr-1"></i> Add Supplier Mapping
+        </a>
+    </div>
+</div>
+
+<!-- Suppliers Table -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-truck mr-2"></i>Mapped Suppliers (@Model.Suppliers.Count)
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Suppliers.Any())
+        {
+            <div class="text-center py-4">
+                <i class="fas fa-truck fa-2x text-gray-300 mb-2"></i>
+                <p class="text-muted mb-2">No suppliers are currently mapped to this product.</p>
+                <a asp-controller="SupplierProducts" asp-action="Create" asp-route-productId="@Model.ProductID" class="btn btn-info btn-sm">
+                    <i class="fas fa-plus mr-1"></i> Add Supplier Mapping
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Supplier Name</th>
+                            <th>Contact</th>
+                            <th>Supplier SKU</th>
+                            <th class="text-right">Contract Price</th>
+                            <th class="text-center">Lead Time</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sup in Model.Suppliers)
+                        {
+                            <tr>
+                                <td class="font-weight-bold">
+                                    <a asp-controller="Suppliers" asp-action="Details" asp-route-id="@sup.SupplierID">@sup.SupplierName</a>
+                                </td>
+                                <td class="text-muted">
+                                    @sup.ContactName
+                                    <small class="d-block">@sup.Phone</small>
+                                </td>
+                                <td><code>@sup.SupplierSKU</code></td>
+                                <td class="text-right font-weight-bold">$@sup.ContractPrice.ToString("N2")</td>
+                                <td class="text-center">@sup.LeadTimeDays days</td>
+                                <td class="text-right">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-controller="SupplierProducts" asp-action="Edit" asp-route-id="@sup.SupplierProductID" class="btn btn-outline-primary" title="Edit Mapping">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-controller="SupplierProducts" asp-action="Delete" asp-route-id="@sup.SupplierProductID" class="btn btn-outline-danger" title="Remove Mapping">
+                                            <i class="fas fa-unlink"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left mr-1"></i> Back to Products
+</a>

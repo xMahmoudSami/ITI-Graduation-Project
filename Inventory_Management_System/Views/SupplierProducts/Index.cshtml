@@ -1,0 +1,159 @@
+@model Inventory_Management_System.ViewModels.PagedResult<Inventory_Management_System.ViewModels.SupplierProductListItemViewModel>
+
+@{
+    ViewData["Title"] = "Supplier Product Mappings";
+    var filter = ViewBag.Filter as Inventory_Management_System.ViewModels.SupplierProductFilterViewModel ?? new();
+}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-gray-800">Supplier Product Mappings</h1>
+        <p class="text-muted small mb-0">Manage relationships between suppliers, products, contract pricing, and lead times</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-icon-split shadow-sm">
+        <span class="icon text-white-50">
+            <i class="fas fa-plus"></i>
+        </span>
+        <span class="text">Add Mapping</span>
+    </a>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body py-3">
+        <form method="get" asp-action="Index">
+            <div class="row align-items-end">
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <label class="small text-muted mb-1">Supplier</label>
+                    <select name="SupplierID" class="custom-select">
+                        <option value="">All Suppliers</option>
+                        @foreach (var sup in filter.Suppliers)
+                        {
+                            <option value="@sup.Value" selected="@(sup.Value == filter.SupplierID?.ToString())">@sup.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <label class="small text-muted mb-1">Product</label>
+                    <select name="ProductID" class="custom-select">
+                        <option value="">All Products</option>
+                        @foreach (var prod in filter.Products)
+                        {
+                            <option value="@prod.Value" selected="@(prod.Value == filter.ProductID?.ToString())">@prod.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <label class="small text-muted mb-1">Search SKU or Keyword</label>
+                    <div class="input-group">
+                        <input type="text" name="Search" value="@filter.Search" class="form-control" placeholder="Search supplier SKU, product, supplier..." aria-label="Search">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary" title="Search">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-2 mb-md-0 d-flex">
+                    <button type="submit" class="btn btn-primary mr-1 flex-grow-1">
+                        <i class="fas fa-filter fa-sm"></i> Filter
+                    </button>
+                    @if (filter.SupplierID.HasValue || filter.ProductID.HasValue || !string.IsNullOrWhiteSpace(filter.Search))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary" title="Clear filters">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Mappings Table Card -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header py-3 d-flex align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">All Mappings (@Model.TotalItems)</h6>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Items.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-link fa-3x text-gray-300 mb-3"></i>
+                <h5 class="text-gray-600 font-weight-bold">No mappings found</h5>
+                <p class="text-muted mb-3">
+                    @if (filter.SupplierID.HasValue || filter.ProductID.HasValue || !string.IsNullOrWhiteSpace(filter.Search))
+                    {
+                        <text>No supplier-product mappings match your filters. Try clearing them.</text>
+                    }
+                    else
+                    {
+                        <text>Start by associating a supplier with a product.</text>
+                    }
+                </p>
+                @if (filter.SupplierID.HasValue || filter.ProductID.HasValue || !string.IsNullOrWhiteSpace(filter.Search))
+                {
+                    <a asp-action="Index" class="btn btn-outline-primary btn-sm">Clear Filters</a>
+                }
+                else
+                {
+                    <a asp-action="Create" class="btn btn-primary btn-sm">Add Mapping</a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Supplier</th>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Supplier SKU</th>
+                            <th class="text-right">Contract Price</th>
+                            <th class="text-center">Lead Time</th>
+                            <th class="text-right" style="width: 15%;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="font-weight-bold">
+                                    <a asp-controller="Suppliers" asp-action="Details" asp-route-id="@item.SupplierID">
+                                        <i class="fas fa-truck text-primary mr-1"></i>@item.SupplierName
+                                    </a>
+                                </td>
+                                <td>
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductID" class="font-weight-bold">
+                                        @item.ProductName
+                                    </a>
+                                    <small class="text-muted d-block">SKU: @item.ProductSKU</small>
+                                </td>
+                                <td><span class="badge badge-light border">@item.CategoryName</span></td>
+                                <td><code>@item.SupplierSKU</code></td>
+                                <td class="text-right font-weight-bold text-gray-800">$@item.ContractPrice.ToString("N2")</td>
+                                <td class="text-center">@item.LeadTimeDays days</td>
+                                <td class="text-right">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.SupplierProductID" class="btn btn-outline-primary" title="Edit Mapping">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.SupplierProductID" class="btn btn-outline-danger" title="Remove Mapping">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="px-3 pb-3">
+                <partial name="_Pagination" model="Model" />
+            </div>
+        }
+    </div>
+</div>
