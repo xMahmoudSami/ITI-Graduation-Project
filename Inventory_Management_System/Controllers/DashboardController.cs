@@ -160,5 +160,37 @@
         }
 
         #endregion
+
+        [HttpGet]
+        public async Task<IActionResult> GlobalSearch(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term) || term.Length < 1)
+            {
+                return Json(new { products = new object[] { }, categories = new object[] { }, suppliers = new object[] { } });
+            }
+
+            term = term.Trim().ToLower();
+
+            var products = await _context.Products
+                .Where(p => p.ProductName.ToLower().Contains(term) || p.SKU.ToLower().Contains(term))
+                .Take(5)
+                .Select(p => new { p.ProductID, p.ProductName, p.SKU })
+                .ToListAsync();
+
+            var categories = await _context.Categories
+                .Where(c => c.CategoryName.ToLower().Contains(term))
+                .Take(3)
+                .Select(c => new { c.CategoryID, c.CategoryName })
+                .ToListAsync();
+
+            var suppliers = await _context.Suppliers
+                .Where(s => s.SupplierName.ToLower().Contains(term) ||
+                      (s.ContactName != null && s.ContactName.ToLower().Contains(term)))
+                .Take(3)
+                .Select(s => new { s.SupplierID, s.SupplierName })
+                .ToListAsync();
+
+            return Json(new { products, categories, suppliers });
+        }
     }
 }
