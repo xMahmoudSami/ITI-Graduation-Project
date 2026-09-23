@@ -74,7 +74,7 @@ The project development is structured into 6 core functional modules following a
 
 The database design adheres to 9 relational entities (8 core + optional AI logs) configured via Entity Framework Core Fluent API:
 
-![ERD](docs/ERD.svg)
+![ERD](Docs/ERD.svg)
 
 ---
 
