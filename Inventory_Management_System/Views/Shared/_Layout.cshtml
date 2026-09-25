@@ -387,7 +387,105 @@
                 });
             });
     </script>
+<script>
+    $(document).ready(function () {
 
+        // Open / close chatbot
+        $('#ai-chat-button').click(function () {
+            $('#ai-chat-window').toggle();
+        });
+
+        $('#ai-chat-close').click(function () {
+            $('#ai-chat-window').hide();
+        });
+
+        // Send message
+        $('#ai-chat-send').click(function () {
+            sendAIMessage();
+        });
+
+        // Send with Enter
+        $('#ai-chat-input').keypress(function (e) {
+            if (e.which === 13) {
+                sendAIMessage();
+            }
+        });
+
+        function sendAIMessage() {
+
+            const input = $('#ai-chat-input');
+            const message = input.val().trim();
+
+            if (!message) {
+                return;
+            }
+
+            // Show user message
+            $('#ai-chat-messages').append(`
+                <div class="user-message">
+                    ${message}
+                </div>
+            `);
+
+            input.val('');
+
+            // Temporary loading message
+            const loadingMessage = $(`
+                <div class="ai-message" id="ai-loading">
+                    Thinking...
+                </div>
+            `);
+
+            $('#ai-chat-messages').append(loadingMessage);
+
+            scrollChatToBottom();
+
+            // Call our C# API
+            $.ajax({
+                url: '/api/AI/chat',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    message: message
+                }),
+
+                success: function (data) {
+
+                    $('#ai-loading').remove();
+
+                    $('#ai-chat-messages').append(`
+                        <div class="ai-message">
+                            ${data.response}
+                        </div>
+                    `);
+
+                    scrollChatToBottom();
+                },
+
+                error: function (xhr) {
+
+                    $('#ai-loading').remove();
+
+                    $('#ai-chat-messages').append(`
+                        <div class="ai-message">
+                            Sorry, something went wrong. Please try again.
+                        </div>
+                    `);
+
+                    console.error(xhr);
+                    scrollChatToBottom();
+                }
+            });
+        }
+
+        function scrollChatToBottom() {
+            const messages = $('#ai-chat-messages');
+
+            messages.scrollTop(messages[0].scrollHeight);
+        }
+
+    });
+</script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
