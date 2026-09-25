@@ -8,16 +8,18 @@ namespace Inventory_Management_System.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
 
-        public AIService(ApplicationDbContext context, HttpClient httpClient)
+        public AIService(ApplicationDbContext context, HttpClient httpClient, IConfiguration configuration)
         {
             _context = context;
             _httpClient = httpClient;
+            _configuration = configuration;
         }
 
         public async Task<string> AskAsync(string userQuery)
         {
-            var apiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY");
+            var apiKey = _configuration["Groq:ApiKey"];
 
             if (string.IsNullOrWhiteSpace(apiKey))
             {
