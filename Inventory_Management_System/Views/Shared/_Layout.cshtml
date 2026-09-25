@@ -39,7 +39,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-boxes"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">IMS Admin</div>
+                <div class="sidebar-brand-text mx-3">IMS Portal</div>
             </a>
 
             <hr class="sidebar-divider my-0" />
@@ -54,13 +54,24 @@
 
             <hr class="sidebar-divider" />
 
-            <div class="sidebar-heading">Management</div>
+            <!-- Section 1: INVENTORY CORE -->
+            <div class="sidebar-heading">INVENTORY CORE</div>
 
+            <!-- Products Sub-menu -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Products" asp-action="Index">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProducts"
+                   aria-expanded="true" aria-controls="collapseProducts">
                     <i class="fas fa-fw fa-box"></i>
                     <span>Products</span>
                 </a>
+                <div id="collapseProducts" class="collapse" data-parent="#accordionSidebar">
+                    <a class="nav-link pl-5 py-2" asp-controller="Products" asp-action="Index">
+                        <span>All Products</span>
+                    </a>
+                    <a class="nav-link pl-5 py-2" asp-controller="Products" asp-action="Create">
+                        <span>Add Product</span>
+                    </a>
+                </div>
             </li>
 
             <li class="nav-item">
@@ -78,21 +89,59 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Purchases" asp-action="Index">
-                    <i class="fas fa-fw fa-shopping-bag"></i>
-                    <span>Purchases</span>
+                <a class="nav-link" asp-controller="SupplierProducts" asp-action="Index">
+                    <i class="fas fa-fw fa-handshake"></i>
+                    <span>Supplier Mappings</span>
                 </a>
             </li>
 
+            <hr class="sidebar-divider" />
+
+            <!-- Section 2: TRANSACTIONS -->
+            <div class="sidebar-heading">TRANSACTIONS</div>
+
+            <!-- Transactions Sub-menu -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Sales" asp-action="Index">
-                    <i class="fas fa-fw fa-shopping-cart"></i>
-                    <span>Sales</span>
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTransactions"
+                   aria-expanded="true" aria-controls="collapseTransactions">
+                    <i class="fas fa-fw fa-exchange-alt"></i>
+                    <span>Transactions</span>
                 </a>
+                <div id="collapseTransactions" class="collapse" data-parent="#accordionSidebar">
+                    <a class="nav-link pl-5 py-2" asp-controller="Purchases" asp-action="Index">
+                        <span>Purchases</span>
+                    </a>
+                    <a class="nav-link pl-5 py-2" asp-controller="Sales" asp-action="Index">
+                        <span>Sales</span>
+                    </a>
+                </div>
+            </li>
+
+            <hr class="sidebar-divider" />
+
+            <!-- Section 3: MANAGEMENT -->
+            <div class="sidebar-heading">MANAGEMENT</div>
+
+            <!-- Reports Sub-menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReports"
+                   aria-expanded="true" aria-controls="collapseReports">
+                    <i class="fas fa-fw fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+                <div id="collapseReports" class="collapse" data-parent="#accordionSidebar">
+                    <a class="nav-link pl-5 py-2" asp-controller="Reports" asp-action="Index">
+                        <span>Inventory Summary</span>
+                    </a>
+                    <a class="nav-link pl-5 py-2" asp-controller="Reports" asp-action="Sales">
+                        <span>Sales Report</span>
+                    </a>
+                </div>
             </li>
 
             <hr class="sidebar-divider d-none d-md-block" />
 
+            <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
