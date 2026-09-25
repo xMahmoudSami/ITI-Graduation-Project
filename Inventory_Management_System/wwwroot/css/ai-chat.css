@@ -1,0 +1,117 @@
+﻿#ai-chat-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    background: #4e73df;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+#ai-chat-window {
+    display: none;
+    position: fixed;
+    bottom: 95px;
+    right: 25px;
+    width: 350px;
+    height: 450px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+    overflow: hidden;
+}
+
+#ai-chat-header {
+    height: 55px;
+    background: #4e73df;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    font-weight: bold;
+}
+
+#ai-chat-close {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+#ai-chat-messages {
+    height: 335px;
+    padding: 15px;
+    overflow-y: auto;
+    background: #f8f9fc;
+}
+
+.ai-message,
+.user-message {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    max-width: 85%;
+    word-wrap: break-word;
+}
+
+.ai-message {
+    background: #e9ecef;
+    color: #333;
+    margin-right: auto;
+}
+
+.user-message {
+    background: #4e73df;
+    color: white;
+    margin-left: auto;
+}
+
+#ai-chat-input-area {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-top: 1px solid #ddd;
+    background: white;
+}
+
+#ai-chat-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 8px 12px;
+    outline: none;
+}
+
+#ai-chat-send {
+    width: 40px;
+    height: 40px;
+    margin-left: 8px;
+    border: none;
+    border-radius: 50%;
+    background: #4e73df;
+    color: white;
+    cursor: pointer;
+}
+
+@media (max-width: 576px) {
+    #ai-chat-window {
+        right: 10px;
+        bottom: 85px;
+        width: calc(100% - 20px);
+    }
+
+    #ai-chat-button {
+        right: 15px;
+        bottom: 15px;
+    }
+}

@@ -10,6 +10,7 @@ builder.Services.AddScoped<Inventory_Management_System.Services.ICategoryService
 builder.Services.AddScoped<Inventory_Management_System.Services.IProductService, Inventory_Management_System.Services.ProductService>();
 builder.Services.AddScoped<Inventory_Management_System.Services.ISupplierService, Inventory_Management_System.Services.SupplierService>();
 builder.Services.AddScoped<Inventory_Management_System.Services.ISupplierProductService, Inventory_Management_System.Services.SupplierProductService>();
+builder.Services.AddHttpClient<Inventory_Management_System.Services.IAIService, Inventory_Management_System.Services.AIService>();
 
 var app = builder.Build();
 
