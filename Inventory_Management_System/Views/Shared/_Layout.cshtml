@@ -255,6 +255,47 @@
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
+<!-- AI Chatbot -->
+<div id="ai-chatbot">
+
+    <button id="ai-chat-button" type="button">
+        <i class="fas fa-robot"></i>
+    </button>
+
+    <div id="ai-chat-window">
+
+        <div id="ai-chat-header">
+            <span>
+                <i class="fas fa-robot mr-2"></i>
+                AI Inventory Assistant
+            </span>
+
+            <button id="ai-chat-close" type="button">
+                &times;
+            </button>
+        </div>
+
+        <div id="ai-chat-messages">
+            <div class="ai-message">
+                Hello! I'm your inventory assistant. How can I help you?
+            </div>
+        </div>
+
+        <div id="ai-chat-input-area">
+            <input
+                type="text"
+                id="ai-chat-input"
+                placeholder="Ask about your inventory..."
+                autocomplete="off" />
+
+            <button id="ai-chat-send" type="button">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+
+    </div>
+
+</div>
 
     <!-- Scripts -->
     <script src="~/vendor/jquery/jquery.min.js"></script>
