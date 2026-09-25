@@ -4,10 +4,18 @@
         .Where(p => p.StockQuantity <= p.LowStockThreshold)
         .OrderBy(p => p.StockQuantity)
         .Take(5)
-        .Select(p => new { p.ProductID, p.ProductName, p.StockQuantity, p.LowStockThreshold, p.SKU })
+        .Select(p => new
+        {
+            p.ProductID,
+            p.ProductName,
+            p.StockQuantity,
+            p.LowStockThreshold,
+            p.SKU
+        })
         .ToList();
 
-    var lowStockCount = _context.Products.Count(p => p.StockQuantity <= p.LowStockThreshold);
+    var lowStockCount = _context.Products
+        .Count(p => p.StockQuantity <= p.LowStockThreshold);
 }
 
 <!DOCTYPE html>
@@ -36,18 +44,22 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-controller="Dashboard" asp-action="Analytics">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center"
+               asp-controller="Dashboard"
+               asp-action="Analytics">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-boxes"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">IMS Admin</div>
+                <div class="sidebar-brand-text mx-3">IMS Portal</div>
             </a>
 
             <hr class="sidebar-divider my-0" />
 
-            <!-- Nav Item - Dashboard -->
+            <!-- Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Dashboard" asp-action="Analytics">
+                <a class="nav-link"
+                   asp-controller="Dashboard"
+                   asp-action="Analytics">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
@@ -55,51 +67,150 @@
 
             <hr class="sidebar-divider" />
 
-            <div class="sidebar-heading">Management</div>
+            <!-- INVENTORY CORE -->
+            <div class="sidebar-heading">INVENTORY CORE</div>
 
+            <!-- Products -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Products" asp-action="Index">
+                <a class="nav-link collapsed"
+                   href="#"
+                   data-toggle="collapse"
+                   data-target="#collapseProducts"
+                   aria-expanded="true"
+                   aria-controls="collapseProducts">
                     <i class="fas fa-fw fa-box"></i>
                     <span>Products</span>
                 </a>
+
+                <div id="collapseProducts"
+                     class="collapse"
+                     data-parent="#accordionSidebar">
+
+                    <a class="nav-link pl-5 py-2"
+                       asp-controller="Products"
+                       asp-action="Index">
+                        <span>All Products</span>
+                    </a>
+
+                    <a class="nav-link pl-5 py-2"
+                       asp-controller="Products"
+                       asp-action="Create">
+                        <span>Add Product</span>
+                    </a>
+                </div>
             </li>
 
+            <!-- Categories -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Categories" asp-action="Index">
+                <a class="nav-link"
+                   asp-controller="Categories"
+                   asp-action="Index">
                     <i class="fas fa-fw fa-tags"></i>
                     <span>Categories</span>
                 </a>
             </li>
 
+            <!-- Suppliers -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Suppliers" asp-action="Index">
+                <a class="nav-link"
+                   asp-controller="Suppliers"
+                   asp-action="Index">
                     <i class="fas fa-fw fa-truck"></i>
                     <span>Suppliers</span>
                 </a>
             </li>
 
+            <!-- Supplier Mappings -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Purchases" asp-action="Index">
-                    <i class="fas fa-fw fa-shopping-bag"></i>
-                    <span>Purchases</span>
+                <a class="nav-link"
+                   asp-controller="SupplierProducts"
+                   asp-action="Index">
+                    <i class="fas fa-fw fa-handshake"></i>
+                    <span>Supplier Mappings</span>
                 </a>
             </li>
 
+            <hr class="sidebar-divider" />
+
+            <!-- TRANSACTIONS -->
+            <div class="sidebar-heading">TRANSACTIONS</div>
+
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Sales" asp-action="Index">
-                    <i class="fas fa-fw fa-shopping-cart"></i>
-                    <span>Sales</span>
+                <a class="nav-link collapsed"
+                   href="#"
+                   data-toggle="collapse"
+                   data-target="#collapseTransactions"
+                   aria-expanded="true"
+                   aria-controls="collapseTransactions">
+                    <i class="fas fa-fw fa-exchange-alt"></i>
+                    <span>Transactions</span>
                 </a>
+
+                <div id="collapseTransactions"
+                     class="collapse"
+                     data-parent="#accordionSidebar">
+
+                    <a class="nav-link pl-5 py-2"
+                       asp-controller="Purchases"
+                       asp-action="Index">
+                        <span>Purchases</span>
+                    </a>
+
+                    <a class="nav-link pl-5 py-2"
+                       asp-controller="Sales"
+                       asp-action="Index">
+                        <span>Sales</span>
+                    </a>
+                </div>
+            </li>
+
+            <hr class="sidebar-divider" />
+
+            <!-- MANAGEMENT -->
+            <div class="sidebar-heading">MANAGEMENT</div>
+
+            <!-- Reports -->
+            <li class="nav-item">
+                <a class="nav-link collapsed"
+                   href="#"
+                   data-toggle="collapse"
+                   data-target="#collapseReports"
+                   aria-expanded="true"
+                   aria-controls="collapseReports">
+                    <i class="fas fa-fw fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+
+                <div id="collapseReports"
+                     class="collapse"
+                     data-parent="#accordionSidebar">
+
+                    <a class="nav-link pl-5 py-2"
+                       asp-controller="Reports"
+                       asp-action="Index">
+                        <span>Inventory Summary</span>
+                    </a>
+
+                    <a class="nav-link pl-5 py-2"
+                       asp-controller="Reports"
+                       asp-action="Sales">
+                        <span>Sales Report</span>
+                    </a>
+                </div>
             </li>
 
             <hr class="sidebar-divider d-none d-md-block" />
 
+            <!-- Sidebar Toggler -->
             <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+                <button class="rounded-circle border-0"
+                        id="sidebarToggle">
+                </button>
             </div>
 
         </ul>
         <!-- End of Sidebar -->
+
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
@@ -109,79 +220,150 @@
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <button id="sidebarToggleTop"
+                            class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
 
-                    <!-- Topbar Search -->
+                    <!-- Global Search -->
                     <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search position-relative">
+
                         <div class="input-group">
-                            <input type="text" id="globalSearchInput" class="form-control bg-light border-0 small" placeholder="Search products, categories..." aria-label="Search" autocomplete="off">
+
+                            <input type="text"
+                                   id="globalSearchInput"
+                                   class="form-control bg-light border-0 small"
+                                   placeholder="Search products, categories..."
+                                   aria-label="Search"
+                                   autocomplete="off">
+
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
+                                <button class="btn btn-primary"
+                                        type="button">
                                     <i class="fas fa-search fa-sm"></i>
                                 </button>
                             </div>
+
                         </div>
-                        <div id="searchResultsDropdown" class="dropdown-menu shadow animated--grow-in w-100 mt-1" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000;"></div>
+
+                        <div id="searchResultsDropdown"
+                             class="dropdown-menu shadow animated--grow-in w-100 mt-1"
+                             style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000;">
+                        </div>
+
                     </form>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
-                        <!-- Nav Item - Alerts -->
+                        <!-- Alerts -->
                         <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="alertsDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+
                                 <i class="fas fa-bell fa-fw"></i>
+
                                 @if (lowStockCount > 0)
                                 {
-                                    <span class="badge badge-danger badge-counter">@lowStockCount</span>
+                                    <span class="badge badge-danger badge-counter">
+                                        @lowStockCount
+                                    </span>
                                 }
+
                             </a>
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="alertsDropdown">
+
                                 <h6 class="dropdown-header bg-danger border-danger">
                                     Low Stock Alerts
                                 </h6>
+
                                 @if (lowStockProducts.Any())
                                 {
                                     foreach (var item in lowStockProducts)
                                     {
-                                        <a class="dropdown-item d-flex align-items-center" asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductID">
+                                        <a class="dropdown-item d-flex align-items-center"
+                                           asp-controller="Products"
+                                           asp-action="Details"
+                                           asp-route-id="@item.ProductID">
+
                                             <div class="mr-3">
                                                 <div class="icon-circle bg-warning text-white">
                                                     <i class="fas fa-exclamation-triangle"></i>
                                                 </div>
                                             </div>
+
                                             <div>
-                                                <div class="small text-gray-500">SKU: @item.SKU</div>
-                                                <span class="font-weight-bold">@item.ProductName</span>
-                                                <div class="small text-danger">Stock: @item.StockQuantity (Threshold: @item.LowStockThreshold)</div>
+                                                <div class="small text-gray-500">
+                                                    SKU: @item.SKU
+                                                </div>
+
+                                                <span class="font-weight-bold">
+                                                    @item.ProductName
+                                                </span>
+
+                                                <div class="small text-danger">
+                                                    Stock: @item.StockQuantity
+                                                    (Threshold: @item.LowStockThreshold)
+                                                </div>
                                             </div>
+
                                         </a>
                                     }
-                                    <a class="dropdown-item text-center small text-gray-500" asp-controller="Dashboard" asp-action="Analytics">Show All Alerts</a>
+
+                                    <a class="dropdown-item text-center small text-gray-500"
+                                       asp-controller="Dashboard"
+                                       asp-action="Analytics">
+                                        Show All Alerts
+                                    </a>
                                 }
                                 else
                                 {
-                                    <span class="dropdown-item text-center small text-gray-500">No low stock items</span>
+                                    <span class="dropdown-item text-center small text-gray-500">
+                                        No low stock items
+                                    </span>
                                 }
+
                             </div>
+
                         </li>
 
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- User Info -->
                         <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">System Administrator</span>
-                                <img class="img-profile rounded-circle" src="~/img/undraw_profile.svg" />
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="userDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    System Administrator
+                                </span>
+
+                                <img class="img-profile rounded-circle"
+                                     src="~/img/undraw_profile.svg" />
+
                             </a>
+
                         </li>
 
                     </ul>
 
                 </nav>
                 <!-- End of Topbar -->
+
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     @RenderBody()
@@ -189,13 +371,20 @@
 
             </div>
             <!-- End of Main Content -->
+
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
+
                 <div class="container my-auto">
+
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Inventory Management System @DateTime.Now.Year</span>
+                        <span>
+                            Copyright &copy; Inventory Management System @DateTime.Now.Year
+                        </span>
                     </div>
+
                 </div>
+
             </footer>
 
         </div>
@@ -204,237 +393,311 @@
     </div>
     <!-- End of Page Wrapper -->
 
-    <a class="scroll-to-top rounded" href="#page-top">
+    <!-- Scroll to Top -->
+    <a class="scroll-to-top rounded"
+       href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
+
     <!-- AI Chatbot -->
     <div id="ai-chatbot">
 
-        <button id="ai-chat-button" type="button">
+        <button id="ai-chat-button"
+                type="button">
             <i class="fas fa-robot"></i>
         </button>
 
         <div id="ai-chat-window">
 
             <div id="ai-chat-header">
+
                 <span>
                     <i class="fas fa-robot mr-2"></i>
                     AI Inventory Assistant
                 </span>
 
-                <button id="ai-chat-close" type="button">
+                <button id="ai-chat-close"
+                        type="button">
                     &times;
                 </button>
+
             </div>
 
             <div id="ai-chat-messages">
+
                 <div class="ai-message">
                     Hello! I'm your inventory assistant. How can I help you?
                 </div>
+
             </div>
 
             <div id="ai-chat-input-area">
+
                 <input type="text"
                        id="ai-chat-input"
                        placeholder="Ask about your inventory..."
                        autocomplete="off" />
 
-                <button id="ai-chat-send" type="button">
+                <button id="ai-chat-send"
+                        type="button">
                     <i class="fas fa-paper-plane"></i>
                 </button>
+
             </div>
 
         </div>
 
     </div>
+
     <!-- Scripts -->
     <script src="~/vendor/jquery/jquery.min.js"></script>
     <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="~/js/sb-admin-2.min.js"></script>
 
-    <!-- Global Search Script (Matches GlobalSearch Controller Response Format) -->
+    <!-- Global Search Script -->
     <script>
-            $(document).ready(function () {
-                let searchTimeout = null;
+        $(document).ready(function () {
 
-                $('#globalSearchInput').on('keyup input', function () {
-                    let term = $(this).val().trim();
-                    let dropdown = $('#searchResultsDropdown');
+            let searchTimeout = null;
 
-                    clearTimeout(searchTimeout);
+            $('#globalSearchInput').on('keyup input', function () {
 
-                    if (term.length < 1) {
-                        dropdown.hide().empty();
-                        return;
-                    }
+                let term = $(this).val().trim();
+                let dropdown = $('#searchResultsDropdown');
 
-                    searchTimeout = setTimeout(function () {
-                        $.ajax({
-                            url: '/Dashboard/GlobalSearch',
-                            type: 'GET',
-                            data: { term: term },
-                            success: function (data) {
-                                dropdown.empty();
-                                let hasResults = false;
+                clearTimeout(searchTimeout);
 
-                                if (data.products && data.products.length > 0) {
-                                    hasResults = true;
-                                    dropdown.append('<h6 class="dropdown-header">Products</h6>');
-                                    $.each(data.products, function (i, item) {
-                                        dropdown.append(`
-                                                    <a class="dropdown-item py-1" href="/Products/Details/${item.productID}">
-                                                        <div class="font-weight-bold text-dark">${item.productName}</div>
-                                                        <div class="small text-gray-500">SKU: ${item.sku}</div>
-                                                    </a>
-                                                `);
-                                    });
-                                }
+                if (term.length < 1) {
+                    dropdown.hide().empty();
+                    return;
+                }
 
-                                if (data.categories && data.categories.length > 0) {
-                                    hasResults = true;
-                                    dropdown.append('<h6 class="dropdown-header">Categories</h6>');
-                                    $.each(data.categories, function (i, item) {
-                                        dropdown.append(`
-                                                    <a class="dropdown-item py-1" href="/Categories/Details/${item.categoryID}">
-                                                        <div class="font-weight-bold text-dark">${item.categoryName}</div>
-                                                    </a>
-                                                `);
-                                    });
-                                }
+                searchTimeout = setTimeout(function () {
 
-                                if (data.suppliers && data.suppliers.length > 0) {
-                                    hasResults = true;
-                                    dropdown.append('<h6 class="dropdown-header">Suppliers</h6>');
-                                    $.each(data.suppliers, function (i, item) {
-                                        dropdown.append(`
-                                                    <a class="dropdown-item py-1" href="/Suppliers/Details/${item.supplierID}">
-                                                        <div class="font-weight-bold text-dark">${item.supplierName}</div>
-                                                    </a>
-                                                `);
-                                    });
-                                }
-
-                                if (hasResults) {
-                                    dropdown.show();
-                                } else {
-                                    dropdown.append('<div class="dropdown-item small text-gray-500 p-2 text-center">No results found</div>');
-                                    dropdown.show();
-                                }
-                            },
-                            error: function () {
-                                dropdown.hide().empty();
-                            }
-                        });
-                    }, 300);
-                });
-
-                $(document).on('click', function (e) {
-                    if (!$(e.target).closest('.navbar-search').length) {
-                        $('#searchResultsDropdown').hide();
-                    }
-                });
-            });
-    </script>
-    <script>
-            $(document).ready(function () {
-
-                // Open / close chatbot
-                $('#ai-chat-button').click(function () {
-                    $('#ai-chat-window').toggle();
-                });
-
-                $('#ai-chat-close').click(function () {
-                    $('#ai-chat-window').hide();
-                });
-
-                // Send message
-                $('#ai-chat-send').click(function () {
-                    sendAIMessage();
-                });
-
-                // Send with Enter
-                $('#ai-chat-input').keypress(function (e) {
-                    if (e.which === 13) {
-                        sendAIMessage();
-                    }
-                });
-
-                function sendAIMessage() {
-
-                    const input = $('#ai-chat-input');
-                    const message = input.val().trim();
-
-                    if (!message) {
-                        return;
-                    }
-
-                    // Show user message
-                    $('#ai-chat-messages').append(`
-                        <div class="user-message">
-                            ${message}
-                        </div>
-                    `);
-
-                    input.val('');
-
-                    // Temporary loading message
-                    const loadingMessage = $(`
-                        <div class="ai-message" id="ai-loading">
-                            Thinking...
-                        </div>
-                    `);
-
-                    $('#ai-chat-messages').append(loadingMessage);
-
-                    scrollChatToBottom();
-
-                    // Call our C# API
                     $.ajax({
-                        url: '/api/AI/chat',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            message: message
-                        }),
+                        url: '/Dashboard/GlobalSearch',
+                        type: 'GET',
+                        data: { term: term },
 
                         success: function (data) {
 
-                            $('#ai-loading').remove();
+                            dropdown.empty();
 
-                            $('#ai-chat-messages').append(`
-                                <div class="ai-message">
-                                    ${data.response}
-                                </div>
-                            `);
+                            let hasResults = false;
 
-                            scrollChatToBottom();
+                            if (data.products && data.products.length > 0) {
+
+                                hasResults = true;
+
+                                dropdown.append(
+                                    '<h6 class="dropdown-header">Products</h6>'
+                                );
+
+                                $.each(data.products, function (i, item) {
+
+                                    dropdown.append(`
+                                        <a class="dropdown-item py-1"
+                                           href="/Products/Details/${item.productID}">
+                                            <div class="font-weight-bold text-dark">
+                                                ${item.productName}
+                                            </div>
+                                            <div class="small text-gray-500">
+                                                SKU: ${item.sku}
+                                            </div>
+                                        </a>
+                                    `);
+
+                                });
+                            }
+
+                            if (data.categories && data.categories.length > 0) {
+
+                                hasResults = true;
+
+                                dropdown.append(
+                                    '<h6 class="dropdown-header">Categories</h6>'
+                                );
+
+                                $.each(data.categories, function (i, item) {
+
+                                    dropdown.append(`
+                                        <a class="dropdown-item py-1"
+                                           href="/Categories/Details/${item.categoryID}">
+                                            <div class="font-weight-bold text-dark">
+                                                ${item.categoryName}
+                                            </div>
+                                        </a>
+                                    `);
+
+                                });
+                            }
+
+                            if (data.suppliers && data.suppliers.length > 0) {
+
+                                hasResults = true;
+
+                                dropdown.append(
+                                    '<h6 class="dropdown-header">Suppliers</h6>'
+                                );
+
+                                $.each(data.suppliers, function (i, item) {
+
+                                    dropdown.append(`
+                                        <a class="dropdown-item py-1"
+                                           href="/Suppliers/Details/${item.supplierID}">
+                                            <div class="font-weight-bold text-dark">
+                                                ${item.supplierName}
+                                            </div>
+                                        </a>
+                                    `);
+
+                                });
+                            }
+
+                            if (hasResults) {
+                                dropdown.show();
+                            }
+                            else {
+                                dropdown.append(
+                                    '<div class="dropdown-item small text-gray-500 p-2 text-center">No results found</div>'
+                                );
+
+                                dropdown.show();
+                            }
                         },
 
-                        error: function (xhr) {
-
-                            $('#ai-loading').remove();
-
-                            $('#ai-chat-messages').append(`
-                                <div class="ai-message">
-                                    Sorry, something went wrong. Please try again.
-                                </div>
-                            `);
-
-                            console.error(xhr);
-                            scrollChatToBottom();
+                        error: function () {
+                            dropdown.hide().empty();
                         }
                     });
-                }
 
-                function scrollChatToBottom() {
-                    const messages = $('#ai-chat-messages');
+                }, 300);
 
-                    messages.scrollTop(messages[0].scrollHeight);
+            });
+
+            $(document).on('click', function (e) {
+
+                if (!$(e.target).closest('.navbar-search').length) {
+                    $('#searchResultsDropdown').hide();
                 }
 
             });
+
+        });
     </script>
+
+    <!-- AI Chatbot Script -->
+    <script>
+        $(document).ready(function () {
+
+            // Open / close chatbot
+            $('#ai-chat-button').click(function () {
+                $('#ai-chat-window').toggle();
+            });
+
+            $('#ai-chat-close').click(function () {
+                $('#ai-chat-window').hide();
+            });
+
+            // Send message
+            $('#ai-chat-send').click(function () {
+                sendAIMessage();
+            });
+
+            // Send with Enter
+            $('#ai-chat-input').keypress(function (e) {
+
+                if (e.which === 13) {
+                    sendAIMessage();
+                }
+
+            });
+
+            function sendAIMessage() {
+
+                const input = $('#ai-chat-input');
+                const message = input.val().trim();
+
+                if (!message) {
+                    return;
+                }
+
+                // Show user message
+                $('#ai-chat-messages').append(`
+                    <div class="user-message">
+                        ${message}
+                    </div>
+                `);
+
+                input.val('');
+
+                // Loading message
+                const loadingMessage = $(`
+                    <div class="ai-message" id="ai-loading">
+                        Thinking...
+                    </div>
+                `);
+
+                $('#ai-chat-messages').append(loadingMessage);
+
+                scrollChatToBottom();
+
+                // Call C# API
+                $.ajax({
+
+                    url: '/api/AI/chat',
+                    type: 'POST',
+                    contentType: 'application/json',
+
+                    data: JSON.stringify({
+                        message: message
+                    }),
+
+                    success: function (data) {
+
+                        $('#ai-loading').remove();
+
+                        $('#ai-chat-messages').append(`
+                            <div class="ai-message">
+                                ${data.response}
+                            </div>
+                        `);
+
+                        scrollChatToBottom();
+                    },
+
+                    error: function (xhr) {
+
+                        $('#ai-loading').remove();
+
+                        $('#ai-chat-messages').append(`
+                            <div class="ai-message">
+                                Sorry, something went wrong. Please try again.
+                            </div>
+                        `);
+
+                        console.error(xhr);
+
+                        scrollChatToBottom();
+                    }
+
+                });
+            }
+
+            function scrollChatToBottom() {
+
+                const messages = $('#ai-chat-messages');
+
+                messages.scrollTop(
+                    messages[0].scrollHeight
+                );
+            }
+
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
