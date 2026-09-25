@@ -1,4 +1,4 @@
-namespace Inventory_Management_System.Services
+﻿namespace Inventory_Management_System.Services
 {
     public interface IAIService
     {
