@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using Inventory_Management_System.Models;
 
@@ -9,9 +9,7 @@ namespace Inventory_Management_System.Services
         private readonly ApplicationDbContext _context;
         private readonly HttpClient _httpClient;
 
-        public AIService(
-            ApplicationDbContext context,
-            HttpClient httpClient)
+        public AIService(ApplicationDbContext context, HttpClient httpClient)
         {
             _context = context;
             _httpClient = httpClient;
@@ -19,7 +17,13 @@ namespace Inventory_Management_System.Services
 
         public async Task<string> AskAsync(string userQuery)
         {
-            // Get inventory data
+            var apiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY");
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                return "Groq API key is not configured.";
+            }
+
             var products = _context.Products
                 .Select(p => new
                 {
@@ -32,7 +36,7 @@ namespace Inventory_Management_System.Services
 
             var inventoryData = JsonSerializer.Serialize(products);
 
-            var prompt = $"""
+            var systemPrompt = $"""
                 You are an inventory management assistant.
 
                 Answer the user's question using ONLY the inventory data provided below.
@@ -44,42 +48,62 @@ namespace Inventory_Management_System.Services
 
                 Inventory Data:
                 {inventoryData}
-
-                User Question:
-                {userQuery}
-
-                Give a short, clear and helpful answer.
                 """;
 
             var requestBody = new
             {
-                model = "llama3.2:3b",
-                prompt = prompt,
+                model = "openai/gpt-oss-20b",
+                messages = new[]
+                {
+                    new
+                    {
+                        role = "system",
+                        content = systemPrompt
+                    },
+                    new
+                    {
+                        role = "user",
+                        content = userQuery
+                    }
+                },
+                temperature = 0.2,
+                max_completion_tokens = 500,
                 stream = false
             };
 
             var json = JsonSerializer.Serialize(requestBody);
 
-            var content = new StringContent(
+            using var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "https://api.groq.com/openai/v1/chat/completions");
+
+            request.Headers.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue(
+                    "Bearer",
+                    apiKey);
+
+            request.Content = new StringContent(
                 json,
                 Encoding.UTF8,
                 "application/json");
 
-            var response = await _httpClient.PostAsync(
-                "http://localhost:11434/api/generate",
-                content);
-
-            response.EnsureSuccessStatusCode();
+            var response = await _httpClient.SendAsync(request);
 
             var responseJson = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return $"Groq API error: {response.StatusCode}";
+            }
 
             using var document = JsonDocument.Parse(responseJson);
 
             var aiResponse = document.RootElement
-                .GetProperty("response")
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
                 .GetString();
 
-            // Save chat log
             var chatLog = new AIChatLog
             {
                 UserQuery = userQuery,
