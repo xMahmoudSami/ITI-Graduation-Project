@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Inventory_Management_System.Models.Purchase>
+
+@{
+    ViewData["Title"] = "Purchases";
+}
+
+<h1>Purchases</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        Add Purchase
+    </a>
+</p>
+
+<table class="table table-bordered table-striped">
+
+    <thead>
+        <tr>
+            <th>Purchase ID</th>
+            <th>Supplier</th>
+            <th>Date</th>
+            <th>Total Amount</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var purchase in Model)
+        {
+            <tr>
+
+                <td>
+                    @purchase.PurchaseID
+                </td>
+
+                <td>
+                    @purchase.Supplier?.SupplierName
+                </td>
+
+                <td>
+                    @purchase.PurchaseDate.ToShortDateString()
+                </td>
+
+                <td>
+                    @purchase.TotalAmount.ToString("0.00")
+                </td>
+
+                <td>
+
+                                       <a asp-action="Details"
+                       asp-route-id="@purchase.PurchaseID"
+                       class="btn btn-info">
+                        Details
+                    </a>
+                    
+    <a asp-action="Edit"
+       asp-route-id="@purchase.PurchaseID"
+       class="btn btn-warning">
+        Edit
+    </a>
+
+                    <form asp-action="Delete"
+                          asp-route-id="@purchase.PurchaseID"
+                          method="post"
+                          style="display:inline;">
+
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit"
+                                class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to delete this purchase?');">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>

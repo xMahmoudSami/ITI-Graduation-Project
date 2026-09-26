@@ -1,0 +1,237 @@
+﻿@model Inventory_Management_System.ViewModels.PurchaseViewModel
+
+@{
+    ViewData["Title"] = "Edit Purchase";
+}
+
+<h1>Edit Purchase</h1>
+
+<form asp-action="Edit" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="SupplierID" class="form-label">
+            Supplier
+        </label>
+
+        <select asp-for="SupplierID"
+                class="form-control"
+                asp-items="@(new SelectList(ViewBag.Suppliers, "SupplierID", "SupplierName"))">
+
+            <option value="">-- Select Supplier --</option>
+
+        </select>
+
+        <span asp-validation-for="SupplierID"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PurchaseDate"
+               class="form-label">
+            Purchase Date
+        </label>
+
+        <input asp-for="PurchaseDate"
+               type="date"
+               class="form-control" />
+
+        <span asp-validation-for="PurchaseDate"
+              class="text-danger"></span>
+    </div>
+
+    <h3>Products</h3>
+
+    <div id="items">
+
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            <div class="item-row mb-3">
+
+                <div class="row">
+
+                    <div class="col-md-4">
+
+                        <label>Product</label>
+
+                        <select name="Items[@i].ProductID"
+                                class="form-control">
+
+                            @foreach (var product in ViewBag.Products)
+                            {
+                                if (product.ProductID == Model.Items[i].ProductID)
+                                {
+                                    <option value="@product.ProductID"
+                                            selected>
+                                        @product.ProductName
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@product.ProductID">
+                                        @product.ProductName
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label>Quantity</label>
+
+                        <input name="Items[@i].Quantity"
+                               value="@Model.Items[i].Quantity"
+                               type="number"
+                               min="1"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label>Unit Cost</label>
+
+                        <input name="Items[@i].UnitCost"
+                               value="@Model.Items[i].UnitCost"
+                               type="number"
+                               step="0.01"
+                               min="0.01"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button type="button"
+                                class="btn btn-danger"
+                                onclick="removeItem(this)">
+                            Remove
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+    <button type="button"
+            class="btn btn-primary mb-3"
+            onclick="addItem()">
+        + Add Product
+    </button>
+
+    <br />
+
+    <button type="submit"
+            class="btn btn-success">
+        Save Changes
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Back
+    </a>
+
+</form>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        let itemIndex = @Model.Items.Count;
+
+        function addItem() {
+
+            let items = document.getElementById("items");
+
+            let newItem = document.createElement("div");
+
+            newItem.className = "item-row mb-3";
+
+            newItem.innerHTML = `
+                <div class="row">
+
+                    <div class="col-md-4">
+
+                        <label>Product</label>
+
+                        <select name="Items[${itemIndex}].ProductID"
+                                class="form-control">
+
+                            <option value="">-- Select Product --</option>
+
+                            @foreach (var product in ViewBag.Products)
+                            {
+                                <option value="@product.ProductID">
+                                    @product.ProductName
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label>Quantity</label>
+
+                        <input name="Items[${itemIndex}].Quantity"
+                               type="number"
+                               min="1"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label>Unit Cost</label>
+
+                        <input name="Items[${itemIndex}].UnitCost"
+                               type="number"
+                               step="0.01"
+                               min="0.01"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button type="button"
+                                class="btn btn-danger"
+                                onclick="removeItem(this)">
+                            Remove
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+            items.appendChild(newItem);
+
+            itemIndex++;
+        }
+
+        function removeItem(button) {
+
+            let row = button.closest(".item-row");
+
+            row.remove();
+
+        }
+
+    </script>
+}
