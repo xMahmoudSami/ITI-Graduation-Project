@@ -32,23 +32,25 @@
     int end = Math.Min(total, current + window);
 }
 
-<div class="row align-items-center mt-3 pt-3 border-top">
-    <!-- Showing info & Page Size Selector -->
-    <div class="col-sm-12 col-md-5 d-flex align-items-center mb-3 mb-md-0">
-        <span class="text-muted mr-3">
+<div class="pagination-footer-wrapper d-flex flex-column flex-md-row align-items-center justify-content-between mt-3 pt-3 border-top">
+    <!-- Showing info & Page Size Selector (Inline together, perfectly aligned) -->
+    <div class="pagination-info-group d-flex align-items-center flex-wrap mb-3 mb-md-0">
+        <span class="pagination-entries-text text-muted mr-3">
             @if (Model.TotalItems == 0)
             {
-                <text>Showing 0 of 0 entries</text>
+                <text>Showing <span class="text-white font-weight-bold">0</span> of <span class="text-white font-weight-bold">0</span> entries</text>
             }
             else
             {
-                <text>Showing <strong>@Model.StartItemIndex</strong>–<strong>@Model.EndItemIndex</strong> of <strong>@Model.TotalItems</strong> entries</text>
+                <text>Showing <span class="text-white font-weight-bold">@Model.StartItemIndex</span>–<span class="text-white font-weight-bold">@Model.EndItemIndex</span> of <span class="text-white font-weight-bold">@Model.TotalItems</span> entries</text>
             }
         </span>
 
-        <div class="d-inline-flex align-items-center">
-            <label for="pageSizeSelect" class="small text-muted mb-0 mr-1">Show:</label>
-            <select id="pageSizeSelect" class="custom-select custom-select-sm form-control form-control-sm" style="width: auto;" onchange="window.location.href=this.value;">
+        <span class="pagination-divider mx-2 text-muted d-none d-sm-inline" style="opacity: 0.35;">|</span>
+
+        <div class="pagination-pagesize-group d-inline-flex align-items-center ml-sm-2">
+            <label for="pageSizeSelect" class="small text-muted mb-0 mr-2">Show:</label>
+            <select id="pageSizeSelect" class="custom-select custom-select-sm form-control form-control-sm" style="width: auto; min-width: 68px;" onchange="window.location.href=this.value;">
                 <option value="@GetPageUrl(1, 10)" selected="@(Model.PageSize == 10)">10</option>
                 <option value="@GetPageUrl(1, 25)" selected="@(Model.PageSize == 25)">25</option>
                 <option value="@GetPageUrl(1, 50)" selected="@(Model.PageSize == 50)">50</option>
@@ -58,11 +60,11 @@
     </div>
 
     <!-- Pagination Navigation Buttons -->
-    <div class="col-sm-12 col-md-7">
+    <div class="pagination-nav-group">
         @if (Model.TotalPages > 1)
         {
             <nav aria-label="Page navigation">
-                <ul class="pagination pagination-sm justify-content-md-end mb-0">
+                <ul class="pagination pagination-sm justify-content-center justify-content-md-end mb-0">
                     <!-- First Page -->
                     <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
                         <a class="page-link" href="@(Model.HasPreviousPage ? GetPageUrl(1) : "#")" tabindex="@(!Model.HasPreviousPage ? "-1" : "0")" aria-label="First">
@@ -124,6 +126,22 @@
                         <a class="page-link" href="@(Model.HasNextPage ? GetPageUrl(total) : "#")" tabindex="@(!Model.HasNextPage ? "-1" : "0")" aria-label="Last">
                             <span aria-hidden="true">Last &raquo;&raquo;</span>
                         </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+        else if (Model.TotalItems > 0)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-center justify-content-md-end mb-0">
+                    <li class="page-item disabled">
+                        <span class="page-link">&laquo; Prev</span>
+                    </li>
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">1 <span class="sr-only">(current)</span></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Next &raquo;</span>
                     </li>
                 </ul>
             </nav>

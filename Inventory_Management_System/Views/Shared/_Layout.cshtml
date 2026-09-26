@@ -16,6 +16,38 @@
 
     var lowStockCount = _context.Products
         .Count(p => p.StockQuantity <= p.LowStockThreshold);
+
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString()
+        ?? ViewContext.ActionDescriptor.RouteValues["controller"]
+        ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString()
+        ?? ViewContext.ActionDescriptor.RouteValues["action"]
+        ?? "";
+    var currentPath = Context.Request.Path.Value?.TrimEnd('/') ?? "";
+
+    bool isDashboardActive = string.Equals(currentController, "Dashboard", StringComparison.OrdinalIgnoreCase)
+        || string.IsNullOrEmpty(currentPath)
+        || string.Equals(currentPath, "/dashboard", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(currentPath, "/dashboard/analytics", StringComparison.OrdinalIgnoreCase);
+
+    bool IsActive(string controller, string? action = null)
+    {
+        if (string.Equals(controller, "Dashboard", StringComparison.OrdinalIgnoreCase))
+            return isDashboardActive;
+
+        if (!string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase))
+            return false;
+        if (!string.IsNullOrEmpty(action))
+            return string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+        return true;
+    }
+
+    bool IsProductsListActive()
+    {
+        if (!string.Equals(currentController, "Products", StringComparison.OrdinalIgnoreCase))
+            return false;
+        return !string.Equals(currentAction, "Create", StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 <!DOCTYPE html>
@@ -33,6 +65,7 @@
     <!-- Custom styles -->
     <link href="~/css/sb-admin-2.min.css" rel="stylesheet" />
     <link href="~/css/ai-chat.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
 </head>
 
 <body id="page-top">
@@ -56,8 +89,8 @@
             <hr class="sidebar-divider my-0" />
 
             <!-- Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link"
+            <li class="nav-item @(IsActive("Dashboard") ? "active-page" : "")">
+                <a class="nav-link @(IsActive("Dashboard") ? "active-page" : "")"
                    asp-controller="Dashboard"
                    asp-action="Analytics">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -72,27 +105,28 @@
 
             <!-- Products -->
             <li class="nav-item">
-                <a class="nav-link collapsed"
+                <a class="nav-link @(IsActive("Products") ? "" : "collapsed")"
                    href="#"
                    data-toggle="collapse"
                    data-target="#collapseProducts"
-                   aria-expanded="true"
+                   aria-expanded="@(IsActive("Products") ? "true" : "false")"
                    aria-controls="collapseProducts">
                     <i class="fas fa-fw fa-box"></i>
                     <span>Products</span>
+                    <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
                 </a>
 
                 <div id="collapseProducts"
-                     class="collapse"
+                     class="collapse @(IsActive("Products") ? "show" : "")"
                      data-parent="#accordionSidebar">
 
-                    <a class="nav-link pl-5 py-2"
+                    <a class="nav-link pl-5 py-2 @(IsProductsListActive() ? "active-page" : "")"
                        asp-controller="Products"
                        asp-action="Index">
                         <span>All Products</span>
                     </a>
 
-                    <a class="nav-link pl-5 py-2"
+                    <a class="nav-link pl-5 py-2 @(IsActive("Products", "Create") ? "active-page" : "")"
                        asp-controller="Products"
                        asp-action="Create">
                         <span>Add Product</span>
@@ -101,8 +135,8 @@
             </li>
 
             <!-- Categories -->
-            <li class="nav-item">
-                <a class="nav-link"
+            <li class="nav-item @(IsActive("Categories") ? "active-page" : "")">
+                <a class="nav-link @(IsActive("Categories") ? "active-page" : "")"
                    asp-controller="Categories"
                    asp-action="Index">
                     <i class="fas fa-fw fa-tags"></i>
@@ -111,8 +145,8 @@
             </li>
 
             <!-- Suppliers -->
-            <li class="nav-item">
-                <a class="nav-link"
+            <li class="nav-item @(IsActive("Suppliers") ? "active-page" : "")">
+                <a class="nav-link @(IsActive("Suppliers") ? "active-page" : "")"
                    asp-controller="Suppliers"
                    asp-action="Index">
                     <i class="fas fa-fw fa-truck"></i>
@@ -121,8 +155,8 @@
             </li>
 
             <!-- Supplier Mappings -->
-            <li class="nav-item">
-                <a class="nav-link"
+            <li class="nav-item @(IsActive("SupplierProducts") ? "active-page" : "")">
+                <a class="nav-link @(IsActive("SupplierProducts") ? "active-page" : "")"
                    asp-controller="SupplierProducts"
                    asp-action="Index">
                     <i class="fas fa-fw fa-handshake"></i>
@@ -136,27 +170,28 @@
             <div class="sidebar-heading">TRANSACTIONS</div>
 
             <li class="nav-item">
-                <a class="nav-link collapsed"
+                <a class="nav-link @(IsActive("Purchases") || IsActive("Sales") ? "" : "collapsed")"
                    href="#"
                    data-toggle="collapse"
                    data-target="#collapseTransactions"
-                   aria-expanded="true"
+                   aria-expanded="@(IsActive("Purchases") || IsActive("Sales") ? "true" : "false")"
                    aria-controls="collapseTransactions">
                     <i class="fas fa-fw fa-exchange-alt"></i>
                     <span>Transactions</span>
+                    <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
                 </a>
 
                 <div id="collapseTransactions"
-                     class="collapse"
+                     class="collapse @(IsActive("Purchases") || IsActive("Sales") ? "show" : "")"
                      data-parent="#accordionSidebar">
 
-                    <a class="nav-link pl-5 py-2"
+                    <a class="nav-link pl-5 py-2 @(IsActive("Purchases") ? "active-page" : "")"
                        asp-controller="Purchases"
                        asp-action="Index">
                         <span>Purchases</span>
                     </a>
 
-                    <a class="nav-link pl-5 py-2"
+                    <a class="nav-link pl-5 py-2 @(IsActive("Sales") ? "active-page" : "")"
                        asp-controller="Sales"
                        asp-action="Index">
                         <span>Sales</span>
@@ -171,27 +206,28 @@
 
             <!-- Reports -->
             <li class="nav-item">
-                <a class="nav-link collapsed"
+                <a class="nav-link @(IsActive("Reports") ? "" : "collapsed")"
                    href="#"
                    data-toggle="collapse"
                    data-target="#collapseReports"
-                   aria-expanded="true"
+                   aria-expanded="@(IsActive("Reports") ? "true" : "false")"
                    aria-controls="collapseReports">
                     <i class="fas fa-fw fa-chart-line"></i>
                     <span>Reports</span>
+                    <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
                 </a>
 
                 <div id="collapseReports"
-                     class="collapse"
+                     class="collapse @(IsActive("Reports") ? "show" : "")"
                      data-parent="#accordionSidebar">
 
-                    <a class="nav-link pl-5 py-2"
+                    <a class="nav-link pl-5 py-2 @(IsActive("Reports", "Index") ? "active-page" : "")"
                        asp-controller="Reports"
                        asp-action="Index">
                         <span>Inventory Summary</span>
                     </a>
 
-                    <a class="nav-link pl-5 py-2"
+                    <a class="nav-link pl-5 py-2 @(IsActive("Reports", "Sales") ? "active-page" : "")"
                        asp-controller="Reports"
                        asp-action="Sales">
                         <span>Sales Report</span>
@@ -259,13 +295,14 @@
                         <!-- Alerts -->
                         <li class="nav-item dropdown no-arrow mx-1">
 
-                            <a class="nav-link dropdown-toggle"
+                            <a class="nav-link dropdown-toggle topbar-alerts-btn"
                                href="#"
                                id="alertsDropdown"
                                role="button"
                                data-toggle="dropdown"
                                aria-haspopup="true"
-                               aria-expanded="false">
+                               aria-expanded="false"
+                               title="Low Stock Alerts">
 
                                 <i class="fas fa-bell fa-fw"></i>
 
@@ -278,57 +315,99 @@
 
                             </a>
 
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow-lg alerts-dropdown-menu"
                                  aria-labelledby="alertsDropdown">
 
-                                <h6 class="dropdown-header bg-danger border-danger">
-                                    Low Stock Alerts
-                                </h6>
+                                <!-- Header -->
+                                <div class="alerts-dropdown-header d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <div class="alerts-header-icon mr-2">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <span class="alerts-header-title">Low Stock Alerts</span>
+                                    </div>
+                                    @if (lowStockCount > 0)
+                                    {
+                                        <span class="alerts-count-pill">
+                                            @lowStockCount @(lowStockCount == 1 ? "Item" : "Items")
+                                        </span>
+                                    }
+                                </div>
 
+                                <!-- Items List -->
+                                <div class="alerts-dropdown-body">
                                 @if (lowStockProducts.Any())
                                 {
                                     foreach (var item in lowStockProducts)
                                     {
-                                        <a class="dropdown-item d-flex align-items-center"
+                                        bool isCritical = item.StockQuantity == 0 || item.StockQuantity <= Math.Max(1, item.LowStockThreshold / 3);
+                                        int stockPercent = item.LowStockThreshold > 0 
+                                            ? Math.Min(100, Math.Max(6, (int)((double)item.StockQuantity / item.LowStockThreshold * 100))) 
+                                            : 0;
+
+                                        <a class="dropdown-item alert-product-item d-flex align-items-center"
                                            asp-controller="Products"
                                            asp-action="Details"
                                            asp-route-id="@item.ProductID">
 
-                                            <div class="mr-3">
-                                                <div class="icon-circle bg-warning text-white">
-                                                    <i class="fas fa-exclamation-triangle"></i>
+                                            <div class="alert-icon-box @(isCritical ? "is-critical" : "is-warning") mr-3">
+                                                <i class="fas @(item.StockQuantity == 0 ? "fa-times-circle" : "fa-exclamation-triangle")"></i>
+                                            </div>
+
+                                            <div class="alert-content-box flex-grow-1 min-w-0">
+                                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                                    <span class="alert-sku-code text-truncate">@item.SKU</span>
+                                                    <span class="alert-status-badge @(item.StockQuantity == 0 ? "badge-out-of-stock" : isCritical ? "badge-critical" : "badge-low")">
+                                                        @(item.StockQuantity == 0 ? "OUT OF STOCK" : $"{item.StockQuantity} LEFT")
+                                                    </span>
+                                                </div>
+
+                                                <div class="alert-product-title text-truncate mb-1" title="@item.ProductName">
+                                                    @item.ProductName
+                                                </div>
+
+                                                <div class="d-flex align-items-center justify-content-between alert-meta-row">
+                                                    <div class="alert-progress-wrap flex-grow-1 mr-2">
+                                                        <div class="alert-progress-bar @(isCritical ? "progress-critical" : "progress-warning")" 
+                                                             style="width: @(stockPercent)%;"></div>
+                                                    </div>
+                                                    <span class="alert-threshold-label">
+                                                        Thresh: @item.LowStockThreshold
+                                                    </span>
                                                 </div>
                                             </div>
 
-                                            <div>
-                                                <div class="small text-gray-500">
-                                                    SKU: @item.SKU
-                                                </div>
-
-                                                <span class="font-weight-bold">
-                                                    @item.ProductName
-                                                </span>
-
-                                                <div class="small text-danger">
-                                                    Stock: @item.StockQuantity
-                                                    (Threshold: @item.LowStockThreshold)
-                                                </div>
+                                            <div class="alert-action-arrow ml-2">
+                                                <i class="fas fa-chevron-right"></i>
                                             </div>
 
                                         </a>
                                     }
-
-                                    <a class="dropdown-item text-center small text-gray-500"
-                                       asp-controller="Dashboard"
-                                       asp-action="Analytics">
-                                        Show All Alerts
-                                    </a>
                                 }
                                 else
                                 {
-                                    <span class="dropdown-item text-center small text-gray-500">
-                                        No low stock items
-                                    </span>
+                                    <div class="alerts-empty-state text-center py-4 px-3">
+                                        <div class="alerts-empty-icon mb-2">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="alerts-empty-title">All Stocks Healthy</div>
+                                        <div class="alerts-empty-desc">No products currently below threshold.</div>
+                                    </div>
+                                }
+                                </div>
+
+                                <!-- Footer -->
+                                @if (lowStockProducts.Any())
+                                {
+                                    <div class="alerts-dropdown-footer">
+                                        <a class="alerts-footer-link d-flex align-items-center justify-content-center"
+                                           asp-controller="Dashboard"
+                                           asp-action="Analytics"
+                                           asp-fragment="lowStockAlertsCard">
+                                            <span>View All in Analytics</span>
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
                                 }
 
                             </div>
@@ -393,11 +472,6 @@
     </div>
     <!-- End of Page Wrapper -->
 
-    <!-- Scroll to Top -->
-    <a class="scroll-to-top rounded"
-       href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
 
     <!-- AI Chatbot -->
     <div id="ai-chatbot">
@@ -454,6 +528,7 @@
     <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="~/js/sb-admin-2.min.js"></script>
+
 
     <!-- Global Search Script -->
     <script>
@@ -591,13 +666,58 @@
     <script>
         $(document).ready(function () {
 
-            // Open / close chatbot
-            $('#ai-chat-button').click(function () {
-                $('#ai-chat-window').toggle();
+            // Remove #page-top scroll button completely from DOM
+            function purgeScrollToTop() {
+                $('.scroll-to-top, a[href="#page-top"], a[href$="#page-top"]').remove();
+            }
+            purgeScrollToTop();
+            $(window).on('scroll', purgeScrollToTop);
+
+            // Toggle AI Chatbot with smooth animations
+            function toggleChat(open) {
+                const chatWindow = $('#ai-chat-window');
+                const chatButton = $('#ai-chat-button');
+                const isOpen = chatWindow.hasClass('is-open');
+                const shouldOpen = (open !== undefined) ? open : !isOpen;
+
+                if (shouldOpen) {
+                    chatWindow.addClass('is-open');
+                    chatButton.addClass('chat-is-open');
+                    setTimeout(function () {
+                        $('#ai-chat-input').focus();
+                    }, 250);
+                } else {
+                    chatWindow.removeClass('is-open');
+                    chatButton.removeClass('chat-is-open');
+                }
+            }
+
+            // Open / close on FAB click
+            $('#ai-chat-button').on('click', function (e) {
+                e.stopPropagation();
+                toggleChat();
             });
 
-            $('#ai-chat-close').click(function () {
-                $('#ai-chat-window').hide();
+            // Close on header close button click
+            $('#ai-chat-close').on('click', function (e) {
+                e.stopPropagation();
+                toggleChat(false);
+            });
+
+            // Close when clicking outside chat window
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#ai-chatbot').length) {
+                    if ($('#ai-chat-window').hasClass('is-open')) {
+                        toggleChat(false);
+                    }
+                }
+            });
+
+            // Close on ESC key
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape' && $('#ai-chat-window').hasClass('is-open')) {
+                    toggleChat(false);
+                }
             });
 
             // Send message
