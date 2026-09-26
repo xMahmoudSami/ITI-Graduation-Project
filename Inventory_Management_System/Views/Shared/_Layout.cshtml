@@ -1,0 +1,823 @@
+@inject Inventory_Management_System.Models.ApplicationDbContext _context
+@{
+    var lowStockProducts = _context.Products
+        .Where(p => p.StockQuantity <= p.LowStockThreshold)
+        .OrderBy(p => p.StockQuantity)
+        .Take(5)
+        .Select(p => new
+        {
+            p.ProductID,
+            p.ProductName,
+            p.StockQuantity,
+            p.LowStockThreshold,
+            p.SKU
+        })
+        .ToList();
+
+    var lowStockCount = _context.Products
+        .Count(p => p.StockQuantity <= p.LowStockThreshold);
+
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString()
+        ?? ViewContext.ActionDescriptor.RouteValues["controller"]
+        ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString()
+        ?? ViewContext.ActionDescriptor.RouteValues["action"]
+        ?? "";
+    var currentPath = Context.Request.Path.Value?.TrimEnd('/') ?? "";
+
+    bool isDashboardActive = string.Equals(currentController, "Dashboard", StringComparison.OrdinalIgnoreCase)
+        || string.IsNullOrEmpty(currentPath)
+        || string.Equals(currentPath, "/dashboard", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(currentPath, "/dashboard/analytics", StringComparison.OrdinalIgnoreCase);
+
+    bool IsActive(string controller, string? action = null)
+    {
+        if (string.Equals(controller, "Dashboard", StringComparison.OrdinalIgnoreCase))
+            return isDashboardActive;
+
+        if (!string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase))
+            return false;
+        if (!string.IsNullOrEmpty(action))
+            return string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+        return true;
+    }
+
+    bool IsProductsListActive()
+    {
+        if (!string.Equals(currentController, "Products", StringComparison.OrdinalIgnoreCase))
+            return false;
+        return !string.Equals(currentAction, "Create", StringComparison.OrdinalIgnoreCase);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>@ViewData["Title"] - Inventory Management System</title>
+
+    <!-- Custom fonts -->
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
+
+    <!-- Custom styles -->
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="~/css/ai-chat.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center"
+               asp-controller="Dashboard"
+               asp-action="Analytics">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">IMS Portal</div>
+            </a>
+
+            <hr class="sidebar-divider my-0" />
+
+            <!-- Dashboard -->
+            <li class="nav-item @(IsActive("Dashboard") ? "active-page" : "")">
+                <a class="nav-link @(IsActive("Dashboard") ? "active-page" : "")"
+                   asp-controller="Dashboard"
+                   asp-action="Analytics">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider" />
+
+            <!-- INVENTORY CORE -->
+            <div class="sidebar-heading">INVENTORY CORE</div>
+
+            <!-- Products -->
+            <li class="nav-item">
+                <a class="nav-link @(IsActive("Products") ? "" : "collapsed")"
+                   href="#"
+                   data-toggle="collapse"
+                   data-target="#collapseProducts"
+                   aria-expanded="@(IsActive("Products") ? "true" : "false")"
+                   aria-controls="collapseProducts">
+                    <i class="fas fa-fw fa-box"></i>
+                    <span>Products</span>
+                    <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
+                </a>
+
+                <div id="collapseProducts"
+                     class="collapse @(IsActive("Products") ? "show" : "")"
+                     data-parent="#accordionSidebar">
+
+                    <a class="nav-link pl-5 py-2 @(IsProductsListActive() ? "active-page" : "")"
+                       asp-controller="Products"
+                       asp-action="Index">
+                        <span>All Products</span>
+                    </a>
+
+                    <a class="nav-link pl-5 py-2 @(IsActive("Products", "Create") ? "active-page" : "")"
+                       asp-controller="Products"
+                       asp-action="Create">
+                        <span>Add Product</span>
+                    </a>
+                </div>
+            </li>
+
+            <!-- Categories -->
+            <li class="nav-item @(IsActive("Categories") ? "active-page" : "")">
+                <a class="nav-link @(IsActive("Categories") ? "active-page" : "")"
+                   asp-controller="Categories"
+                   asp-action="Index">
+                    <i class="fas fa-fw fa-tags"></i>
+                    <span>Categories</span>
+                </a>
+            </li>
+
+            <!-- Suppliers -->
+            <li class="nav-item @(IsActive("Suppliers") ? "active-page" : "")">
+                <a class="nav-link @(IsActive("Suppliers") ? "active-page" : "")"
+                   asp-controller="Suppliers"
+                   asp-action="Index">
+                    <i class="fas fa-fw fa-truck"></i>
+                    <span>Suppliers</span>
+                </a>
+            </li>
+
+            <!-- Supplier Mappings -->
+            <li class="nav-item @(IsActive("SupplierProducts") ? "active-page" : "")">
+                <a class="nav-link @(IsActive("SupplierProducts") ? "active-page" : "")"
+                   asp-controller="SupplierProducts"
+                   asp-action="Index">
+                    <i class="fas fa-fw fa-handshake"></i>
+                    <span>Supplier Mappings</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider" />
+
+            <!-- TRANSACTIONS -->
+            <div class="sidebar-heading">TRANSACTIONS</div>
+
+            <li class="nav-item">
+                <a class="nav-link @(IsActive("Purchases") || IsActive("Sales") ? "" : "collapsed")"
+                   href="#"
+                   data-toggle="collapse"
+                   data-target="#collapseTransactions"
+                   aria-expanded="@(IsActive("Purchases") || IsActive("Sales") ? "true" : "false")"
+                   aria-controls="collapseTransactions">
+                    <i class="fas fa-fw fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                    <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
+                </a>
+
+                <div id="collapseTransactions"
+                     class="collapse @(IsActive("Purchases") || IsActive("Sales") ? "show" : "")"
+                     data-parent="#accordionSidebar">
+
+                    <a class="nav-link pl-5 py-2 @(IsActive("Purchases") ? "active-page" : "")"
+                       asp-controller="Purchases"
+                       asp-action="Index">
+                        <span>Purchases</span>
+                    </a>
+
+                    <a class="nav-link pl-5 py-2 @(IsActive("Sales") ? "active-page" : "")"
+                       asp-controller="Sales"
+                       asp-action="Index">
+                        <span>Sales</span>
+                    </a>
+                </div>
+            </li>
+
+            <hr class="sidebar-divider" />
+
+            <!-- MANAGEMENT -->
+            <div class="sidebar-heading">MANAGEMENT</div>
+
+            <!-- Reports -->
+            <li class="nav-item">
+                <a class="nav-link @(IsActive("Reports") ? "" : "collapsed")"
+                   href="#"
+                   data-toggle="collapse"
+                   data-target="#collapseReports"
+                   aria-expanded="@(IsActive("Reports") ? "true" : "false")"
+                   aria-controls="collapseReports">
+                    <i class="fas fa-fw fa-chart-line"></i>
+                    <span>Reports</span>
+                    <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
+                </a>
+
+                <div id="collapseReports"
+                     class="collapse @(IsActive("Reports") ? "show" : "")"
+                     data-parent="#accordionSidebar">
+
+                    <a class="nav-link pl-5 py-2 @(IsActive("Reports", "Index") ? "active-page" : "")"
+                       asp-controller="Reports"
+                       asp-action="Index">
+                        <span>Inventory Summary</span>
+                    </a>
+
+                    <a class="nav-link pl-5 py-2 @(IsActive("Reports", "Sales") ? "active-page" : "")"
+                       asp-controller="Reports"
+                       asp-action="Sales">
+                        <span>Sales Report</span>
+                    </a>
+                </div>
+            </li>
+
+            <hr class="sidebar-divider d-none d-md-block" />
+
+            <!-- Sidebar Toggler -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0"
+                        id="sidebarToggle">
+                </button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <button id="sidebarToggleTop"
+                            class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Global Search -->
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search position-relative">
+
+                        <div class="input-group">
+
+                            <input type="text"
+                                   id="globalSearchInput"
+                                   class="form-control bg-light border-0 small"
+                                   placeholder="Search products, categories..."
+                                   aria-label="Search"
+                                   autocomplete="off">
+
+                            <div class="input-group-append">
+                                <button class="btn btn-primary"
+                                        type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <div id="searchResultsDropdown"
+                             class="dropdown-menu shadow animated--grow-in w-100 mt-1"
+                             style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000;">
+                        </div>
+
+                    </form>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Alerts -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+
+                            <a class="nav-link dropdown-toggle topbar-alerts-btn"
+                               href="#"
+                               id="alertsDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false"
+                               title="Low Stock Alerts">
+
+                                <i class="fas fa-bell fa-fw"></i>
+
+                                @if (lowStockCount > 0)
+                                {
+                                    <span class="badge badge-danger badge-counter">
+                                        @lowStockCount
+                                    </span>
+                                }
+
+                            </a>
+
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow-lg alerts-dropdown-menu"
+                                 aria-labelledby="alertsDropdown">
+
+                                <!-- Header -->
+                                <div class="alerts-dropdown-header d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <div class="alerts-header-icon mr-2">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <span class="alerts-header-title">Low Stock Alerts</span>
+                                    </div>
+                                    @if (lowStockCount > 0)
+                                    {
+                                        <span class="alerts-count-pill">
+                                            @lowStockCount @(lowStockCount == 1 ? "Item" : "Items")
+                                        </span>
+                                    }
+                                </div>
+
+                                <!-- Items List -->
+                                <div class="alerts-dropdown-body">
+                                @if (lowStockProducts.Any())
+                                {
+                                    foreach (var item in lowStockProducts)
+                                    {
+                                        bool isCritical = item.StockQuantity == 0 || item.StockQuantity <= Math.Max(1, item.LowStockThreshold / 3);
+                                        int stockPercent = item.LowStockThreshold > 0 
+                                            ? Math.Min(100, Math.Max(6, (int)((double)item.StockQuantity / item.LowStockThreshold * 100))) 
+                                            : 0;
+
+                                        <a class="dropdown-item alert-product-item d-flex align-items-center"
+                                           asp-controller="Products"
+                                           asp-action="Details"
+                                           asp-route-id="@item.ProductID">
+
+                                            <div class="alert-icon-box @(isCritical ? "is-critical" : "is-warning") mr-3">
+                                                <i class="fas @(item.StockQuantity == 0 ? "fa-times-circle" : "fa-exclamation-triangle")"></i>
+                                            </div>
+
+                                            <div class="alert-content-box flex-grow-1 min-w-0">
+                                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                                    <span class="alert-sku-code text-truncate">@item.SKU</span>
+                                                    <span class="alert-status-badge @(item.StockQuantity == 0 ? "badge-out-of-stock" : isCritical ? "badge-critical" : "badge-low")">
+                                                        @(item.StockQuantity == 0 ? "OUT OF STOCK" : $"{item.StockQuantity} LEFT")
+                                                    </span>
+                                                </div>
+
+                                                <div class="alert-product-title text-truncate mb-1" title="@item.ProductName">
+                                                    @item.ProductName
+                                                </div>
+
+                                                <div class="d-flex align-items-center justify-content-between alert-meta-row">
+                                                    <div class="alert-progress-wrap flex-grow-1 mr-2">
+                                                        <div class="alert-progress-bar @(isCritical ? "progress-critical" : "progress-warning")" 
+                                                             style="width: @(stockPercent)%;"></div>
+                                                    </div>
+                                                    <span class="alert-threshold-label">
+                                                        Thresh: @item.LowStockThreshold
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="alert-action-arrow ml-2">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </div>
+
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="alerts-empty-state text-center py-4 px-3">
+                                        <div class="alerts-empty-icon mb-2">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="alerts-empty-title">All Stocks Healthy</div>
+                                        <div class="alerts-empty-desc">No products currently below threshold.</div>
+                                    </div>
+                                }
+                                </div>
+
+                                <!-- Footer -->
+                                @if (lowStockProducts.Any())
+                                {
+                                    <div class="alerts-dropdown-footer">
+                                        <a class="alerts-footer-link d-flex align-items-center justify-content-center"
+                                           asp-controller="Dashboard"
+                                           asp-action="Analytics"
+                                           asp-fragment="lowStockAlertsCard">
+                                            <span>View All in Analytics</span>
+                                            <i class="fas fa-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                }
+
+                            </div>
+
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- User Info -->
+                        <li class="nav-item dropdown no-arrow">
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="userDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    System Administrator
+                                </span>
+
+                                <img class="img-profile rounded-circle"
+                                     src="~/img/undraw_profile.svg" />
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+
+                <div class="container my-auto">
+
+                    <div class="copyright text-center my-auto">
+                        <span>
+                            Copyright &copy; Inventory Management System @DateTime.Now.Year
+                        </span>
+                    </div>
+
+                </div>
+
+            </footer>
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+
+    <!-- AI Chatbot -->
+    <div id="ai-chatbot">
+
+        <button id="ai-chat-button"
+                type="button">
+            <i class="fas fa-robot"></i>
+        </button>
+
+        <div id="ai-chat-window">
+
+            <div id="ai-chat-header">
+
+                <span>
+                    <i class="fas fa-robot mr-2"></i>
+                    AI Inventory Assistant
+                </span>
+
+                <button id="ai-chat-close"
+                        type="button">
+                    &times;
+                </button>
+
+            </div>
+
+            <div id="ai-chat-messages">
+
+                <div class="ai-message">
+                    Hello! I'm your inventory assistant. How can I help you?
+                </div>
+
+            </div>
+
+            <div id="ai-chat-input-area">
+
+                <input type="text"
+                       id="ai-chat-input"
+                       placeholder="Ask about your inventory..."
+                       autocomplete="off" />
+
+                <button id="ai-chat-send"
+                        type="button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="~/js/sb-admin-2.min.js"></script>
+
+
+    <!-- Global Search Script -->
+    <script>
+        $(document).ready(function () {
+
+            let searchTimeout = null;
+
+            $('#globalSearchInput').on('keyup input', function () {
+
+                let term = $(this).val().trim();
+                let dropdown = $('#searchResultsDropdown');
+
+                clearTimeout(searchTimeout);
+
+                if (term.length < 1) {
+                    dropdown.hide().empty();
+                    return;
+                }
+
+                searchTimeout = setTimeout(function () {
+
+                    $.ajax({
+                        url: '/Dashboard/GlobalSearch',
+                        type: 'GET',
+                        data: { term: term },
+
+                        success: function (data) {
+
+                            dropdown.empty();
+
+                            let hasResults = false;
+
+                            if (data.products && data.products.length > 0) {
+
+                                hasResults = true;
+
+                                dropdown.append(
+                                    '<h6 class="dropdown-header">Products</h6>'
+                                );
+
+                                $.each(data.products, function (i, item) {
+
+                                    dropdown.append(`
+                                        <a class="dropdown-item py-1"
+                                           href="/Products/Details/${item.productID}">
+                                            <div class="font-weight-bold text-dark">
+                                                ${item.productName}
+                                            </div>
+                                            <div class="small text-gray-500">
+                                                SKU: ${item.sku}
+                                            </div>
+                                        </a>
+                                    `);
+
+                                });
+                            }
+
+                            if (data.categories && data.categories.length > 0) {
+
+                                hasResults = true;
+
+                                dropdown.append(
+                                    '<h6 class="dropdown-header">Categories</h6>'
+                                );
+
+                                $.each(data.categories, function (i, item) {
+
+                                    dropdown.append(`
+                                        <a class="dropdown-item py-1"
+                                           href="/Categories/Details/${item.categoryID}">
+                                            <div class="font-weight-bold text-dark">
+                                                ${item.categoryName}
+                                            </div>
+                                        </a>
+                                    `);
+
+                                });
+                            }
+
+                            if (data.suppliers && data.suppliers.length > 0) {
+
+                                hasResults = true;
+
+                                dropdown.append(
+                                    '<h6 class="dropdown-header">Suppliers</h6>'
+                                );
+
+                                $.each(data.suppliers, function (i, item) {
+
+                                    dropdown.append(`
+                                        <a class="dropdown-item py-1"
+                                           href="/Suppliers/Details/${item.supplierID}">
+                                            <div class="font-weight-bold text-dark">
+                                                ${item.supplierName}
+                                            </div>
+                                        </a>
+                                    `);
+
+                                });
+                            }
+
+                            if (hasResults) {
+                                dropdown.show();
+                            }
+                            else {
+                                dropdown.append(
+                                    '<div class="dropdown-item small text-gray-500 p-2 text-center">No results found</div>'
+                                );
+
+                                dropdown.show();
+                            }
+                        },
+
+                        error: function () {
+                            dropdown.hide().empty();
+                        }
+                    });
+
+                }, 300);
+
+            });
+
+            $(document).on('click', function (e) {
+
+                if (!$(e.target).closest('.navbar-search').length) {
+                    $('#searchResultsDropdown').hide();
+                }
+
+            });
+
+        });
+    </script>
+
+    <!-- AI Chatbot Script -->
+    <script>
+        $(document).ready(function () {
+
+            // Remove #page-top scroll button completely from DOM
+            function purgeScrollToTop() {
+                $('.scroll-to-top, a[href="#page-top"], a[href$="#page-top"]').remove();
+            }
+            purgeScrollToTop();
+            $(window).on('scroll', purgeScrollToTop);
+
+            // Toggle AI Chatbot with smooth animations
+            function toggleChat(open) {
+                const chatWindow = $('#ai-chat-window');
+                const chatButton = $('#ai-chat-button');
+                const isOpen = chatWindow.hasClass('is-open');
+                const shouldOpen = (open !== undefined) ? open : !isOpen;
+
+                if (shouldOpen) {
+                    chatWindow.addClass('is-open');
+                    chatButton.addClass('chat-is-open');
+                    setTimeout(function () {
+                        $('#ai-chat-input').focus();
+                    }, 250);
+                } else {
+                    chatWindow.removeClass('is-open');
+                    chatButton.removeClass('chat-is-open');
+                }
+            }
+
+            // Open / close on FAB click
+            $('#ai-chat-button').on('click', function (e) {
+                e.stopPropagation();
+                toggleChat();
+            });
+
+            // Close on header close button click
+            $('#ai-chat-close').on('click', function (e) {
+                e.stopPropagation();
+                toggleChat(false);
+            });
+
+            // Close when clicking outside chat window
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#ai-chatbot').length) {
+                    if ($('#ai-chat-window').hasClass('is-open')) {
+                        toggleChat(false);
+                    }
+                }
+            });
+
+            // Close on ESC key
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape' && $('#ai-chat-window').hasClass('is-open')) {
+                    toggleChat(false);
+                }
+            });
+
+            // Send message
+            $('#ai-chat-send').click(function () {
+                sendAIMessage();
+            });
+
+            // Send with Enter
+            $('#ai-chat-input').keypress(function (e) {
+
+                if (e.which === 13) {
+                    sendAIMessage();
+                }
+
+            });
+
+            function sendAIMessage() {
+
+                const input = $('#ai-chat-input');
+                const message = input.val().trim();
+
+                if (!message) {
+                    return;
+                }
+
+                // Show user message
+                $('#ai-chat-messages').append(`
+                    <div class="user-message">
+                        ${message}
+                    </div>
+                `);
+
+                input.val('');
+
+                // Loading message
+                const loadingMessage = $(`
+                    <div class="ai-message" id="ai-loading">
+                        Thinking...
+                    </div>
+                `);
+
+                $('#ai-chat-messages').append(loadingMessage);
+
+                scrollChatToBottom();
+
+                // Call C# API
+                $.ajax({
+
+                    url: '/api/AI/chat',
+                    type: 'POST',
+                    contentType: 'application/json',
+
+                    data: JSON.stringify({
+                        message: message
+                    }),
+
+                    success: function (data) {
+
+                        $('#ai-loading').remove();
+
+                        $('#ai-chat-messages').append(`
+                            <div class="ai-message">
+                                ${data.response}
+                            </div>
+                        `);
+
+                        scrollChatToBottom();
+                    },
+
+                    error: function (xhr) {
+
+                        $('#ai-loading').remove();
+
+                        $('#ai-chat-messages').append(`
+                            <div class="ai-message">
+                                Sorry, something went wrong. Please try again.
+                            </div>
+                        `);
+
+                        console.error(xhr);
+
+                        scrollChatToBottom();
+                    }
+
+                });
+            }
+
+            function scrollChatToBottom() {
+
+                const messages = $('#ai-chat-messages');
+
+                messages.scrollTop(
+                    messages[0].scrollHeight
+                );
+            }
+
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

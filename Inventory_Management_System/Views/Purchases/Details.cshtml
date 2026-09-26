@@ -1,0 +1,146 @@
+﻿@model Inventory_Management_System.ViewModels.PurchaseDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Purchase Order #{Model.PurchaseID}";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Purchases</a></li>
+        <li class="breadcrumb-item active" aria-current="page">#@Model.PurchaseID</li>
+    </ol>
+</nav>
+
+<!-- Main Overview Card & Summary Cards Row -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-file-invoice-dollar mr-2"></i>Purchase Order Summary
+                </h6>
+                <div class="btn-group btn-group-sm">
+                    <a asp-action="Edit" asp-route-id="@Model.PurchaseID" class="btn btn-outline-primary" title="Edit">
+                        <i class="fas fa-edit mr-1"></i> Edit
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.PurchaseID" class="btn btn-outline-danger" title="Delete">
+                        <i class="fas fa-trash mr-1"></i> Delete
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-gray-600">Purchase ID</dt>
+                    <dd class="col-sm-8"><code class="font-weight-bold">#@Model.PurchaseID</code></dd>
+
+                    <dt class="col-sm-4 text-gray-600">Supplier Name</dt>
+                    <dd class="col-sm-8 font-weight-bold text-gray-800">
+                        <i class="fas fa-truck text-primary mr-1"></i>
+                        @(string.IsNullOrEmpty(Model.SupplierName) ? "N/A" : Model.SupplierName)
+                    </dd>
+
+                    <dt class="col-sm-4 text-gray-600">Purchase Date</dt>
+                    <dd class="col-sm-8 text-gray-800 font-weight-bold">
+                        @Model.PurchaseDate.ToString("MMMM dd, yyyy")
+                    </dd>
+
+                    <dt class="col-sm-4 text-gray-600">Total Items Count</dt>
+                    <dd class="col-sm-8 font-weight-bold text-gray-800">
+                        @Model.Items.Count items
+                    </dd>
+
+                    <dt class="col-sm-4 text-gray-600">Grand Total Amount</dt>
+                    <dd class="col-sm-8 font-weight-bold text-success h5 mb-0">
+                        $@Model.TotalAmount.ToString("N2")
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Side Cards -->
+    <div class="col-lg-4">
+        <div class="card border-left-primary shadow-sm mb-3">
+            <div class="card-body py-3">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Cost</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.TotalAmount.ToString("N2")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-left-info shadow-sm mb-3">
+            <div class="card-body py-3">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Purchased Products</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Items.Count Line Items</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-boxes fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Items Detailed Table -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-list mr-2"></i>Purchased Items Breakdown
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Items.Any())
+        {
+            <div class="text-center py-4">
+                <i class="fas fa-box-open fa-2x text-gray-300 mb-2"></i>
+                <p class="text-muted mb-0">No items registered under this purchase order.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Product Name</th>
+                            <th>SKU</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-right">Unit Cost</th>
+                            <th class="text-right">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="font-weight-bold text-gray-800">
+                                    <i class="fas fa-box text-primary mr-1"></i>
+                                    @(string.IsNullOrEmpty(item.ProductName) ? "N/A" : item.ProductName)
+                                </td>
+                                <td><code>@(string.IsNullOrEmpty(item.SKU) ? "—" : item.SKU)</code></td>
+                                <td class="text-center font-weight-bold">@item.Quantity</td>
+                                <td class="text-right">$@item.UnitCost.ToString("N2")</td>
+                                <td class="text-right font-weight-bold text-success">$@item.Subtotal.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-outline-secondary">
+    <i class="fas fa-arrow-left mr-1"></i> Back to Purchases
+</a>
