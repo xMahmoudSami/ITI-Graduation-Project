@@ -4,213 +4,143 @@
     ViewData["Title"] = "Create Purchase";
 }
 
-<h1>Create Purchase</h1>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Create New Purchase</h1>
+    <a asp-action="Index" class="btn btn-sm btn-secondary shadow-sm">
+        <i class="fas fa-arrow-left fa-sm text-white-50 mr-1"></i> Back to List
+    </a>
+</div>
 
 <form asp-controller="Purchases" asp-action="Create" method="post">
-
     @Html.AntiForgeryToken()
 
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Purchase Information</h6>
+        </div>
+        <div class="card-body">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-    <!-- Supplier -->
-    <div class="mb-3">
-        <label asp-for="SupplierID" class="form-label">
-            Supplier
-        </label>
-
-        <select asp-for="SupplierID"
-                class="form-control"
-                asp-items="@(new SelectList(ViewBag.Suppliers, "SupplierID", "SupplierName"))">
-
-            <option value="">-- Select Supplier --</option>
-
-        </select>
-
-        <span asp-validation-for="SupplierID"
-              class="text-danger"></span>
-    </div>
-
-    <!-- Purchase Date -->
-    <div class="mb-3">
-        <label asp-for="PurchaseDate" class="form-label">
-            Purchase Date
-        </label>
-
-        <input asp-for="PurchaseDate"
-               type="date"
-               class="form-control" />
-
-        <span asp-validation-for="PurchaseDate"
-              class="text-danger"></span>
-    </div>
-
-    <hr />
-
-    <h3>Products</h3>
-
-    <div id="items">
-
-        <!-- First Product -->
-        <div class="item-row mb-3">
-
-            <div class="row">
-
-                <div class="col-md-4">
-                    <label>Product</label>
-
-                    <select name="Items[0].ProductID"
-                            class="form-control">
-
-                        <option value="">-- Select Product --</option>
-
-                        @foreach (var product in ViewBag.Products)
-                        {
-                            <option value="@product.ProductID">
-                                @product.ProductName
-                            </option>
-                        }
-
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label asp-for="SupplierID" class="font-weight-bold">Supplier</label>
+                    <select asp-for="SupplierID" class="form-control" asp-items="@(new SelectList(ViewBag.Suppliers, "SupplierID", "SupplierName"))">
+                        <option value="">-- Select Supplier --</option>
                     </select>
+                    <span asp-validation-for="SupplierID" class="text-danger small"></span>
                 </div>
 
-                <div class="col-md-3">
-                    <label>Quantity</label>
-
-                    <input name="Items[0].Quantity"
-                           type="number"
-                           min="1"
-                           class="form-control" />
+                <div class="form-group col-md-6">
+                    <label asp-for="PurchaseDate" class="font-weight-bold">Purchase Date</label>
+                    <input asp-for="PurchaseDate" type="date" class="form-control" />
+                    <span asp-validation-for="PurchaseDate" class="text-danger small"></span>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="col-md-3">
-                    <label>Unit Cost</label>
-
-                    <input name="Items[0].UnitCost"
-                           type="number"
-                           step="0.01"
-                           min="0.01"
-                           class="form-control" />
+    <!-- Products Repeater Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Purchase Items</h6>
+            <button type="button" class="btn btn-sm btn-primary shadow-sm" onclick="addItem()">
+                <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Add Product
+            </button>
+        </div>
+        <div class="card-body">
+            <div id="items">
+                <!-- First Row Item -->
+                <div class="item-row card border-left-primary mb-3 bg-light p-3">
+                    <div class="form-row align-items-end">
+                        <div class="form-group col-md-5 mb-0">
+                            <label class="font-weight-bold">Product</label>
+                            <select name="Items[0].ProductID" class="form-control">
+                                <option value="">-- Select Product --</option>
+                                @foreach (var product in ViewBag.Products)
+                                {
+                                    <option value="@product.ProductID">@product.ProductName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3 mb-0">
+                            <label class="font-weight-bold">Quantity</label>
+                            <input name="Items[0].Quantity" type="number" min="1" class="form-control" placeholder="1" />
+                        </div>
+                        <div class="form-group col-md-3 mb-0">
+                            <label class="font-weight-bold">Unit Cost ($)</label>
+                            <input name="Items[0].UnitCost" type="number" step="0.01" min="0.01" class="form-control" placeholder="0.00" />
+                        </div>
+                        <div class="form-group col-md-1 mb-0 text-center">
+                            <button type="button" class="btn btn-danger btn-circle" onclick="removeItem(this)" title="Remove Product">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="button"
-                            class="btn btn-danger"
-                            onclick="removeItem(this)">
-                        Remove
-                    </button>
-                </div>
-
             </div>
 
+            <div class="mt-4 border-top pt-3 text-right">
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="fas fa-save mr-1"></i> Save Purchase
+                </button>
+                <a asp-action="Index" class="btn btn-secondary px-4">Cancel</a>
+            </div>
         </div>
-
     </div>
-
-    <button type="button"
-            class="btn btn-primary mb-3"
-            onclick="addItem()">
-        + Add Product
-    </button>
-
-    <br />
-
-    <button type="submit"
-            class="btn btn-success">
-        Save Purchase
-    </button>
-
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Back
-    </a>
-
 </form>
 
-
 @section Scripts {
-
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
     <script>
-
         let itemIndex = 1;
 
         function addItem() {
-
             let items = document.getElementById("items");
-
             let newItem = document.createElement("div");
 
-            newItem.className = "item-row mb-3";
-
+            newItem.className = "item-row card border-left-primary mb-3 bg-light p-3";
             newItem.innerHTML = `
-                <div class="row">
-
-                    <div class="col-md-4">
-                        <label>Product</label>
-
-                        <select name="Items[${itemIndex}].ProductID"
-                                class="form-control">
-
-                            <option value="">-- Select Product --</option>
-
-                            @foreach (var product in ViewBag.Products)
-                            {
-                                <option value="@product.ProductID">
-                                    @product.ProductName
-                                </option>
-                            }
-
-                        </select>
-                    </div>
-
-                    <div class="col-md-3">
-                        <label>Quantity</label>
-
-                        <input name="Items[${itemIndex}].Quantity"
-                               type="number"
-                               min="1"
-                               class="form-control" />
-                    </div>
-
-                    <div class="col-md-3">
-                        <label>Unit Cost</label>
-
-                        <input name="Items[${itemIndex}].UnitCost"
-                               type="number"
-                               step="0.01"
-                               min="0.01"
-                               class="form-control" />
-                    </div>
-
-                    <div class="col-md-2 d-flex align-items-end">
-
-                        <button type="button"
-                                class="btn btn-danger"
-                                onclick="removeItem(this)">
-                            Remove
-                        </button>
-
-                    </div>
-
-                </div>
-            `;
-
+                        <div class="form-row align-items-end">
+                            <div class="form-group col-md-5 mb-0">
+                                <label class="font-weight-bold">Product</label>
+                                <select name="Items[${itemIndex}].ProductID" class="form-control">
+                                    <option value="">-- Select Product --</option>
+                                    @foreach (var product in ViewBag.Products)
+                                    {
+                                            <option value="@product.ProductID">@product.ProductName</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3 mb-0">
+                                <label class="font-weight-bold">Quantity</label>
+                                <input name="Items[${itemIndex}].Quantity" type="number" min="1" class="form-control" placeholder="1" />
+                            </div>
+                            <div class="form-group col-md-3 mb-0">
+                                <label class="font-weight-bold">Unit Cost ($)</label>
+                                <input name="Items[${itemIndex}].UnitCost" type="number" step="0.01" min="0.01" class="form-control" placeholder="0.00" />
+                            </div>
+                            <div class="form-group col-md-1 mb-0 text-center">
+                                <button type="button" class="btn btn-danger btn-circle" onclick="removeItem(this)" title="Remove Product">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
             items.appendChild(newItem);
-
             itemIndex++;
         }
 
-
         function removeItem(button) {
-
             let row = button.closest(".item-row");
-
-            row.remove();
-
+            let rows = document.querySelectorAll(".item-row");
+            if (rows.length > 1) {
+                row.remove();
+            } else {
+                alert("At least one product item is required.");
+            }
         }
-
     </script>
 }
