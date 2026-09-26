@@ -18,7 +18,7 @@ namespace Inventory_Management_System.Controllers
             return View(pagedResult);
         }
 
-        // GET: /Categories/Details/5
+        // GET: /Categories/Details/{id}
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -58,7 +58,7 @@ namespace Inventory_Management_System.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Categories/Edit/5
+        // GET: /Categories/Edit/{id}
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -70,7 +70,7 @@ namespace Inventory_Management_System.Controllers
             return View(model);
         }
 
-        // POST: /Categories/Edit/5
+        // POST: /Categories/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CategoryFormViewModel model)
@@ -96,7 +96,7 @@ namespace Inventory_Management_System.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Categories/Delete/5
+        // GET: /Categories/Delete/{id}
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -108,7 +108,7 @@ namespace Inventory_Management_System.Controllers
             return View(model);
         }
 
-        // POST: /Categories/Delete/5
+        // POST: /Categories/Delete/{id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

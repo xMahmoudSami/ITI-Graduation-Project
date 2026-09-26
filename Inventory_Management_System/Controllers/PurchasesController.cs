@@ -1,9 +1,4 @@
-﻿using Inventory_Management_System.Models;
-using Inventory_Management_System.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-namespace Inventory_Management_System.Controllers
+﻿namespace Inventory_Management_System.Controllers
 {
     public class PurchasesController : Controller
     {
@@ -14,16 +9,27 @@ namespace Inventory_Management_System.Controllers
             _context = context;
         }
 
+        // GET: /Purchases
         public async Task<IActionResult> Index()
         {
             var purchases = await _context.Purchases
                 .Include(p => p.Supplier)
                 .Include(p => p.PurchaseItems)
-                .ThenInclude(pi => pi.Product)
+                .Select(p => new PurchaseListItemViewModel
+                {
+                    PurchaseID = p.PurchaseID,
+                    PurchaseDate = p.PurchaseDate,
+                    SupplierID = p.SupplierID,
+                    SupplierName = p.Supplier != null ? p.Supplier.SupplierName : "N/A",
+                    TotalAmount = p.TotalAmount,
+                    ItemsCount = p.PurchaseItems.Count
+                })
                 .ToListAsync();
 
             return View(purchases);
         }
+
+        // GET: /Purchases/Details/{id}
         public async Task<IActionResult> Details(int id)
         {
             var purchase = await _context.Purchases
@@ -32,122 +38,182 @@ namespace Inventory_Management_System.Controllers
                 .ThenInclude(pi => pi.Product)
                 .FirstOrDefaultAsync(p => p.PurchaseID == id);
 
-            if (purchase == null)
-            {
-                return NotFound();
-            }
+            if (purchase == null) return NotFound();
 
-            return View(purchase);
+            var viewModel = new PurchaseDetailsViewModel
+            {
+                PurchaseID = purchase.PurchaseID,
+                PurchaseDate = purchase.PurchaseDate,
+                SupplierID = purchase.SupplierID,
+                SupplierName = purchase.Supplier?.SupplierName ?? "N/A",
+                TotalAmount = purchase.TotalAmount,
+                Items = purchase.PurchaseItems.Select(pi => new PurchaseItemDetailsViewModel
+                {
+                    PurchaseItemID = pi.PurchaseItemID,
+                    ProductID = pi.ProductID,
+                    ProductName = pi.Product?.ProductName ?? "N/A",
+                    SKU = pi.Product?.SKU ?? "N/A",
+                    Quantity = pi.Quantity,
+                    UnitCost = pi.UnitCost
+                }).ToList()
+            };
+
+            return View(viewModel);
         }
+
+        // GET: /Purchases/Create
+        public async Task<IActionResult> Create()
+        {
+            var model = new PurchaseFormViewModel
+            {
+                PurchaseDate = DateTime.Now
+            };
+
+            await PopulateSelectListsAsync(model);
+
+            return View(model);
+        }
+
+        // POST: /Purchases/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Create(PurchaseFormViewModel model)
         {
-            var purchase = await _context.Purchases
-                .Include(p => p.PurchaseItems)
-                .FirstOrDefaultAsync(p => p.PurchaseID == id);
-
-            if (purchase == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                await PopulateSelectListsAsync(model);
+                return View(model);
             }
 
-            foreach (var item in purchase.PurchaseItems)
+            if (model.Items == null || !model.Items.Any())
             {
-                var product = await _context.Products
-                    .FirstOrDefaultAsync(p => p.ProductID == item.ProductID);
-
-                if (product != null)
-                {
-                    product.StockQuantity -= item.Quantity;
-                }
+                ModelState.AddModelError("", "At least one product is required.");
+                await PopulateSelectListsAsync(model);
+                return View(model);
             }
 
-            _context.Purchases.Remove(purchase);
+            var duplicateProducts = model.Items
+                .GroupBy(x => x.ProductID)
+                .Where(x => x.Count() > 1)
+                .ToList();
 
+            if (duplicateProducts.Any())
+            {
+                ModelState.AddModelError("", "You cannot add the same product more than once.");
+                await PopulateSelectListsAsync(model);
+                return View(model);
+            }
+
+            decimal totalAmount = model.Items.Sum(item => item.Quantity * item.UnitCost);
+
+            var purchase = new Purchase
+            {
+                SupplierID = model.SupplierID,
+                PurchaseDate = model.PurchaseDate,
+                TotalAmount = totalAmount
+            };
+
+            _context.Purchases.Add(purchase);
             await _context.SaveChangesAsync();
 
+            foreach (var item in model.Items)
+            {
+                var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == item.ProductID);
+
+                if (product == null)
+                {
+                    ModelState.AddModelError("", "Product not found.");
+                    await PopulateSelectListsAsync(model);
+                    return View(model);
+                }
+
+                product.StockQuantity += item.Quantity;
+
+                var purchaseItem = new PurchaseItem
+                {
+                    PurchaseID = purchase.PurchaseID,
+                    ProductID = item.ProductID,
+                    Quantity = item.Quantity,
+                    UnitCost = item.UnitCost
+                };
+
+                _context.PurchaseItems.Add(purchaseItem);
+            }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        // GET: /Purchases/Edit/{id}
         public async Task<IActionResult> Edit(int id)
         {
             var purchase = await _context.Purchases
                 .Include(p => p.PurchaseItems)
                 .FirstOrDefaultAsync(p => p.PurchaseID == id);
 
-            if (purchase == null)
-            {
-                return NotFound();
-            }
+            if (purchase == null) return NotFound();
 
-            var model = new PurchaseViewModel
+            var model = new PurchaseFormViewModel
             {
+                PurchaseID = purchase.PurchaseID,
                 SupplierID = purchase.SupplierID,
                 PurchaseDate = purchase.PurchaseDate,
-
-                Items = purchase.PurchaseItems.Select(item => new PurchaseItemViewModel
+                TotalAmount = purchase.TotalAmount,
+                Items = purchase.PurchaseItems.Select(item => new PurchaseItemFormViewModel
                 {
+                    PurchaseItemID = item.PurchaseItemID,
                     ProductID = item.ProductID,
                     Quantity = item.Quantity,
                     UnitCost = item.UnitCost
                 }).ToList()
             };
 
-            ViewBag.Suppliers = _context.Suppliers.ToList();
-            ViewBag.Products = _context.Products.ToList();
+            await PopulateSelectListsAsync(model);
 
             return View(model);
         }
+
+        // POST: /Purchases/Edit/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, PurchaseViewModel model)
+        public async Task<IActionResult> Edit(int id, PurchaseFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Suppliers = _context.Suppliers.ToList();
-                ViewBag.Products = _context.Products.ToList();
-
+                await PopulateSelectListsAsync(model);
                 return View(model);
             }
+
             var duplicateProducts = model.Items
-    .GroupBy(x => x.ProductID)
-    .Where(x => x.Count() > 1)
-    .ToList();
+                .GroupBy(x => x.ProductID)
+                .Where(x => x.Count() > 1)
+                .ToList();
 
             if (duplicateProducts.Any())
             {
                 ModelState.AddModelError("", "You cannot add the same product more than once.");
-
-                ViewBag.Suppliers = _context.Suppliers.ToList();
-                ViewBag.Products = _context.Products.ToList();
-
+                await PopulateSelectListsAsync(model);
                 return View(model);
             }
+
             var purchase = await _context.Purchases
                 .Include(p => p.PurchaseItems)
                 .FirstOrDefaultAsync(p => p.PurchaseID == id);
 
-            if (purchase == null)
-            {
-                return NotFound();
-            }
+            if (purchase == null) return NotFound();
 
             // Return old quantities to stock
             foreach (var oldItem in purchase.PurchaseItems)
             {
-                var product = await _context.Products
-                    .FirstOrDefaultAsync(p => p.ProductID == oldItem.ProductID);
-
+                var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == oldItem.ProductID);
                 if (product != null)
                 {
                     product.StockQuantity -= oldItem.Quantity;
                 }
             }
 
-            // Remove old purchase items
             _context.PurchaseItems.RemoveRange(purchase.PurchaseItems);
 
-            // Update purchase information
             purchase.SupplierID = model.SupplierID;
             purchase.PurchaseDate = model.PurchaseDate;
 
@@ -155,21 +221,16 @@ namespace Inventory_Management_System.Controllers
 
             foreach (var item in model.Items)
             {
-                var product = await _context.Products
-                    .FirstOrDefaultAsync(p => p.ProductID == item.ProductID);
+                var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == item.ProductID);
 
                 if (product == null)
                 {
                     ModelState.AddModelError("", "Product not found.");
-
-                    ViewBag.Suppliers = _context.Suppliers.ToList();
-                    ViewBag.Products = _context.Products.ToList();
-
+                    await PopulateSelectListsAsync(model);
                     return View(model);
                 }
 
                 product.StockQuantity += item.Quantity;
-
                 totalAmount += item.Quantity * item.UnitCost;
 
                 var purchaseItem = new PurchaseItem
@@ -184,103 +245,115 @@ namespace Inventory_Management_System.Controllers
             }
 
             purchase.TotalAmount = totalAmount;
-
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Create()
+        // GET: /Purchases/Delete/{id}
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
         {
-            ViewBag.Suppliers = _context.Suppliers.ToList();
-            ViewBag.Products = _context.Products.ToList();
+            if (id <= 0) return NotFound();
 
-            return View();
-        }
+            var purchase = await _context.Purchases
+                .Include(p => p.Supplier)
+                .Include(p => p.PurchaseItems)
+                .ThenInclude(pi => pi.Product)
+                .FirstOrDefaultAsync(m => m.PurchaseID == id);
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PurchaseViewModel model)
-        {
-            if (!ModelState.IsValid)
+            if (purchase == null) return NotFound();
+
+            var viewModel = new PurchaseDeleteViewModel
             {
-                ViewBag.Suppliers = _context.Suppliers.ToList();
-                ViewBag.Products = _context.Products.ToList();
-
-                return View(model);
-            }
-            var duplicateProducts = model.Items
-                .GroupBy(x => x.ProductID)
-                .Where(x => x.Count() > 1)
-                .ToList();
-
-            if (duplicateProducts.Any())
-            {
-                ModelState.AddModelError("", "You cannot add the same product more than once.");
-
-                ViewBag.Suppliers = _context.Suppliers.ToList();
-                ViewBag.Products = _context.Products.ToList();
-
-                return View(model);
-            }
-            if (model.Items == null || model.Items.Count == 0)
-            {
-                ModelState.AddModelError("", "At least one product is required.");
-
-                ViewBag.Suppliers = _context.Suppliers.ToList();
-                ViewBag.Products = _context.Products.ToList();
-
-                return View(model);
-            }
-            decimal totalAmount = 0;
-
-            foreach (var item in model.Items)
-            {
-                totalAmount += item.Quantity * item.UnitCost;
-            }
-
-            var purchase = new Purchase
-            {
-                SupplierID = model.SupplierID,
-                PurchaseDate = model.PurchaseDate,
-                TotalAmount = totalAmount
+                PurchaseID = purchase.PurchaseID,
+                PurchaseDate = purchase.PurchaseDate,
+                SupplierName = purchase.Supplier?.SupplierName ?? "N/A",
+                TotalAmount = purchase.TotalAmount,
+                ItemsCount = purchase.PurchaseItems.Count,
+                Items = purchase.PurchaseItems.Select(pi => new PurchaseItemDetailsViewModel
+                {
+                    PurchaseItemID = pi.PurchaseItemID,
+                    ProductID = pi.ProductID,
+                    ProductName = pi.Product?.ProductName ?? "N/A",
+                    SKU = pi.Product?.SKU ?? "N/A",
+                    Quantity = pi.Quantity,
+                    UnitCost = pi.UnitCost
+                }).ToList()
             };
 
-            _context.Purchases.Add(purchase);
-
-            await _context.SaveChangesAsync();
-
-            foreach (var item in model.Items)
+            foreach (var item in purchase.PurchaseItems)
             {
-                var product = await _context.Products
-                    .FirstOrDefaultAsync(p => p.ProductID == item.ProductID);
-
-                if (product == null)
+                if (item.Product != null && item.Product.StockQuantity < item.Quantity)
                 {
-                    ModelState.AddModelError("", "Product not found.");
-
-                    ViewBag.Suppliers = _context.Suppliers.ToList();
-                    ViewBag.Products = _context.Products.ToList();
-
-                    return View(model);
+                    viewModel.CanDelete = false;
+                    viewModel.BlockingReason = $"Cannot delete purchase order. Product '{item.Product.ProductName}' current stock ({item.Product.StockQuantity}) is less than the quantity to revert ({item.Quantity}).";
+                    break;
                 }
-
-                product.StockQuantity += item.Quantity;
-
-                var purchaseItem = new PurchaseItem
-                {
-                    PurchaseID = purchase.PurchaseID,
-                    ProductID = item.ProductID,
-                    Quantity = item.Quantity,
-                    UnitCost = item.UnitCost
-                };
-
-                _context.PurchaseItems.Add(purchaseItem);
             }
 
+            return View(viewModel);
+        }
+
+        // POST: /Purchases/Delete/{id}
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (id <= 0) return BadRequest();
+
+            var purchase = await _context.Purchases
+                .Include(p => p.PurchaseItems)
+                .ThenInclude(pi => pi.Product)
+                .FirstOrDefaultAsync(p => p.PurchaseID == id);
+
+            if (purchase == null) return NotFound();
+
+            foreach (var item in purchase.PurchaseItems)
+            {
+                var product = item.Product ?? await _context.Products.FindAsync(item.ProductID);
+                if (product != null && product.StockQuantity < item.Quantity)
+                {
+                    TempData["ErrorMessage"] = $"Cannot delete purchase. Product '{product.ProductName}' stock ({product.StockQuantity}) is less than the quantity to revert ({item.Quantity}).";
+                    return RedirectToAction(nameof(Delete), new { id = id });
+                }
+            }
+
+            foreach (var item in purchase.PurchaseItems)
+            {
+                var product = item.Product ?? await _context.Products.FindAsync(item.ProductID);
+                if (product != null)
+                {
+                    product.StockQuantity -= item.Quantity;
+                }
+            }
+
+            _context.PurchaseItems.RemoveRange(purchase.PurchaseItems);
+            _context.Purchases.Remove(purchase);
+
             await _context.SaveChangesAsync();
 
+            TempData["SuccessMessage"] = "Purchase deleted and inventory adjusted successfully.";
             return RedirectToAction(nameof(Index));
+        }
+
+        // Helper Method To Populate Dropdown Lists inside ViewModel
+        private async Task PopulateSelectListsAsync(PurchaseFormViewModel model)
+        {
+            var suppliers = await _context.Suppliers.ToListAsync();
+            var products = await _context.Products.ToListAsync();
+
+            model.Suppliers = suppliers.Select(s => new SelectListItem
+            {
+                Value = s.SupplierID.ToString(),
+                Text = s.SupplierName
+            }).ToList();
+
+            model.Products = products.Select(p => new SelectListItem
+            {
+                Value = p.ProductID.ToString(),
+                Text = $"{p.ProductName} (SKU: {p.SKU})"
+            }).ToList();
         }
     }
 }

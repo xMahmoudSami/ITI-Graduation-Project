@@ -1,237 +1,222 @@
-﻿@model Inventory_Management_System.ViewModels.PurchaseViewModel
+﻿@model Inventory_Management_System.ViewModels.PurchaseFormViewModel
 
 @{
-    ViewData["Title"] = "Edit Purchase";
+    ViewData["Title"] = "Edit Purchase Order";
 }
 
-<h1>Edit Purchase</h1>
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Purchases</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit Purchase Order</li>
+    </ol>
+</nav>
 
-<form asp-action="Edit" method="post">
-
+<form asp-action="Edit" asp-route-id="@Model.PurchaseID" method="post" id="purchaseEditForm" novalidate>
     @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="PurchaseID" />
 
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <!-- Purchase Header Details Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-edit mr-2"></i>Edit Purchase Order #@Model.PurchaseID
+            </h6>
+        </div>
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-    <div class="mb-3">
-        <label asp-for="SupplierID" class="form-label">
-            Supplier
-        </label>
-
-        <select asp-for="SupplierID"
-                class="form-control"
-                asp-items="@(new SelectList(ViewBag.Suppliers, "SupplierID", "SupplierName"))">
-
-            <option value="">-- Select Supplier --</option>
-
-        </select>
-
-        <span asp-validation-for="SupplierID"
-              class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="PurchaseDate"
-               class="form-label">
-            Purchase Date
-        </label>
-
-        <input asp-for="PurchaseDate"
-               type="date"
-               class="form-control" />
-
-        <span asp-validation-for="PurchaseDate"
-              class="text-danger"></span>
-    </div>
-
-    <h3>Products</h3>
-
-    <div id="items">
-
-        @for (int i = 0; i < Model.Items.Count; i++)
-        {
-            <div class="item-row mb-3">
-
-                <div class="row">
-
-                    <div class="col-md-4">
-
-                        <label>Product</label>
-
-                        <select name="Items[@i].ProductID"
-                                class="form-control">
-
-                            @foreach (var product in ViewBag.Products)
-                            {
-                                if (product.ProductID == Model.Items[i].ProductID)
-                                {
-                                    <option value="@product.ProductID"
-                                            selected>
-                                        @product.ProductName
-                                    </option>
-                                }
-                                else
-                                {
-                                    <option value="@product.ProductID">
-                                        @product.ProductName
-                                    </option>
-                                }
-                            }
-
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="SupplierID" class="font-weight-bold">
+                            Supplier <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="SupplierID" asp-items="Model.Suppliers" class="custom-select" required>
+                            <option value="">— Select Supplier —</option>
                         </select>
-
+                        <span asp-validation-for="SupplierID" class="text-danger small font-weight-bold"></span>
                     </div>
-
-                    <div class="col-md-3">
-
-                        <label>Quantity</label>
-
-                        <input name="Items[@i].Quantity"
-                               value="@Model.Items[i].Quantity"
-                               type="number"
-                               min="1"
-                               class="form-control" />
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label>Unit Cost</label>
-
-                        <input name="Items[@i].UnitCost"
-                               value="@Model.Items[i].UnitCost"
-                               type="number"
-                               step="0.01"
-                               min="0.01"
-                               class="form-control" />
-
-                    </div>
-
-                    <div class="col-md-2 d-flex align-items-end">
-
-                        <button type="button"
-                                class="btn btn-danger"
-                                onclick="removeItem(this)">
-                            Remove
-                        </button>
-
-                    </div>
-
                 </div>
 
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="PurchaseDate" class="font-weight-bold">
+                            Purchase Date <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="PurchaseDate" class="form-control" type="date" value="@Model.PurchaseDate.ToString("yyyy-MM-dd")" required />
+                        <span asp-validation-for="PurchaseDate" class="text-danger small font-weight-bold"></span>
+                    </div>
+                </div>
             </div>
-        }
-
+        </div>
     </div>
 
-    <button type="button"
-            class="btn btn-primary mb-3"
-            onclick="addItem()">
-        + Add Product
-    </button>
-
-    <br />
-
-    <button type="submit"
-            class="btn btn-success">
-        Save Changes
-    </button>
-
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Back
-    </a>
-
+    <!-- Purchase Order Line Items Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3 d-flex align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-boxes mr-2"></i>Purchase Order Items
+            </h6>
+            <button type="button" class="btn btn-sm btn-success shadow-sm" id="btnAddItem">
+                <i class="fas fa-plus mr-1"></i> Add Another Product
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0" id="itemsTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 40%;">PRODUCT <span class="text-danger">*</span></th>
+                            <th style="width: 20%;">QUANTITY <span class="text-danger">*</span></th>
+                            <th style="width: 20%;">UNIT COST ($) <span class="text-danger">*</span></th>
+                            <th style="width: 15%;" class="text-right">SUBTOTAL</th>
+                            <th style="width: 5%;" class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsContainer">
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+                            <tr class="item-row">
+                                <input type="hidden" name="Items[@i].PurchaseItemID" value="@Model.Items[i].PurchaseItemID" />
+                                <td>
+                                    <select name="Items[@i].ProductID" class="custom-select product-select" required>
+                                        <option value="">— Select Product —</option>
+                                        @foreach (var prod in Model.Products)
+                                        {
+                                            if (prod.Value == Model.Items[i].ProductID.ToString())
+                                            {
+                                                <option value="@prod.Value" selected="selected">@prod.Text</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@prod.Value">@prod.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="Items[@i].Quantity" class="form-control qty-input" min="1" value="@Model.Items[i].Quantity" required />
+                                </td>
+                                <td>
+                                    <input type="number" step="0.01" name="Items[@i].UnitCost" class="form-control cost-input" min="0.01" value="@Model.Items[i].UnitCost" required />
+                                </td>
+                                <td class="text-right align-middle font-weight-bold text-success">
+                                    $<span class="subtotal-text">@Model.Items[i].Subtotal.ToString("F2")</span>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove-row">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Back to List
+            </a>
+            <div>
+                <span class="h5 font-weight-bold text-gray-800 mr-3">
+                    Total Amount: <span class="text-primary">$<span id="grandTotalText">@Model.TotalAmount.ToString("F2")</span></span>
+                </span>
+                <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                    <i class="fas fa-save mr-1"></i> Update Purchase Order
+                </button>
+            </div>
+        </div>
+    </div>
 </form>
 
-@section Scripts {
-
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+<!-- Template Option for Products Dropdown -->
+<select id="productOptionsTemplate" class="d-none">
+    <option value="">— Select Product —</option>
+    @foreach (var prod in Model.Products)
+    {
+        <option value="@prod.Value">@prod.Text</option>
     }
+</select>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
+        $(document).ready(function () {
 
-        let itemIndex = @Model.Items.Count;
+            function reindexRows() {
+                $('#itemsContainer tr.item-row').each(function (index, row) {
+                    $(row).find('input[name*="PurchaseItemID"]').attr('name', `Items[${index}].PurchaseItemID`);
+                    $(row).find('select.product-select').attr('name', `Items[${index}].ProductID`);
+                    $(row).find('input.qty-input').attr('name', `Items[${index}].Quantity`);
+                    $(row).find('input.cost-input').attr('name', `Items[${index}].UnitCost`);
+                });
+            }
 
-        function addItem() {
+            function calculateTotals() {
+                let grandTotal = 0;
+                $('#itemsContainer tr.item-row').each(function () {
+                    const qty = parseFloat($(this).find('.qty-input').val()) || 0;
+                    const cost = parseFloat($(this).find('.cost-input').val()) || 0;
+                    const subtotal = qty * cost;
 
-            let items = document.getElementById("items");
+                    $(this).find('.subtotal-text').text(subtotal.toFixed(2));
+                    grandTotal += subtotal;
+                });
 
-            let newItem = document.createElement("div");
+                $('#grandTotalText').text(grandTotal.toFixed(2));
+            }
 
-            newItem.className = "item-row mb-3";
+            $('#btnAddItem').click(function () {
+                const productOptions = $('#productOptionsTemplate').html();
+                const newIndex = $('#itemsContainer tr.item-row').length;
 
-            newItem.innerHTML = `
-                <div class="row">
+                const rowHtml = `
+                            <tr class="item-row">
+                                <input type="hidden" name="Items[${newIndex}].PurchaseItemID" value="0" />
+                                <td>
+                                    <select name="Items[${newIndex}].ProductID" class="custom-select product-select" required>
+                                        ${productOptions}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" name="Items[${newIndex}].Quantity" class="form-control qty-input" min="1" value="1" required />
+                                </td>
+                                <td>
+                                    <input type="number" step="0.01" name="Items[${newIndex}].UnitCost" class="form-control cost-input" min="0.01" value="1.00" required />
+                                </td>
+                                <td class="text-right align-middle font-weight-bold text-success">
+                                    $<span class="subtotal-text">1.00</span>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove-row">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                $('#itemsContainer').append(rowHtml);
+                reindexRows();
+                calculateTotals();
+            });
 
-                    <div class="col-md-4">
+            $(document).on('click', '.btn-remove-row', function () {
+                if ($('#itemsContainer tr.item-row').length > 1) {
+                    $(this).closest('tr').remove();
+                    reindexRows();
+                    calculateTotals();
+                } else {
+                    alert('Purchase order must contain at least one item.');
+                }
+            });
 
-                        <label>Product</label>
+            $(document).on('input change', '.qty-input, .cost-input', function () {
+                calculateTotals();
+            });
 
-                        <select name="Items[${itemIndex}].ProductID"
-                                class="form-control">
-
-                            <option value="">-- Select Product --</option>
-
-                            @foreach (var product in ViewBag.Products)
-                            {
-                                <option value="@product.ProductID">
-                                    @product.ProductName
-                                </option>
-                            }
-
-                        </select>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label>Quantity</label>
-
-                        <input name="Items[${itemIndex}].Quantity"
-                               type="number"
-                               min="1"
-                               class="form-control" />
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <label>Unit Cost</label>
-
-                        <input name="Items[${itemIndex}].UnitCost"
-                               type="number"
-                               step="0.01"
-                               min="0.01"
-                               class="form-control" />
-
-                    </div>
-
-                    <div class="col-md-2 d-flex align-items-end">
-
-                        <button type="button"
-                                class="btn btn-danger"
-                                onclick="removeItem(this)">
-                            Remove
-                        </button>
-
-                    </div>
-
-                </div>
-            `;
-
-            items.appendChild(newItem);
-
-            itemIndex++;
-        }
-
-        function removeItem(button) {
-
-            let row = button.closest(".item-row");
-
-            row.remove();
-
-        }
-
+            calculateTotals();
+        });
     </script>
 }

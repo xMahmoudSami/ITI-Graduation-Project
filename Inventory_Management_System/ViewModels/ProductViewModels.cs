@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc.Rendering;
-
 namespace Inventory_Management_System.ViewModels
 {
     public enum StockStatusFilter
