@@ -120,13 +120,13 @@
                      class="collapse @(IsActive("Products") ? "show" : "")"
                      data-parent="#accordionSidebar">
 
-                    <a class="nav-link pl-5 py-2 @(IsProductsListActive() ? "active-page" : "")"
+                    <a class="nav-link py-2 @(IsProductsListActive() ? "active-page" : "")"
                        asp-controller="Products"
                        asp-action="Index">
                         <span>All Products</span>
                     </a>
 
-                    <a class="nav-link pl-5 py-2 @(IsActive("Products", "Create") ? "active-page" : "")"
+                    <a class="nav-link py-2 @(IsActive("Products", "Create") ? "active-page" : "")"
                        asp-controller="Products"
                        asp-action="Create">
                         <span>Add Product</span>
@@ -185,13 +185,13 @@
                      class="collapse @(IsActive("Purchases") || IsActive("Sales") ? "show" : "")"
                      data-parent="#accordionSidebar">
 
-                    <a class="nav-link pl-5 py-2 @(IsActive("Purchases") ? "active-page" : "")"
+                    <a class="nav-link py-2 @(IsActive("Purchases") ? "active-page" : "")"
                        asp-controller="Purchases"
                        asp-action="Index">
                         <span>Purchases</span>
                     </a>
 
-                    <a class="nav-link pl-5 py-2 @(IsActive("Sales") ? "active-page" : "")"
+                    <a class="nav-link py-2 @(IsActive("Sales") ? "active-page" : "")"
                        asp-controller="Sales"
                        asp-action="Index">
                         <span>Sales</span>
@@ -221,13 +221,13 @@
                      class="collapse @(IsActive("Reports") ? "show" : "")"
                      data-parent="#accordionSidebar">
 
-                    <a class="nav-link pl-5 py-2 @(IsActive("Reports", "Index") ? "active-page" : "")"
+                    <a class="nav-link py-2 @(IsActive("Reports", "StockHealth") || IsActive("Reports", "Index") ? "active-page" : "")"
                        asp-controller="Reports"
-                       asp-action="Index">
-                        <span>Inventory Summary</span>
+                       asp-action="StockHealth">
+                        <span>Stock Valuation</span>
                     </a>
 
-                    <a class="nav-link pl-5 py-2 @(IsActive("Reports", "Sales") ? "active-page" : "")"
+                    <a class="nav-link py-2 @(IsActive("Reports", "Sales") ? "active-page" : "")"
                        asp-controller="Reports"
                        asp-action="Sales">
                         <span>Sales Report</span>

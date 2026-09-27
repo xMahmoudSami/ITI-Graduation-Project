@@ -175,7 +175,7 @@ a:hover {
 .text-gray-600 { color: #cbd5e1 !important; }
 .text-gray-500 { color: #94a3b8 !important; }
 .text-gray-400 { color: #64748b !important; }
-.text-gray-300 { color: #475569 !important; }
+.text-gray-300 { color: #cbd5e1 !important; }
 .text-dark { color: #f8fafc !important; }
 .text-muted { color: var(--text-muted) !important; }
 
@@ -474,13 +474,31 @@ a:hover {
   border: 1px solid var(--border-subtle);
   margin-top: 4px;
   overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .sidebar .collapse .nav-link {
-  padding-left: 2.85rem !important;
+  padding-left: 2rem !important;
+  padding-right: 0.75rem !important;
   font-size: 0.86rem;
   color: var(--text-muted) !important;
   border-radius: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sidebar .collapse .nav-link span {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
 /* Sub-tab hover */
@@ -1305,10 +1323,15 @@ footer.sticky-footer {
   min-height: 0;
 }
 
-/* Ensure inner table-responsive and charts fill card-body naturally */
-.card-body > .table-responsive {
+/* Ensure inner table-responsive fills card-body naturally when at the bottom of the card */
+.card-body > .table-responsive:last-child {
   flex: 1 1 auto;
   margin-bottom: 0 !important;
+}
+
+/* Explicit breathing room between table and invoice totals / notes */
+.invoice-card .table-responsive {
+  margin-bottom: 2rem !important;
 }
 
 /* Centered Chart Containers inside Cards */
@@ -2832,5 +2855,375 @@ canvas {
     width: 52px !important;
     height: 52px !important;
     font-size: 20px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   UI HELPERS, TABLE HIGHLIGHTS & STANDARDIZED DARK SURFACES
+   -------------------------------------------------------------------------- */
+.text-slate-400 { color: #94A3B8 !important; }
+.text-slate-300 { color: #CBD5E1 !important; }
+.text-slate-200 { color: #E2E8F0 !important; }
+.text-white { color: #FFFFFF !important; }
+
+/* --------------------------------------------------------------------------
+   GLOBAL MODERN CSS MICRO-INTERACTIONS (PURE NATIVE CSS)
+   Ultra-fast, zero-dependency, hardware-accelerated animations
+   -------------------------------------------------------------------------- */
+@keyframes appFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle, smooth native entry animation for all cards, containers, and alerts */
+.card,
+.kpi-card,
+.filter-card,
+.table-card,
+.invoice-card,
+.delete-card,
+.alert {
+  animation: appFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Sequential stagger for KPI metrics row */
+.kpi-row > div:nth-child(1) .kpi-card { animation-delay: 0.00s; }
+.kpi-row > div:nth-child(2) .kpi-card { animation-delay: 0.03s; }
+.kpi-row > div:nth-child(3) .kpi-card { animation-delay: 0.06s; }
+.kpi-row > div:nth-child(4) .kpi-card { animation-delay: 0.09s; }
+
+/* Interactive Hover States: Clean Elevation */
+.card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.kpi-card:hover,
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55) !important;
+}
+
+.btn {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Table Rows: Smooth Interactive Hover Highlighting */
+.table tbody tr {
+  transition: background-color 0.12s ease;
+}
+
+/* Modern Standardized Alert Containers */
+.alert {
+  border-radius: 8px !important;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.alert.border-left-warning {
+  border-left: 4px solid #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  color: #fde68a !important;
+}
+
+.alert.border-left-danger {
+  border-left: 4px solid #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #fca5a5 !important;
+}
+
+.alert.border-left-success {
+  border-left: 4px solid #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #6ee7b7 !important;
+}
+
+/* Standardized KPI Metric Cards Surface (#111827 / #1F2937) */
+.kpi-card,
+.card.kpi-card {
+  background: #111827 !important;
+  border: 1px solid #1F2937 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6) !important;
+  border-color: #374151 !important;
+}
+
+/* Identical #111827 surface across all 4 cards with crisp accent left borders */
+.kpi-card.border-left-primary {
+  border-left: 4px solid #6366f1 !important;
+  background: #111827 !important;
+}
+
+.kpi-card.border-left-success {
+  border-left: 4px solid #10b981 !important;
+  background: #111827 !important;
+}
+
+.kpi-card.border-left-info {
+  border-left: 4px solid #06b6d4 !important;
+  background: #111827 !important;
+}
+
+.kpi-card.border-left-warning {
+  border-left: 4px solid #f59e0b !important;
+  background: #111827 !important;
+}
+
+.kpi-card.border-left-danger {
+  border-left: 4px solid #ef4444 !important;
+  background: #111827 !important;
+}
+
+/* Distinct Surface for Search & Filter Container */
+.filter-card,
+.card.filter-card {
+  background: #111827 !important;
+  border: 1px solid #1F2937 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Distinct Surface for Table Cards */
+.table-card,
+.card.table-card {
+  background: #111827 !important;
+  border: 1px solid #1F2937 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
+}
+
+.table-card .card-header {
+  background: #1a2234 !important;
+  border-bottom: 1px solid #1F2937 !important;
+}
+
+.table-card .card-footer {
+  background: #1a2234 !important;
+  border-top: 1px solid #1F2937 !important;
+}
+
+/* Explicit High-Contrast Table Headers */
+.table thead th,
+.table th,
+.thead-light th {
+  background-color: #1E293B !important;
+  color: #E2E8F0 !important;
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.06em !important;
+  border-bottom: 2px solid #334155 !important;
+  border-top: none !important;
+  border-color: #334155 !important;
+  text-transform: uppercase;
+  padding: 0.95rem 1.15rem !important;
+  vertical-align: middle;
+}
+
+/* Table Cells High-Contrast */
+.table td {
+  border-color: #1F2937 !important;
+  color: #F1F5F9 !important;
+  background-color: transparent !important;
+  vertical-align: middle;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #1F2937 !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) td {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.table-hover tbody tr:hover td,
+.table tbody tr:hover td {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+.table tfoot td,
+.table tfoot th {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+  color: #E2E8F0 !important;
+}
+
+.table-danger-light {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+}
+
+.table-warning-light {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+}
+
+.print-only {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   PRINT STYLES (@media print)
+   Clean, paper-ready printing for Invoices, Stock Valuation, and Sales Reports
+   -------------------------------------------------------------------------- */
+@media print {
+  /* Hide interactive, navigation, and floating UI elements */
+  #accordionSidebar,
+  .sidebar,
+  .topbar,
+  nav.navbar,
+  footer,
+  footer.sticky-footer,
+  #ai-chatbot,
+  .no-print,
+  .btn,
+  .breadcrumb,
+  nav[aria-label="breadcrumb"],
+  .filter-card,
+  .pagination,
+  .badge-counter,
+  .sidebar-toggler,
+  .alert-dismissible {
+    display: none !important;
+  }
+
+  /* Show dedicated print headers */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Global page canvas resets */
+  html, body {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    font-size: 11pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #wrapper,
+  #content-wrapper,
+  #content,
+  .container-fluid {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  /* Clean Paper Cards */
+  .card, .invoice-card {
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    page-break-inside: avoid;
+    margin-bottom: 1rem !important;
+  }
+
+  .card-header,
+  .card-footer,
+  .bg-light {
+    background: #f9fafb !important;
+    color: #111827 !important;
+    border-color: #e5e7eb !important;
+  }
+
+  /* Text & Heading colors for print */
+  h1, h2, h3, h4, h5, h6,
+  .text-gray-800, .text-gray-900, .text-dark {
+    color: #111827 !important;
+  }
+
+  .text-muted {
+    color: #4b5563 !important;
+  }
+
+  .text-primary {
+    color: #4338ca !important;
+  }
+
+  .text-success {
+    color: #047857 !important;
+  }
+
+  .text-danger {
+    color: #b91c1c !important;
+  }
+
+  .text-warning {
+    color: #b45309 !important;
+  }
+
+  /* Table styling for paper */
+  .table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  .table-bordered th,
+  .table-bordered td {
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+    padding: 6px 10px !important;
+  }
+
+  .thead-light th {
+    background-color: #f3f4f6 !important;
+    color: #111827 !important;
+  }
+
+  /* Printable Badges */
+  .badge {
+    border: 1px solid #9ca3af !important;
+    color: #111827 !important;
+    background: transparent !important;
+    font-size: 8.5pt !important;
+  }
+
+  .badge-success {
+    border-color: #059669 !important;
+    color: #047857 !important;
+  }
+
+  .badge-warning {
+    border-color: #d97706 !important;
+    color: #b45309 !important;
+  }
+
+  .badge-danger {
+    border-color: #dc2626 !important;
+    color: #b91c1c !important;
+  }
+
+  .progress {
+    border: 1px solid #9ca3af !important;
+    height: 8px !important;
   }
 }
