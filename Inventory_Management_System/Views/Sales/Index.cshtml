@@ -1,0 +1,303 @@
+@model Inventory_Management_System.ViewModels.PagedResult<Inventory_Management_System.ViewModels.SaleListItemViewModel>
+
+@{
+    ViewData["Title"] = "Sales Management";
+    var totalRevenue = (decimal)(ViewBag.TotalRevenue ?? 0m);
+    var totalSalesCount = (int)(ViewBag.TotalSalesCount ?? 0);
+    var totalUnitsSold = (int)(ViewBag.TotalUnitsSold ?? 0);
+    var avgOrderValue = (decimal)(ViewBag.AvgOrderValue ?? 0m);
+    var todayRevenue = (decimal)(ViewBag.TodayRevenue ?? 0m);
+    var currentSearch = (string?)ViewBag.CurrentSearch;
+    var fromDate = (string?)ViewBag.FromDate;
+    var toDate = (string?)ViewBag.ToDate;
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
+        <li class="breadcrumb-item active text-slate-400" aria-current="page">Sales</li>
+    </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h1 class="h3 mb-1 text-white font-weight-bold">
+            <i class="fas fa-cash-register text-primary mr-2"></i>Sales Orders & POS
+        </h1>
+        <p class="small mb-0 text-slate-400">Record customer sales transactions, snapshot pricing, and track atomic stock deductions</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-icon-split shadow-sm">
+        <span class="icon text-white-50">
+            <i class="fas fa-plus"></i>
+        </span>
+        <span class="text font-weight-bold">New Sale Order</span>
+    </a>
+</div>
+
+<!-- Alerts / Notifications -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="fas fa-check-circle mr-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="fas fa-exclamation-triangle mr-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<!-- KPI Metrics Row -->
+<div class="row mb-4 kpi-row">
+    <!-- Total Revenue Card -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-left-primary shadow-sm h-100 py-2 kpi-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Sales Revenue</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">$@totalRevenue.ToString("N2")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-primary" style="opacity: 0.45;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Orders Card -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-left-success shadow-sm h-100 py-2 kpi-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Orders</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@totalSalesCount.ToString("N0")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-shopping-bag fa-2x text-success" style="opacity: 0.45;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Units Sold Card -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-left-info shadow-sm h-100 py-2 kpi-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Units Sold</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">@totalUnitsSold.ToString("N0")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-cubes fa-2x text-info" style="opacity: 0.45;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avg Order Value Card -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-left-warning shadow-sm h-100 py-2 kpi-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Average Order Value</div>
+                        <div class="h5 mb-0 font-weight-bold text-white">$@avgOrderValue.ToString("N2")</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-warning" style="opacity: 0.45;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Date Filter Card -->
+<div class="card shadow-sm mb-4 filter-card">
+    <div class="card-body py-3">
+        <form method="get" asp-action="Index" class="form-row align-items-end">
+            <div class="col-md-4 mb-2 mb-md-0">
+                <label class="small font-weight-bold text-slate-400 mb-1">Customer / Order #</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text border-right-0" style="background: #1a2234; border-color: #334155;"><i class="fas fa-search text-slate-400"></i></span>
+                    </div>
+                    <input type="text" name="search" value="@currentSearch" class="form-control border-left-0" style="background: #0f172a; border-color: #334155; color: #ffffff;" placeholder="Search customer info or order ID..." />
+                </div>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="small font-weight-bold text-slate-400 mb-1">From Date</label>
+                <input type="date" name="fromDate" value="@fromDate" class="form-control" style="background: #0f172a; border-color: #334155; color: #ffffff;" />
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="small font-weight-bold text-slate-400 mb-1">To Date</label>
+                <input type="date" name="toDate" value="@toDate" class="form-control" style="background: #0f172a; border-color: #334155; color: #ffffff;" />
+            </div>
+            <div class="col-md-2 d-flex">
+                <button type="submit" class="btn btn-primary btn-block mr-1">
+                    <i class="fas fa-filter mr-1"></i> Filter
+                </button>
+                @if (!string.IsNullOrEmpty(currentSearch) || !string.IsNullOrEmpty(fromDate) || !string.IsNullOrEmpty(toDate))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary" style="border-color: #475569; color: #cbd5e1;" title="Reset Filters">
+                        <i class="fas fa-undo"></i>
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sales Orders List Card -->
+<div class="card shadow-sm mb-4 table-card">
+    <div class="card-header py-3 d-flex align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-white">
+            <i class="fas fa-list text-primary mr-2"></i>Sales Order History (@Model.TotalItems Total)
+        </h6>
+        <span class="badge border text-slate-300 px-2 py-1" style="background: #1e293b; border-color: #334155;">Page @Model.PageNumber of @Math.Max(1, Model.TotalPages)</span>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Items.Any())
+        {
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="fas fa-receipt fa-3x" style="color: #475569;"></i>
+                </div>
+                <h5 class="text-white font-weight-bold">No sales orders found</h5>
+                <p class="text-slate-400 mb-3">No completed sales match your current search or date criteria.</p>
+                <a asp-action="Create" class="btn btn-primary btn-sm px-3 shadow-sm">
+                    <i class="fas fa-plus mr-1"></i> Record New Sale
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 12%;">ORDER #</th>
+                            <th style="width: 25%;">CUSTOMER</th>
+                            <th style="width: 15%;">SALE DATE</th>
+                            <th class="text-center" style="width: 12%;">LINE ITEMS</th>
+                            <th class="text-center" style="width: 12%;">UNITS SOLD</th>
+                            <th class="text-right" style="width: 12%;">TOTAL AMOUNT</th>
+                            <th class="text-right" style="width: 12%;">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr class="sales-row">
+                                <td>
+                                    <span class="badge px-2 py-1 font-weight-bold" style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155;">
+                                        INV-@item.SaleID.ToString("D6")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="font-weight-bold text-white">
+                                        <i class="fas fa-user text-primary mr-1"></i>
+                                        @item.CustomerInfo
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-slate-400">
+                                        <i class="far fa-calendar-alt mr-1"></i>@item.SaleDate.ToString("yyyy-MM-dd")
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge border px-2 py-1 font-weight-bold" style="background: #1e293b; color: #e2e8f0; border-color: #334155;">
+                                        @item.ItemsCount line@(item.ItemsCount == 1 ? "" : "s")
+                                    </span>
+                                </td>
+                                <td class="text-center font-weight-bold text-white">
+                                    @item.TotalUnits
+                                </td>
+                                <td class="text-right font-weight-bold text-success h6 mb-0">
+                                    $@item.TotalAmount.ToString("N2")
+                                </td>
+                                <td class="text-right">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.SaleID" class="btn btn-outline-info" title="View & Print Invoice">
+                                            <i class="fas fa-file-invoice mr-1"></i> Invoice
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.SaleID" class="btn btn-outline-danger" title="Delete & Revert Stock">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="card-footer d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+                <span class="small mb-2 mb-md-0 text-slate-400">
+                    Showing @Model.StartItemIndex to @Model.EndItemIndex of @Model.TotalItems entries
+                </span>
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Sales pagination">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- Previous -->
+                            <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@(Model.PageNumber - 1)"
+                                   asp-route-search="@currentSearch"
+                                   asp-route-fromDate="@fromDate"
+                                   asp-route-toDate="@toDate">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            @for (int p = 1; p <= Model.TotalPages; p++)
+                            {
+                                <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@p"
+                                       asp-route-search="@currentSearch"
+                                       asp-route-fromDate="@fromDate"
+                                       asp-route-toDate="@toDate">
+                                        @p
+                                    </a>
+                                </li>
+                            }
+
+                            <!-- Next -->
+                            <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@(Model.PageNumber + 1)"
+                                   asp-route-search="@currentSearch"
+                                   asp-route-fromDate="@fromDate"
+                                   asp-route-toDate="@toDate">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            </div>
+        }
+    </div>
+</div>
+

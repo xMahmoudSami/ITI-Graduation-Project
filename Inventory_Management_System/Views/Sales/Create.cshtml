@@ -1,0 +1,338 @@
+@model Inventory_Management_System.ViewModels.SaleFormViewModel
+
+@{
+    ViewData["Title"] = "New Sale Order";
+}
+
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Sales</a></li>
+        <li class="breadcrumb-item active text-slate-400" aria-current="page">New Sale Order</li>
+    </ol>
+</nav>
+
+<form asp-action="Create" method="post" id="saleForm" novalidate>
+    @Html.AntiForgeryToken()
+
+    <!-- Header Card: Customer & Sale Date -->
+    <div class="card shadow-sm mb-4 form-card">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-white">
+                <i class="fas fa-cash-register text-primary mr-2"></i>Record New Sale Transaction
+            </h6>
+        </div>
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm" role="alert"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="CustomerInfo" class="font-weight-bold text-slate-300">
+                            Customer Info / Name
+                        </label>
+                        <input asp-for="CustomerInfo" class="form-control" placeholder="e.g. Acme Corp / Walk-in Customer / John Doe" />
+                        <small class="form-text text-slate-400">Leave empty or specify client details, phone, or company name.</small>
+                        <span asp-validation-for="CustomerInfo" class="text-danger small font-weight-bold"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="SaleDate" class="font-weight-bold text-slate-300">
+                            Sale Date <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="SaleDate" class="form-control" type="date" />
+                        <small class="form-text text-slate-400">Date the sale transaction took place.</small>
+                        <span asp-validation-for="SaleDate" class="text-danger small font-weight-bold"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items Card: Dynamic Products Line Items -->
+    <div class="card shadow-sm mb-4 table-card">
+        <div class="card-header py-3 d-flex align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-white">
+                <i class="fas fa-boxes text-primary mr-2"></i>Sale Order Line Items
+            </h6>
+            <button type="button" id="btnAddItem" class="btn btn-sm btn-success shadow-sm">
+                <i class="fas fa-plus mr-1"></i> Add Another Product
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0" id="saleItemsTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 42%;">PRODUCT <span class="text-danger">*</span></th>
+                            <th style="width: 18%;">QUANTITY <span class="text-danger">*</span></th>
+                            <th style="width: 20%;">SNAPSHOT PRICE ($)</th>
+                            <th style="width: 15%;">SUBTOTAL</th>
+                            <th style="width: 5%;" class="text-center">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsContainer">
+                        @if (Model.Items != null && Model.Items.Count > 0)
+                        {
+                            for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                var selectedItem = Model.Items[i];
+                                var matchingCatalog = Model.ProductCatalog.FirstOrDefault(p => p.ProductID == selectedItem.ProductID);
+                                decimal itemPrice = matchingCatalog?.UnitPrice ?? selectedItem.UnitPrice;
+                                int itemStock = matchingCatalog?.StockQuantity ?? 0;
+
+                                <tr class="item-row">
+                                    <td>
+                                        <select name="Items[@i].ProductID" class="custom-select product-select">
+                                            <option value="0" data-price="0" data-stock="0">— Select Product —</option>
+                                            @foreach (var prod in Model.ProductCatalog)
+                                            {
+                                                <option value="@prod.ProductID"
+                                                        data-price="@prod.UnitPrice"
+                                                        data-stock="@prod.StockQuantity"
+                                                        data-name="@prod.ProductName"
+                                                        selected="@(prod.ProductID == selectedItem.ProductID)">
+                                                    @prod.ProductName (SKU: @prod.SKU) - $@prod.UnitPrice.ToString("N2") [@prod.StockQuantity in stock]
+                                                </option>
+                                            }
+                                        </select>
+                                        <div class="stock-badge-container mt-1">
+                                            @if (matchingCatalog != null)
+                                            {
+                                                <span class="badge @(itemStock > 0 ? "badge-info" : "badge-danger") font-weight-normal">
+                                                    Available Stock: @itemStock
+                                                </span>
+                                            }
+                                        </div>
+                                        <span class="text-danger small font-weight-bold field-validation-valid" data-valmsg-for="Items[@i].ProductID" data-valmsg-replace="true"></span>
+                                    </td>
+                                    <td>
+                                        <input name="Items[@i].Quantity"
+                                               value="@selectedItem.Quantity"
+                                               class="form-control quantity-input"
+                                               type="number"
+                                               min="1"
+                                               max="@(itemStock > 0 ? itemStock : 10000)"
+                                               placeholder="1" />
+                                        <div class="stock-warning text-danger small font-weight-bold mt-1" style="display: none;"></div>
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">$</span>
+                                            </div>
+                                            <input name="Items[@i].UnitPrice"
+                                                   value="@itemPrice.ToString("F2")"
+                                                   class="form-control price-input"
+                                                   style="background: #1a2234; color: #ffffff;"
+                                                   type="number"
+                                                   step="0.01"
+                                                   readonly />
+                                        </div>
+                                        <small class="form-text text-slate-400">Auto-captured snapshot</small>
+                                    </td>
+                                    <td class="align-middle font-weight-bold text-success subtotal-cell">
+                                        $@((selectedItem.Quantity * itemPrice).ToString("N2"))
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item" title="Remove row">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer Section: Total & Actions -->
+            <div class="p-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center" style="background: #1a2234; border-color: #1F2937 !important;">
+                <a asp-action="Index" class="btn btn-outline-secondary mb-2 mb-md-0">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Sales
+                </a>
+                <div class="d-flex align-items-center">
+                    <div class="mr-4 text-right">
+                        <span class="small text-uppercase font-weight-bold d-block text-slate-400">Grand Total</span>
+                        <h4 class="mb-0 font-weight-bold text-success" id="totalAmount">$0.00</h4>
+                    </div>
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm" id="btnSubmit">
+                        <i class="fas fa-check-circle mr-1"></i> Complete Sale & Deduct Stock
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            // Build JS Product Options HTML from Model Catalog
+            let productCatalog = [
+                @foreach (var p in Model.ProductCatalog)
+                {
+                    <text>{ id: @p.ProductID, name: "@Html.Raw(p.ProductName.Replace("\"", "\\\""))", sku: "@p.SKU", price: @p.UnitPrice, stock: @p.StockQuantity },</text>
+                }
+            ];
+
+            function generateProductOptionsHtml(selectedId) {
+                let html = '<option value="0" data-price="0" data-stock="0">— Select Product —</option>';
+                for (let i = 0; i < productCatalog.length; i++) {
+                    let prod = productCatalog[i];
+                    let isSelected = (prod.id === selectedId) ? 'selected' : '';
+                    let stockClass = prod.stock === 0 ? ' [OUT OF STOCK]' : ` [${prod.stock} in stock]`;
+                    html += `<option value="${prod.id}" data-price="${prod.price}" data-stock="${prod.stock}" data-name="${prod.name}" ${isSelected}>
+                                ${prod.name} (SKU: ${prod.sku}) - $${prod.price.toFixed(2)}${stockClass}
+                             </option>`;
+                }
+                return html;
+            }
+
+            function reindexRows() {
+                $('#itemsContainer tr.item-row').each(function (index) {
+                    $(this).find('.product-select').attr('name', `Items[${index}].ProductID`);
+                    $(this).find('.quantity-input').attr('name', `Items[${index}].Quantity`);
+                    $(this).find('.price-input').attr('name', `Items[${index}].UnitPrice`);
+                });
+            }
+
+            function calculateTotals() {
+                let grandTotal = 0;
+                let hasStockError = false;
+
+                $('#itemsContainer tr.item-row').each(function () {
+                    let select = $(this).find('.product-select option:selected');
+                    let price = parseFloat(select.data('price')) || parseFloat($(this).find('.price-input').val()) || 0;
+                    let stock = parseInt(select.data('stock')) || 0;
+                    let qtyInput = $(this).find('.quantity-input');
+                    let qty = parseInt(qtyInput.val()) || 0;
+                    let warningDiv = $(this).find('.stock-warning');
+
+                    // Check stock sufficiency
+                    if (select.val() && select.val() !== "0") {
+                        if (qty > stock) {
+                            hasStockError = true;
+                            warningDiv.text(`⚠️ Exceeds stock (${stock} available)`).show();
+                            qtyInput.addClass('is-invalid');
+                        } else if (stock === 0) {
+                            hasStockError = true;
+                            warningDiv.text(`⚠️ Product is Out of Stock`).show();
+                            qtyInput.addClass('is-invalid');
+                        } else {
+                            warningDiv.hide();
+                            qtyInput.removeClass('is-invalid');
+                        }
+                    } else {
+                        warningDiv.hide();
+                        qtyInput.removeClass('is-invalid');
+                    }
+
+                    let subtotal = qty * price;
+                    $(this).find('.subtotal-cell').text('$' + subtotal.toFixed(2));
+                    grandTotal += subtotal;
+                });
+
+                $('#totalAmount').text('$' + grandTotal.toFixed(2));
+            }
+
+            function addNewRow() {
+                let index = $('#itemsContainer tr.item-row').length;
+                let optionsHtml = generateProductOptionsHtml(0);
+
+                let rowHtml = `
+                    <tr class="item-row">
+                        <td>
+                            <select name="Items[${index}].ProductID" class="custom-select product-select">
+                                ${optionsHtml}
+                            </select>
+                            <div class="stock-badge-container mt-1"></div>
+                        </td>
+                        <td>
+                            <input name="Items[${index}].Quantity" class="form-control quantity-input" type="number" min="1" value="1" placeholder="1" />
+                            <div class="stock-warning text-danger small font-weight-bold mt-1" style="display: none;"></div>
+                        </td>
+                        <td>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                <input name="Items[${index}].UnitPrice" class="form-control price-input" style="background: #1a2234; color: #ffffff;" type="number" step="0.01" value="0.00" readonly />
+                            </div>
+                            <small class="form-text text-slate-400">Auto-captured snapshot</small>
+                        </td>
+                        <td class="align-middle font-weight-bold text-success subtotal-cell">
+                            $0.00
+                        </td>
+                        <td class="text-center align-middle">
+                            <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item" title="Remove row">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+
+                let $newRow = $(rowHtml);
+                $('#itemsContainer').append($newRow);
+                calculateTotals();
+            }
+
+            // On Product Change -> Auto-fill snapshot price and update stock badge
+            $(document).on('change', '.product-select', function () {
+                let selectedOpt = $(this).find('option:selected');
+                let price = parseFloat(selectedOpt.data('price')) || 0;
+                let stock = parseInt(selectedOpt.data('stock')) || 0;
+                let row = $(this).closest('tr');
+
+                // Auto-fill price
+                row.find('.price-input').val(price.toFixed(2));
+
+                // Update stock badge
+                let badgeContainer = row.find('.stock-badge-container');
+                badgeContainer.empty();
+                if (selectedOpt.val() !== "0") {
+                    let badgeClass = stock > 0 ? "badge-info" : "badge-danger";
+                    let badgeText = stock > 0 ? `Available Stock: ${stock}` : "OUT OF STOCK";
+                    badgeContainer.html(`<span class="badge ${badgeClass} font-weight-normal">${badgeText}</span>`);
+                    row.find('.quantity-input').attr('max', stock > 0 ? stock : 1);
+                }
+
+                calculateTotals();
+            });
+
+            // On Quantity or Price Input Change -> Recalculate
+            $(document).on('input change', '.quantity-input', function () {
+                calculateTotals();
+            });
+
+            // Add Row Button
+            $('#btnAddItem').click(function () {
+                addNewRow();
+            });
+
+            // Remove Row Button
+            $(document).on('click', '.btn-remove-item', function () {
+                if ($('#itemsContainer tr.item-row').length > 1) {
+                    let row = $(this).closest('tr');
+                    row.fadeOut(150, function () {
+                        row.remove();
+                        reindexRows();
+                        calculateTotals();
+                    });
+                } else {
+                    alert('At least one line item is required for a sale order.');
+                }
+            });
+
+            // Ensure initial row exists
+            if ($('#itemsContainer tr.item-row').length === 0) {
+                addNewRow();
+            } else {
+                calculateTotals();
+            }
+        });
+    </script>
+}
