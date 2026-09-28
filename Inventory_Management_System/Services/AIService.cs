@@ -96,8 +96,11 @@ namespace Inventory_Management_System.Services
                      Contract Price: X
                      Lead Time: Y days
 
-                18. At the end, add a short useful summary when appropriate.
-                19. Do not use unnecessary explanations.
+                18. For analytics or summaries, organize the answer clearly using
+                    headings, bullet points, and short sections.
+                19. Show calculated values clearly.
+                20. At the end, add a short useful summary when appropriate.
+                21. Do not use unnecessary explanations.
 
                 You can answer questions about:
                 - Products
@@ -115,6 +118,11 @@ namespace Inventory_Management_System.Services
                 - Customers
                 - Best-selling products
                 - Inventory analytics
+                - Inventory value
+                - Stock value
+                - Average product price
+                - Stock by category
+                - Inventory summary
 
                 DATABASE CONTEXT:
                 {databaseContext}
@@ -506,7 +514,153 @@ namespace Inventory_Management_System.Services
             }
 
             // =====================================================
-            // 4. SUPPLIERS
+            // 4. INVENTORY ANALYTICS
+            // =====================================================
+            if (ContainsAny(
+                query,
+                "analytics",
+                "analysis",
+                "inventory summary",
+                "inventory overview",
+                "stock summary",
+                "stock value",
+                "inventory value",
+                "total inventory value",
+                "average price",
+                "average product price",
+                "highest stock",
+                "lowest stock",
+                "highest inventory value",
+                "category stock",
+                "stock by category",
+                "inventory statistics",
+                "inventory stats",
+                "stock statistics",
+                "stock stats",
+                "how many products",
+                "how many categories"))
+            {
+                // -------------------------------------------------
+                // GET ALL PRODUCTS
+                // -------------------------------------------------
+                var products = await _context.Products
+                    .AsNoTracking()
+                    .Select(p => new
+                    {
+                        p.ProductID,
+                        p.ProductName,
+                        p.SKU,
+                        p.UnitPrice,
+                        p.StockQuantity,
+                        p.LowStockThreshold,
+                        CategoryName = p.Category != null
+                            ? p.Category.CategoryName
+                            : null
+                    })
+                    .ToListAsync();
+
+                // -------------------------------------------------
+                // BASIC METRICS
+                // -------------------------------------------------
+                var totalProducts = products.Count;
+
+                var totalCategories = await _context.Categories
+                    .AsNoTracking()
+                    .CountAsync();
+
+                var totalStockUnits = products
+                    .Sum(p => p.StockQuantity);
+
+                // Total current value of all inventory
+                var totalInventoryValue = products
+                    .Sum(p => p.UnitPrice * p.StockQuantity);
+
+                // Average unit price
+                var averageProductPrice = products.Count > 0
+                    ? products.Average(p => p.UnitPrice)
+                    : 0;
+
+                // Low stock count
+                var lowStockCount = products
+                    .Count(p =>
+                        p.StockQuantity > 0 &&
+                        p.StockQuantity <= p.LowStockThreshold);
+
+                // Out of stock count
+                var outOfStockCount = products
+                    .Count(p => p.StockQuantity == 0);
+
+                // -------------------------------------------------
+                // STOCK BY CATEGORY
+                // -------------------------------------------------
+                var stockByCategory = products
+                    .GroupBy(p => p.CategoryName ?? "Uncategorized")
+                    .Select(g => new
+                    {
+                        Category = g.Key,
+                        ProductCount = g.Count(),
+                        TotalStockUnits = g.Sum(p => p.StockQuantity),
+                        InventoryValue = g.Sum(
+                            p => p.UnitPrice * p.StockQuantity)
+                    })
+                    .OrderByDescending(x => x.TotalStockUnits)
+                    .ToList();
+
+                // -------------------------------------------------
+                // PRODUCT WITH HIGHEST STOCK
+                // -------------------------------------------------
+                var highestStockProduct = products
+                    .OrderByDescending(p => p.StockQuantity)
+                    .Select(p => new
+                    {
+                        p.ProductName,
+                        p.SKU,
+                        p.StockQuantity
+                    })
+                    .FirstOrDefault();
+
+                // -------------------------------------------------
+                // PRODUCT WITH HIGHEST INVENTORY VALUE
+                // -------------------------------------------------
+                var highestValueProduct = products
+                    .OrderByDescending(
+                        p => p.UnitPrice * p.StockQuantity)
+                    .Select(p => new
+                    {
+                        p.ProductName,
+                        p.SKU,
+                        p.StockQuantity,
+                        p.UnitPrice,
+                        InventoryValue =
+                            p.UnitPrice * p.StockQuantity
+                    })
+                    .FirstOrDefault();
+
+                return Serialize(new
+                {
+                    DataType = "Inventory Analytics",
+
+                    Summary = new
+                    {
+                        TotalProducts = totalProducts,
+                        TotalCategories = totalCategories,
+                        TotalStockUnits = totalStockUnits,
+                        TotalInventoryValue = totalInventoryValue,
+                        AverageProductPrice = averageProductPrice,
+                        LowStockProducts = lowStockCount,
+                        OutOfStockProducts = outOfStockCount
+                    },
+
+                    HighestStockProduct = highestStockProduct,
+
+                    HighestInventoryValueProduct = highestValueProduct,
+
+                    StockByCategory = stockByCategory
+                });
+            }
+
+            // =====================================================
+            // 5. SUPPLIERS
             // =====================================================
             if (ContainsAny(
                 query,
@@ -561,7 +715,7 @@ namespace Inventory_Management_System.Services
             }
 
             // =====================================================
-            // 5. PRODUCTS / CATEGORIES / STOCK
+            // 6. PRODUCTS / CATEGORIES / STOCK
             // =====================================================
             if (ContainsAny(
                 query,
@@ -572,8 +726,7 @@ namespace Inventory_Management_System.Services
                 "category",
                 "categories",
                 "price",
-                "prices",
-                "how many products"))
+                "prices"))
             {
                 var categories = await _context.Categories
                     .AsNoTracking()
@@ -618,7 +771,7 @@ namespace Inventory_Management_System.Services
             }
 
             // =====================================================
-            // 6. GENERAL INVENTORY OVERVIEW
+            // 7. GENERAL INVENTORY OVERVIEW
             // =====================================================
             var allCategories = await _context.Categories
                 .AsNoTracking()
