@@ -145,16 +145,16 @@
 <div class="card shadow-sm mb-4 filter-card no-print">
     <div class="card-body py-3">
         <!-- Date Preset Quick Links -->
-        <div class="d-flex align-items-center mb-3 pb-2 border-bottom" style="border-color: #1F2937 !important;">
+        <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
             <span class="small font-weight-bold text-slate-400 mr-3"><i class="far fa-calendar-check mr-1"></i>@Loc["QuickRanges"]</span>
             <div class="btn-group btn-group-sm">
-                <a asp-action="Sales" asp-route-preset="Today" class="btn @(Model.DatePreset == "Today" ? "btn-primary font-weight-bold" : "btn-outline-secondary")" style="@(Model.DatePreset == "Today" ? "" : "border-color: #475569; color: #cbd5e1;")">
+                <a asp-action="Sales" asp-route-preset="Today" class="btn @(Model.DatePreset == "Today" ? "btn-primary font-weight-bold" : "btn-outline-secondary")">
                     @Loc["Today"]
                 </a>
-                <a asp-action="Sales" asp-route-preset="ThisWeek" class="btn @(Model.DatePreset == "ThisWeek" ? "btn-primary font-weight-bold" : "btn-outline-secondary")" style="@(Model.DatePreset == "ThisWeek" ? "" : "border-color: #475569; color: #cbd5e1;")">
+                <a asp-action="Sales" asp-route-preset="ThisWeek" class="btn @(Model.DatePreset == "ThisWeek" ? "btn-primary font-weight-bold" : "btn-outline-secondary")">
                     @Loc["ThisWeek"]
                 </a>
-                <a asp-action="Sales" asp-route-preset="ThisMonth" class="btn @(Model.DatePreset == "ThisMonth" ? "btn-primary font-weight-bold" : "btn-outline-secondary")" style="@(Model.DatePreset == "ThisMonth" ? "" : "border-color: #475569; color: #cbd5e1;")">
+                <a asp-action="Sales" asp-route-preset="ThisMonth" class="btn @(Model.DatePreset == "ThisMonth" ? "btn-primary font-weight-bold" : "btn-outline-secondary")">
                     @Loc["ThisMonth"]
                 </a>
             </div>
@@ -167,24 +167,24 @@
                 <label class="small font-weight-bold text-slate-400 mb-1">@Loc["CustomerOrOrderNumber"]</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
-                        <span class="input-group-text border-right-0" style="background: #1a2234; border-color: #334155;"><i class="fas fa-search text-slate-400"></i></span>
+                        <span class="input-group-text border-right-0"><i class="fas fa-search text-slate-400"></i></span>
                     </div>
-                    <input type="text" name="search" value="@Model.Search" class="form-control border-left-0" style="background: #0f172a; border-color: #334155; color: #ffffff;" placeholder="@Loc["SearchCustomerOrOrder"]" />
+                    <input type="text" name="search" value="@Model.Search" class="form-control border-left-0" placeholder="@Loc["SearchCustomerOrOrder"]" />
                 </div>
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="small font-weight-bold text-slate-400 mb-1">@Loc["FromDate"]</label>
-                <input type="date" name="fromDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" class="form-control" style="background: #0f172a; border-color: #334155; color: #ffffff;" />
+                <input type="date" name="fromDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" class="form-control" />
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="small font-weight-bold text-slate-400 mb-1">@Loc["ToDate"]</label>
-                <input type="date" name="toDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="form-control" style="background: #0f172a; border-color: #334155; color: #ffffff;" />
+                <input type="date" name="toDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="form-control" />
             </div>
             <div class="col-md-2 d-flex">
                 <button type="submit" class="btn btn-primary btn-block mr-1">
                     <i class="fas fa-filter mr-1"></i> @Loc["Apply"]
                 </button>
-                <a asp-action="Sales" class="btn btn-outline-secondary" style="border-color: #475569; color: #cbd5e1;" title="@Loc["Reset"]">
+                <a asp-action="Sales" class="btn btn-outline-secondary" title="@Loc["Reset"]">
                     <i class="fas fa-undo"></i>
                 </a>
             </div>
@@ -198,7 +198,7 @@
         <h6 class="m-0 font-weight-bold text-white">
             <i class="fas fa-file-invoice-dollar text-primary mr-2"></i>@Loc["SalesOrdersBreakdown"] (@Model.SalesRecords.Count @Loc["TotalOrders"])
         </h6>
-        <span class="badge border text-slate-300 px-2 py-1" style="background: #1e293b; border-color: #334155;">
+        <span class="badge border badge-light px-2 py-1">
             @Loc["Period"] @Model.StartDate.ToString("MMM dd, yyyy") &ndash; @Model.EndDate.ToString("MMM dd, yyyy")
         </span>
     </div>
@@ -236,7 +236,7 @@
                         {
                             <tr class="sales-row">
                                 <td>
-                                    <span class="badge px-2 py-1 font-weight-bold" style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155;">
+                                    <span class="badge badge-invoice px-2 py-1 font-weight-bold">
                                         INV-@sale.SaleID.ToString("D6")
                                     </span>
                                 </td>
@@ -252,7 +252,7 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="badge border px-2 py-1 font-weight-bold" style="background: #1e293b; color: #e2e8f0; border-color: #334155;">
+                                    <span class="badge border badge-light px-2 py-1 font-weight-bold">
                                         @sale.ItemsCount @Loc["LineItems"]
                                     </span>
                                 </td>

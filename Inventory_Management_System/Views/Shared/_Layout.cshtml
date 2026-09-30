@@ -94,6 +94,21 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!-- Anti-flicker theme detection (must run synchronously before styles render) -->
+    <script>
+        (function () {
+            try {
+                var savedTheme = localStorage.getItem('ims_theme') || localStorage.getItem('theme') || 'dark';
+                if (savedTheme === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
     <title>@ViewData["Title"] - Inventory Management System</title>
 
     <!-- Custom fonts -->
@@ -279,13 +294,41 @@
                 </div>
             </li>
 
-            <hr class="sidebar-divider d-none d-md-block" />
+            <hr class="sidebar-divider d-none d-md-block my-2" />
 
-            <!-- Sidebar Toggler -->
-            <div class="text-center d-none d-md-inline">
+            <!-- Sidebar Toggler (Desktop - directly beneath navigation tabs) -->
+            <div class="text-center d-none d-md-inline sidebar-toggler-wrapper my-2">
                 <button class="rounded-circle border-0"
-                        id="sidebarToggle">
+                        id="sidebarToggle"
+                        type="button"
+                        title="Toggle Sidebar"
+                        aria-label="Toggle Sidebar">
                 </button>
+            </div>
+
+            <!-- Theme Switcher (Separate at the very bottom corner of the sidebar) -->
+            <div class="sidebar-bottom-corner mt-auto w-100 pb-3">
+                <div class="sidebar-theme-item">
+                    <button type="button" 
+                            id="themeToggleBtn" 
+                            class="sidebar-theme-toggle" 
+                            title="@Loc["Theme_Toggle"]" 
+                            aria-label="@Loc["Theme_Toggle"]"
+                            data-light-text="@Loc["Theme_Light"]"
+                            data-dark-text="@Loc["Theme_Dark"]">
+                        <div class="theme-icon-container">
+                            <i class="fas fa-moon theme-icon-moon"></i>
+                            <i class="fas fa-sun theme-icon-sun"></i>
+                        </div>
+                        <div class="theme-info-box">
+                            <span class="theme-title">@Loc["Theme"]</span>
+                            <span class="theme-mode-label" id="themeStatusText">@Loc["Theme_Dark"]</span>
+                        </div>
+                        <div class="theme-switch-track">
+                            <span class="theme-switch-thumb"></span>
+                        </div>
+                    </button>
+                </div>
             </div>
 
         </ul>
@@ -647,6 +690,49 @@
     <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="~/js/sb-admin-2.min.js"></script>
 
+    <!-- Theme Switcher Script -->
+    <script>
+        (function () {
+            function initThemeSwitcher() {
+                var btn = document.getElementById('themeToggleBtn');
+                var statusText = document.getElementById('themeStatusText');
+                if (!btn) return;
+
+                var lightLabel = btn.getAttribute('data-light-text') || 'Light Mode';
+                var darkLabel = btn.getAttribute('data-dark-text') || 'Dark Mode';
+
+                function updateUI(theme) {
+                    if (statusText) {
+                        statusText.textContent = (theme === 'light') ? lightLabel : darkLabel;
+                    }
+                    btn.setAttribute('data-current-theme', theme);
+                }
+
+                var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+                updateUI(currentTheme);
+
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var active = document.documentElement.getAttribute('data-theme') || 'dark';
+                    var next = (active === 'light') ? 'dark' : 'light';
+
+                    document.documentElement.setAttribute('data-theme', next);
+                    try {
+                        localStorage.setItem('ims_theme', next);
+                        localStorage.setItem('theme', next);
+                    } catch (err) { }
+
+                    updateUI(next);
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initThemeSwitcher);
+            } else {
+                initThemeSwitcher();
+            }
+        })();
+    </script>
 
     <!-- Global Search Script -->
     <script>
@@ -678,13 +764,17 @@
                             dropdown.empty();
 
                             let hasResults = false;
+                            const lblProducts = '@Loc["Products"]';
+                            const lblCategories = '@Loc["Categories"]';
+                            const lblSuppliers = '@Loc["Suppliers"]';
+                            const lblNoResults = '@Loc["NoResultsFound"]';
 
                             if (data.products && data.products.length > 0) {
 
                                 hasResults = true;
 
                                 dropdown.append(
-                                    '<h6 class="dropdown-header">Products</h6>'
+                                    `<h6 class="dropdown-header">${lblProducts}</h6>`
                                 );
 
                                 $.each(data.products, function (i, item) {
@@ -709,7 +799,7 @@
                                 hasResults = true;
 
                                 dropdown.append(
-                                    '<h6 class="dropdown-header">Categories</h6>'
+                                    `<h6 class="dropdown-header">${lblCategories}</h6>`
                                 );
 
                                 $.each(data.categories, function (i, item) {
@@ -731,7 +821,7 @@
                                 hasResults = true;
 
                                 dropdown.append(
-                                    '<h6 class="dropdown-header">Suppliers</h6>'
+                                    `<h6 class="dropdown-header">${lblSuppliers}</h6>`
                                 );
 
                                 $.each(data.suppliers, function (i, item) {
@@ -753,7 +843,7 @@
                             }
                             else {
                                 dropdown.append(
-                                    '<div class="dropdown-item small text-gray-500 p-2 text-center">No results found</div>'
+                                    `<div class="dropdown-item small text-gray-500 p-2 text-center">${lblNoResults}</div>`
                                 );
 
                                 dropdown.show();

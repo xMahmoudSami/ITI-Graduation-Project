@@ -34,7 +34,7 @@
                 <dl class="row mb-4">
                     <dt class="col-sm-4 text-slate-400 mb-2">@Loc["OrderNumber"]</dt>
                     <dd class="col-sm-8 mb-2">
-                        <code class="font-weight-bold" style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155; padding: 2px 8px; border-radius: 4px;">INV-@Model.SaleID.ToString("D6")</code>
+                        <code class="font-weight-bold px-2 py-1">INV-@Model.SaleID.ToString("D6")</code>
                     </dd>
 
                     <dt class="col-sm-4 text-slate-400 mb-2">@Loc["Customer"]</dt>
@@ -52,7 +52,7 @@
 
                     <dt class="col-sm-4 text-slate-400 mb-0">@Loc["TotalLineItems"]</dt>
                     <dd class="col-sm-8 mb-0">
-                        <span class="badge px-2 py-1 font-weight-bold" style="background: #1e293b; color: #e2e8f0; border: 1px solid #334155;">@Model.ItemsCount @Loc["LineItems"]</span>
+                        <span class="badge border badge-light px-2 py-1 font-weight-bold">@Model.ItemsCount @Loc["LineItems"]</span>
                     </dd>
                 </dl>
 
@@ -61,8 +61,8 @@
                     <h6 class="font-weight-bold text-white mb-3">
                         <i class="fas fa-boxes text-warning mr-2"></i>@Loc["ItemsToRevertToStock"]
                     </h6>
-                    <div class="table-responsive rounded" style="border: 1px solid #1F2937;">
-                        <table class="table table-bordered mb-0" style="background: #111827;">
+                    <div class="table-responsive rounded border">
+                        <table class="table table-bordered mb-0">
                             <thead class="thead-light">
                                 <tr>
                                     <th class="py-2 px-3">@Loc["ProductName"]</th>
@@ -77,7 +77,7 @@
                                     <tr>
                                         <td class="font-weight-bold text-white py-2 px-3 align-middle">@item.ProductName</td>
                                         <td class="text-center py-2 px-3 align-middle">
-                                            <code style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px;">@item.SKU</code>
+                                            <code>@item.SKU</code>
                                         </td>
                                         <td class="text-center font-weight-bold text-success py-2 px-3 align-middle">
                                             +@item.Quantity
@@ -90,10 +90,10 @@
                     </div>
                 </div>
 
-                <hr class="my-4" style="border-color: #1F2937;">
+                <hr class="my-4">
 
                 <div class="d-flex justify-content-between align-items-center">
-                    <a asp-action="Index" class="btn btn-outline-secondary" style="border-color: #475569; color: #cbd5e1;">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left mr-1"></i> @Loc["CancelAndKeepSale"]
                     </a>
                     <form asp-action="Delete" method="post">

@@ -146,14 +146,14 @@
                 <label class="small font-weight-bold text-slate-400 mb-1">@Loc["SearchByNameOrSku"]</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
-                        <span class="input-group-text border-right-0" style="background: #1a2234; border-color: #334155;"><i class="fas fa-search text-slate-400"></i></span>
+                        <span class="input-group-text border-right-0"><i class="fas fa-search text-slate-400"></i></span>
                     </div>
-                    <input type="text" name="search" value="@Model.Search" class="form-control border-left-0" style="background: #0f172a; border-color: #334155; color: #ffffff;" placeholder="@Loc["SearchByNameOrSku"]" />
+                    <input type="text" name="search" value="@Model.Search" class="form-control border-left-0" placeholder="@Loc["SearchByNameOrSku"]" />
                 </div>
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="small font-weight-bold text-slate-400 mb-1">@Loc["Category"]</label>
-                <select name="categoryId" class="custom-select" style="background-color: #0f172a !important; border-color: #334155 !important; color: #ffffff !important;">
+                <select name="categoryId" class="custom-select">
                     <option value="">— @Loc["AllCategories"] —</option>
                     @foreach (var cat in Model.Categories)
                     {
@@ -163,7 +163,7 @@
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
                 <label class="small font-weight-bold text-slate-400 mb-1">@Loc["StockStatus"]</label>
-                <select name="status" class="custom-select" style="background-color: #0f172a !important; border-color: #334155 !important; color: #ffffff !important;">
+                <select name="status" class="custom-select">
                     <option value="All" selected="@(Model.StatusFilter == "All")">@Loc["AllStatuses"]</option>
                     <option value="InStock" selected="@(Model.StatusFilter == "InStock")">@Loc["InStock"] (@Loc["HealthyStockItems"])</option>
                     <option value="LowStock" selected="@(Model.StatusFilter == "LowStock")">@Loc["LowStock"] (@Loc["FastRestockRequired"])</option>
@@ -176,7 +176,7 @@
                 </button>
                 @if (Model.CategoryID.HasValue || (Model.StatusFilter != null && Model.StatusFilter != "All") || !string.IsNullOrEmpty(Model.Search))
                 {
-                    <a asp-action="StockHealth" class="btn btn-outline-secondary" style="border-color: #475569; color: #cbd5e1;" title="@Loc["Reset"]">
+                    <a asp-action="StockHealth" class="btn btn-outline-secondary" title="@Loc["Reset"]">
                         <i class="fas fa-undo"></i>
                     </a>
                 }
@@ -191,7 +191,7 @@
         <h6 class="m-0 font-weight-bold text-white">
             <i class="fas fa-table text-primary mr-2"></i>@Loc["ProductStockValuationAndRestock"] (@Model.Items.Count @Loc["ItemsDisplayed"])
         </h6>
-        <span class="badge border text-slate-300 px-2 py-1" style="background: #1e293b; border-color: #334155;">
+        <span class="badge border badge-light px-2 py-1">
             @Loc["FilteredSubtotal"] $@Model.Items.Sum(i => i.TotalValue).ToString("N2")
         </span>
     </div>
@@ -241,11 +241,11 @@
                                         </a>
                                     </div>
                                     <div class="small text-slate-400">
-                                        @Loc["SKU"]: <code style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155;">@item.SKU</code>
+                                        @Loc["SKU"]: <code>@item.SKU</code>
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge border px-2 py-1" style="background: #1e293b; color: #e2e8f0; border-color: #334155;">
+                                    <span class="badge badge-category border px-2 py-1">
                                         @item.CategoryName
                                     </span>
                                 </td>
@@ -255,11 +255,11 @@
                                 <td>
                                     <div class="d-flex justify-content-between small font-weight-bold mb-1">
                                         <span class="@(isOut ? "text-danger" : isLow ? "text-warning" : "text-success")">
-                                            @item.StockQuantity @Loc["Units"]
+                                             @item.StockQuantity @Loc["Units"]
                                         </span>
                                         <span class="text-slate-400">@Loc["Min"] @item.Threshold</span>
                                     </div>
-                                    <div class="progress" style="height: 6px; background: #1e293b;">
+                                    <div class="progress" style="height: 6px;">
                                         <div class="progress-bar @(isOut ? "bg-danger" : isLow ? "bg-warning" : "bg-success")"
                                              role="progressbar"
                                              style="width: @percent%;"

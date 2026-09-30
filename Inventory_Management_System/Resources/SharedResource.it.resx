@@ -377,4 +377,9 @@
   <data name="DuplicateProductInOrder" xml:space="preserve"><value>Non puoi aggiungere lo stesso prodotto più di una volta.</value></data>
   <data name="AtLeastOneItemRequired" xml:space="preserve"><value>È richiesto almeno un prodotto.</value></data>
   <data name="PleaseSelectSupplierFirst" xml:space="preserve"><value>Seleziona prima un fornitore.</value></data>
+  <data name="Theme" xml:space="preserve"><value>Tema</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>Modalità Scura</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>Modalità Chiara</value></data>
+  <data name="Theme_Toggle" xml:space="preserve"><value>Cambia tema</value></data>
+  <data name="NoResultsFound" xml:space="preserve"><value>Nessun risultato trovato</value></data>
 </root>
