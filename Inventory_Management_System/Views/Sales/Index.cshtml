@@ -1,7 +1,7 @@
 @model Inventory_Management_System.ViewModels.PagedResult<Inventory_Management_System.ViewModels.SaleListItemViewModel>
 
 @{
-    ViewData["Title"] = "Sales Management";
+    ViewData["Title"] = Loc["SalesManagement"].Value;
     var totalRevenue = (decimal)(ViewBag.TotalRevenue ?? 0m);
     var totalSalesCount = (int)(ViewBag.TotalSalesCount ?? 0);
     var totalUnitsSold = (int)(ViewBag.TotalUnitsSold ?? 0);
@@ -15,8 +15,8 @@
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item active text-slate-400" aria-current="page">Sales</li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item active text-slate-400" aria-current="page">@Loc["Nav_Sales"]</li>
     </ol>
 </nav>
 
@@ -24,15 +24,15 @@
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <div>
         <h1 class="h3 mb-1 text-white font-weight-bold">
-            <i class="fas fa-cash-register text-primary mr-2"></i>Sales Orders & POS
+            <i class="fas fa-cash-register text-primary mr-2"></i>@Loc["SalesOrdersAndPOS"]
         </h1>
-        <p class="small mb-0 text-slate-400">Record customer sales transactions, snapshot pricing, and track atomic stock deductions</p>
+        <p class="small mb-0 text-slate-400">@Loc["SalesOrdersSubtitle"]</p>
     </div>
     <a asp-action="Create" class="btn btn-primary btn-icon-split shadow-sm">
         <span class="icon text-white-50">
             <i class="fas fa-plus"></i>
         </span>
-        <span class="text font-weight-bold">New Sale Order</span>
+        <span class="text font-weight-bold">@Loc["NewSaleOrder"]</span>
     </a>
 </div>
 
@@ -64,7 +64,7 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Sales Revenue</div>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">@Loc["TotalSalesRevenue"]</div>
                         <div class="h5 mb-0 font-weight-bold text-white">$@totalRevenue.ToString("N2")</div>
                     </div>
                     <div class="col-auto">
@@ -81,7 +81,7 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Orders</div>
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">@Loc["TotalOrders"]</div>
                         <div class="h5 mb-0 font-weight-bold text-white">@totalSalesCount.ToString("N0")</div>
                     </div>
                     <div class="col-auto">
@@ -98,7 +98,7 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Units Sold</div>
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">@Loc["TotalUnitsSold"]</div>
                         <div class="h5 mb-0 font-weight-bold text-white">@totalUnitsSold.ToString("N0")</div>
                     </div>
                     <div class="col-auto">
@@ -115,7 +115,7 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Average Order Value</div>
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">@Loc["AverageOrderValue"]</div>
                         <div class="h5 mb-0 font-weight-bold text-white">$@avgOrderValue.ToString("N2")</div>
                     </div>
                     <div class="col-auto">
@@ -132,29 +132,29 @@
     <div class="card-body py-3">
         <form method="get" asp-action="Index" class="form-row align-items-end">
             <div class="col-md-4 mb-2 mb-md-0">
-                <label class="small font-weight-bold text-slate-400 mb-1">Customer / Order #</label>
+                <label class="small font-weight-bold text-slate-400 mb-1">@Loc["CustomerOrOrderNumber"]</label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text border-right-0" style="background: #1a2234; border-color: #334155;"><i class="fas fa-search text-slate-400"></i></span>
                     </div>
-                    <input type="text" name="search" value="@currentSearch" class="form-control border-left-0" style="background: #0f172a; border-color: #334155; color: #ffffff;" placeholder="Search customer info or order ID..." />
+                    <input type="text" name="search" value="@currentSearch" class="form-control border-left-0" style="background: #0f172a; border-color: #334155; color: #ffffff;" placeholder="@Loc["SearchCustomerOrOrder"]" />
                 </div>
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
-                <label class="small font-weight-bold text-slate-400 mb-1">From Date</label>
+                <label class="small font-weight-bold text-slate-400 mb-1">@Loc["FromDate"]</label>
                 <input type="date" name="fromDate" value="@fromDate" class="form-control" style="background: #0f172a; border-color: #334155; color: #ffffff;" />
             </div>
             <div class="col-md-3 mb-2 mb-md-0">
-                <label class="small font-weight-bold text-slate-400 mb-1">To Date</label>
+                <label class="small font-weight-bold text-slate-400 mb-1">@Loc["ToDate"]</label>
                 <input type="date" name="toDate" value="@toDate" class="form-control" style="background: #0f172a; border-color: #334155; color: #ffffff;" />
             </div>
             <div class="col-md-2 d-flex">
                 <button type="submit" class="btn btn-primary btn-block mr-1">
-                    <i class="fas fa-filter mr-1"></i> Filter
+                    <i class="fas fa-filter mr-1"></i> @Loc["Filter"]
                 </button>
                 @if (!string.IsNullOrEmpty(currentSearch) || !string.IsNullOrEmpty(fromDate) || !string.IsNullOrEmpty(toDate))
                 {
-                    <a asp-action="Index" class="btn btn-outline-secondary" style="border-color: #475569; color: #cbd5e1;" title="Reset Filters">
+                    <a asp-action="Index" class="btn btn-outline-secondary" style="border-color: #475569; color: #cbd5e1;" title="@Loc["Reset"]">
                         <i class="fas fa-undo"></i>
                     </a>
                 }
@@ -167,9 +167,9 @@
 <div class="card shadow-sm mb-4 table-card">
     <div class="card-header py-3 d-flex align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-white">
-            <i class="fas fa-list text-primary mr-2"></i>Sales Order History (@Model.TotalItems Total)
+            <i class="fas fa-list text-primary mr-2"></i>@Loc["SalesOrderHistory"] (@Model.TotalItems)
         </h6>
-        <span class="badge border text-slate-300 px-2 py-1" style="background: #1e293b; border-color: #334155;">Page @Model.PageNumber of @Math.Max(1, Model.TotalPages)</span>
+        <span class="badge border text-slate-300 px-2 py-1" style="background: #1e293b; border-color: #334155;">@Loc["Page"] @Model.PageNumber @Loc["Of"] @Math.Max(1, Model.TotalPages)</span>
     </div>
     <div class="card-body p-0">
         @if (!Model.Items.Any())
@@ -178,10 +178,10 @@
                 <div class="mb-3">
                     <i class="fas fa-receipt fa-3x" style="color: #475569;"></i>
                 </div>
-                <h5 class="text-white font-weight-bold">No sales orders found</h5>
-                <p class="text-slate-400 mb-3">No completed sales match your current search or date criteria.</p>
+                <h5 class="text-white font-weight-bold">@Loc["NoSalesFound"]</h5>
+                <p class="text-slate-400 mb-3">@Loc["NoSalesMatchCriteria"]</p>
                 <a asp-action="Create" class="btn btn-primary btn-sm px-3 shadow-sm">
-                    <i class="fas fa-plus mr-1"></i> Record New Sale
+                    <i class="fas fa-plus mr-1"></i> @Loc["RecordNewSale"]
                 </a>
             </div>
         }
@@ -191,13 +191,13 @@
                 <table class="table table-bordered table-hover align-middle mb-0">
                     <thead class="thead-light">
                         <tr>
-                            <th style="width: 12%;">ORDER #</th>
-                            <th style="width: 25%;">CUSTOMER</th>
-                            <th style="width: 15%;">SALE DATE</th>
-                            <th class="text-center" style="width: 12%;">LINE ITEMS</th>
-                            <th class="text-center" style="width: 12%;">UNITS SOLD</th>
-                            <th class="text-right" style="width: 12%;">TOTAL AMOUNT</th>
-                            <th class="text-right" style="width: 12%;">ACTIONS</th>
+                            <th style="width: 12%;">@Loc["OrderNumber"]</th>
+                            <th style="width: 25%;">@Loc["Customer"]</th>
+                            <th style="width: 15%;">@Loc["SaleDate"]</th>
+                            <th class="text-center" style="width: 12%;">@Loc["LineItems"]</th>
+                            <th class="text-center" style="width: 12%;">@Loc["UnitsSold"]</th>
+                            <th class="text-right" style="width: 12%;">@Loc["TotalAmount"]</th>
+                            <th class="text-right" style="width: 12%;">@Loc["Actions"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -222,7 +222,7 @@
                                 </td>
                                 <td class="text-center">
                                     <span class="badge border px-2 py-1 font-weight-bold" style="background: #1e293b; color: #e2e8f0; border-color: #334155;">
-                                        @item.ItemsCount line@(item.ItemsCount == 1 ? "" : "s")
+                                        @item.ItemsCount @Loc["LineItems"]
                                     </span>
                                 </td>
                                 <td class="text-center font-weight-bold text-white">
@@ -233,10 +233,10 @@
                                 </td>
                                 <td class="text-right">
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a asp-action="Details" asp-route-id="@item.SaleID" class="btn btn-outline-info" title="View & Print Invoice">
-                                            <i class="fas fa-file-invoice mr-1"></i> Invoice
+                                        <a asp-action="Details" asp-route-id="@item.SaleID" class="btn btn-outline-info" title="@Loc["PrintInvoice"]">
+                                            <i class="fas fa-file-invoice mr-1"></i> @Loc["Invoice"]
                                         </a>
-                                        <a asp-action="Delete" asp-route-id="@item.SaleID" class="btn btn-outline-danger" title="Delete & Revert Stock">
+                                        <a asp-action="Delete" asp-route-id="@item.SaleID" class="btn btn-outline-danger" title="@Loc["Delete"]">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
@@ -250,7 +250,7 @@
             <!-- Pagination Bar -->
             <div class="card-footer d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
                 <span class="small mb-2 mb-md-0 text-slate-400">
-                    Showing @Model.StartItemIndex to @Model.EndItemIndex of @Model.TotalItems entries
+                    @Loc["Showing"] @Model.StartItemIndex @Loc["ToDate"] @Model.EndItemIndex @Loc["Of"] @Model.TotalItems @Loc["Entries"]
                 </span>
                 @if (Model.TotalPages > 1)
                 {

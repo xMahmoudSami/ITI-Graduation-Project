@@ -1,5 +1,9 @@
 @inject Inventory_Management_System.Models.ApplicationDbContext _context
+@using System.Globalization
 @{
+    // ── Culture & RTL Detection ──────────────────────────────────────────
+    var currentCulture = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+    var isRtl = currentCulture.Equals("ar", StringComparison.OrdinalIgnoreCase);
     var lowStockProducts = _context.Products
         .Where(p => p.StockQuantity <= p.LowStockThreshold)
         .OrderBy(p => p.StockQuantity)
@@ -48,10 +52,44 @@
             return false;
         return !string.Equals(currentAction, "Create", StringComparison.OrdinalIgnoreCase);
     }
+
+    // ── Localized Chatbot Strings with culture-aware fallbacks ────────
+    var chatTitle = Loc["AIChatbotTitle"].IsResourceNotFound || Loc["AIChatbotTitle"].Value == "AIChatbotTitle"
+        ? (currentCulture switch {
+            "ar" => "المساعد الذكي للمخزون",
+            "fr" => "Assistant d'inventaire IA",
+            "es" => "Asistente de inventario IA",
+            "it" => "Assistente inventario IA",
+            "de" => "KI-Inventar-Assistent",
+            _ => "AI Inventory Assistant"
+        })
+        : Loc["AIChatbotTitle"].Value;
+
+    var chatGreeting = Loc["AIChatGreeting"].IsResourceNotFound || Loc["AIChatGreeting"].Value == "AIChatGreeting"
+        ? (currentCulture switch {
+            "ar" => "مرحباً! أنا مساعدك الذكي للمخزون، كيف يمكنني مساعدتك اليوم؟",
+            "fr" => "Bonjour! Je suis votre assistant d'inventaire. Comment puis-je vous aider?",
+            "es" => "¡Hola! Soy tu asistente de inventario. ¿Cómo puedo ayudarte?",
+            "it" => "Ciao! Sono il tuo assistente inventario. Come posso aiutarti?",
+            "de" => "Hallo! Ich bin Ihr Inventar-Assistent. Wie kann ich Ihnen helfen?",
+            _ => "Hello! I'm your inventory assistant. How can I help you?"
+        })
+        : Loc["AIChatGreeting"].Value;
+
+    var chatPlaceholder = Loc["AskAIPlaceholder"].IsResourceNotFound || Loc["AskAIPlaceholder"].Value == "AskAIPlaceholder"
+        ? (currentCulture switch {
+            "ar" => "اسأل عن مخزونك...",
+            "fr" => "Posez une question sur votre inventaire...",
+            "es" => "Pregunte sobre su inventario...",
+            "it" => "Chiedi informazioni sul tuo inventario...",
+            "de" => "Fragen Sie nach Ihrem Inventar...",
+            _ => "Ask about your inventory..."
+        })
+        : Loc["AskAIPlaceholder"].Value;
 }
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@currentCulture" dir="@(isRtl ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -66,6 +104,12 @@
     <link href="~/css/sb-admin-2.min.css" rel="stylesheet" />
     <link href="~/css/ai-chat.css" rel="stylesheet" />
     <link href="~/css/site.css" rel="stylesheet" />
+
+    @* RTL overrides — loaded only for Arabic culture *@
+    @if (isRtl)
+    {
+        <link href="~/css/rtl.css" rel="stylesheet" />
+    }
 </head>
 
 <body id="page-top">
@@ -94,14 +138,14 @@
                    asp-controller="Dashboard"
                    asp-action="Analytics">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
+                    <span>@SharedLocalizer["Nav_Dashboard"]</span>
                 </a>
             </li>
 
             <hr class="sidebar-divider" />
 
             <!-- INVENTORY CORE -->
-            <div class="sidebar-heading">INVENTORY CORE</div>
+            <div class="sidebar-heading">@SharedLocalizer["Nav_InventoryCore"]</div>
 
             <!-- Products -->
             <li class="nav-item">
@@ -112,7 +156,7 @@
                    aria-expanded="@(IsActive("Products") ? "true" : "false")"
                    aria-controls="collapseProducts">
                     <i class="fas fa-fw fa-box"></i>
-                    <span>Products</span>
+                    <span>@SharedLocalizer["Nav_Products"]</span>
                     <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
                 </a>
 
@@ -123,13 +167,13 @@
                     <a class="nav-link py-2 @(IsProductsListActive() ? "active-page" : "")"
                        asp-controller="Products"
                        asp-action="Index">
-                        <span>All Products</span>
+                        <span>@SharedLocalizer["Nav_AllProducts"]</span>
                     </a>
 
                     <a class="nav-link py-2 @(IsActive("Products", "Create") ? "active-page" : "")"
                        asp-controller="Products"
                        asp-action="Create">
-                        <span>Add Product</span>
+                        <span>@SharedLocalizer["Nav_AddProduct"]</span>
                     </a>
                 </div>
             </li>
@@ -140,7 +184,7 @@
                    asp-controller="Categories"
                    asp-action="Index">
                     <i class="fas fa-fw fa-tags"></i>
-                    <span>Categories</span>
+                    <span>@SharedLocalizer["Nav_Categories"]</span>
                 </a>
             </li>
 
@@ -150,7 +194,7 @@
                    asp-controller="Suppliers"
                    asp-action="Index">
                     <i class="fas fa-fw fa-truck"></i>
-                    <span>Suppliers</span>
+                    <span>@SharedLocalizer["Nav_Suppliers"]</span>
                 </a>
             </li>
 
@@ -160,14 +204,14 @@
                    asp-controller="SupplierProducts"
                    asp-action="Index">
                     <i class="fas fa-fw fa-handshake"></i>
-                    <span>Supplier Mappings</span>
+                    <span>@SharedLocalizer["Nav_SupplierMappings"]</span>
                 </a>
             </li>
 
             <hr class="sidebar-divider" />
 
             <!-- TRANSACTIONS -->
-            <div class="sidebar-heading">TRANSACTIONS</div>
+            <div class="sidebar-heading">@SharedLocalizer["Nav_Transactions"]</div>
 
             <li class="nav-item">
                 <a class="nav-link @(IsActive("Purchases") || IsActive("Sales") ? "" : "collapsed")"
@@ -177,7 +221,7 @@
                    aria-expanded="@(IsActive("Purchases") || IsActive("Sales") ? "true" : "false")"
                    aria-controls="collapseTransactions">
                     <i class="fas fa-fw fa-exchange-alt"></i>
-                    <span>Transactions</span>
+                    <span>@SharedLocalizer["Nav_Transactions"]</span>
                     <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
                 </a>
 
@@ -188,13 +232,13 @@
                     <a class="nav-link py-2 @(IsActive("Purchases") ? "active-page" : "")"
                        asp-controller="Purchases"
                        asp-action="Index">
-                        <span>Purchases</span>
+                        <span>@SharedLocalizer["Nav_Purchases"]</span>
                     </a>
 
                     <a class="nav-link py-2 @(IsActive("Sales") ? "active-page" : "")"
                        asp-controller="Sales"
                        asp-action="Index">
-                        <span>Sales</span>
+                        <span>@SharedLocalizer["Nav_Sales"]</span>
                     </a>
                 </div>
             </li>
@@ -202,7 +246,7 @@
             <hr class="sidebar-divider" />
 
             <!-- MANAGEMENT -->
-            <div class="sidebar-heading">MANAGEMENT</div>
+            <div class="sidebar-heading">@SharedLocalizer["Nav_Management"]</div>
 
             <!-- Reports -->
             <li class="nav-item">
@@ -213,7 +257,7 @@
                    aria-expanded="@(IsActive("Reports") ? "true" : "false")"
                    aria-controls="collapseReports">
                     <i class="fas fa-fw fa-chart-line"></i>
-                    <span>Reports</span>
+                    <span>@SharedLocalizer["Nav_Reports"]</span>
                     <i class="fas fa-angle-right ml-auto sidebar-chevron"></i>
                 </a>
 
@@ -224,13 +268,13 @@
                     <a class="nav-link py-2 @(IsActive("Reports", "StockHealth") || IsActive("Reports", "Index") ? "active-page" : "")"
                        asp-controller="Reports"
                        asp-action="StockHealth">
-                        <span>Stock Valuation</span>
+                        <span>@SharedLocalizer["Nav_StockValuation"]</span>
                     </a>
 
                     <a class="nav-link py-2 @(IsActive("Reports", "Sales") ? "active-page" : "")"
                        asp-controller="Reports"
                        asp-action="Sales">
-                        <span>Sales Report</span>
+                        <span>@SharedLocalizer["Nav_SalesReport"]</span>
                     </a>
                 </div>
             </li>
@@ -269,7 +313,7 @@
                             <input type="text"
                                    id="globalSearchInput"
                                    class="form-control bg-light border-0 small"
-                                   placeholder="Search products, categories..."
+                                   placeholder="@Loc["SearchProductsCategories"]"
                                    aria-label="Search"
                                    autocomplete="off">
 
@@ -291,6 +335,67 @@
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
+
+                        <!-- ── Language Switcher ── -->
+                        <li class="nav-item dropdown no-arrow mx-1 lang-switcher-dropdown">
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="languageDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false"
+                               title="@SharedLocalizer["Lbl_SelectLanguage"]"
+                               style="font-size:0.82rem;">
+                                <i class="fas fa-globe fa-fw"></i>
+                                <span class="d-none d-lg-inline ml-1">@SharedLocalizer["Lbl_Language"]</span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="languageDropdown"
+                                 style="min-width:11rem;">
+
+                                @{
+                                    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+                                    var cultures = new[]
+                                    {
+                                        (Code:"en", Flag:"🇬🇧", Label:"English"),
+                                        (Code:"ar", Flag:"🇸🇦", Label:"العربية"),
+                                        (Code:"fr", Flag:"🇫🇷", Label:"Français"),
+                                        (Code:"es", Flag:"🇪🇸", Label:"Español"),
+                                        (Code:"it", Flag:"🇮🇹", Label:"Italiano"),
+                                        (Code:"de", Flag:"🇩🇪", Label:"Deutsch")
+                                    };
+                                }
+
+                                @foreach (var lang in cultures)
+                                {
+                                    bool isSelected = currentCulture.Equals(lang.Code, StringComparison.OrdinalIgnoreCase);
+                                    <form method="post"
+                                          asp-controller="Culture"
+                                          asp-action="SetLanguage"
+                                          style="margin:0;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="culture" value="@lang.Code" />
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        <button type="submit"
+                                                class="dropdown-item @(isSelected ? "active" : "")"
+                                                style="display:flex;align-items:center;gap:0.5rem;">
+                                            <span class="lang-flag" style="font-size:1rem;">@lang.Flag</span>
+                                            <span>@lang.Label</span>
+                                            @if (isSelected)
+                                            {
+                                                <i class="fas fa-check ml-auto" style="font-size:0.75rem;"></i>
+                                            }
+                                        </button>
+                                    </form>
+                                }
+
+                            </div>
+                        </li>
+                        <!-- ── /Language Switcher ── -->
+
 
                         <!-- Alerts -->
                         <li class="nav-item dropdown no-arrow mx-1">
@@ -324,7 +429,7 @@
                                         <div class="alerts-header-icon mr-2">
                                             <i class="fas fa-bell"></i>
                                         </div>
-                                        <span class="alerts-header-title">Low Stock Alerts</span>
+                                        <span class="alerts-header-title">@SharedLocalizer["Lbl_LowStockAlerts"]</span>
                                     </div>
                                     @if (lowStockCount > 0)
                                     {
@@ -390,8 +495,8 @@
                                         <div class="alerts-empty-icon mb-2">
                                             <i class="fas fa-check-circle"></i>
                                         </div>
-                                        <div class="alerts-empty-title">All Stocks Healthy</div>
-                                        <div class="alerts-empty-desc">No products currently below threshold.</div>
+                                        <div class="alerts-empty-title">@Loc["Lbl_AllStocksHealthy"]</div>
+                                        <div class="alerts-empty-desc">@Loc["Lbl_NoProductsBelowThreshold"]</div>
                                     </div>
                                 }
                                 </div>
@@ -404,7 +509,7 @@
                                            asp-controller="Dashboard"
                                            asp-action="Analytics"
                                            asp-fragment="lowStockAlertsCard">
-                                            <span>View All in Analytics</span>
+                                            <span>@Loc["Lbl_ViewAllInAnalytics"]</span>
                                             <i class="fas fa-arrow-right"></i>
                                         </a>
                                     </div>
@@ -428,7 +533,7 @@
                                aria-expanded="false">
 
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    System Administrator
+                                    @SharedLocalizer["Lbl_SystemAdministrator"]
                                 </span>
 
                                 <img class="img-profile rounded-circle"
@@ -458,7 +563,7 @@
 
                     <div class="copyright text-center my-auto">
                         <span>
-                            Copyright &copy; Inventory Management System @DateTime.Now.Year
+                            @Loc["Lbl_Copyright"] &copy; @Loc["Lbl_InventoryManagementSystem"] @DateTime.Now.Year
                         </span>
                     </div>
 
@@ -474,20 +579,24 @@
 
 
     <!-- AI Chatbot -->
-    <div id="ai-chatbot">
+    <div id="ai-chatbot" class="chat-widget ai-chat-widget"
+         data-title="@chatTitle"
+         data-greeting="@chatGreeting"
+         data-placeholder="@chatPlaceholder">
 
         <button id="ai-chat-button"
+                class="chat-widget-btn"
                 type="button">
             <i class="fas fa-robot"></i>
         </button>
 
-        <div id="ai-chat-window">
+        <div id="ai-chat-window" class="chat-widget-window">
 
-            <div id="ai-chat-header">
+            <div id="ai-chat-header" class="chat-widget-header">
 
                 <span>
                     <i class="fas fa-robot mr-2"></i>
-                    AI Inventory Assistant
+                    <span id="ai-chat-title-text">@chatTitle</span>
                 </span>
 
                 <button id="ai-chat-close"
@@ -497,19 +606,19 @@
 
             </div>
 
-            <div id="ai-chat-messages">
+            <div id="ai-chat-messages" class="chat-messages">
 
-                <div class="ai-message">
-                    Hello! I'm your inventory assistant. How can I help you?
+                <div class="ai-message" id="ai-initial-greeting">
+                    @chatGreeting
                 </div>
 
             </div>
 
-            <div id="ai-chat-input-area">
+            <div id="ai-chat-input-area" class="chat-input-container">
 
                 <input type="text"
                        id="ai-chat-input"
-                       placeholder="Ask about your inventory..."
+                       placeholder="@chatPlaceholder"
                        autocomplete="off" />
 
                 <button id="ai-chat-send"
@@ -522,6 +631,15 @@
         </div>
 
     </div>
+
+    <!-- Pre-load Chatbot Translations for client-side scripts -->
+    <script>
+        window.ChatbotTranslations = {
+            title: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatTitle))",
+            greeting: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatGreeting))",
+            placeholder: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatPlaceholder))"
+        };
+    </script>
 
     <!-- Scripts -->
     <script src="~/vendor/jquery/jquery.min.js"></script>
@@ -666,6 +784,26 @@
     <script>
         $(document).ready(function () {
 
+            // Initialize / synchronize localized text from window.ChatbotTranslations or data attributes
+            const chatContainer = $('#ai-chatbot, #ai-chat-widget');
+            const translations = window.ChatbotTranslations || {
+                title: chatContainer.attr('data-title'),
+                greeting: chatContainer.attr('data-greeting'),
+                placeholder: chatContainer.attr('data-placeholder')
+            };
+
+            if (translations) {
+                if (translations.title && $('#ai-chat-title-text').length) {
+                    $('#ai-chat-title-text').text(translations.title);
+                }
+                if (translations.greeting && $('#ai-initial-greeting').length) {
+                    $('#ai-initial-greeting').text(translations.greeting);
+                }
+                if (translations.placeholder && $('#ai-chat-input').length) {
+                    $('#ai-chat-input').attr('placeholder', translations.placeholder);
+                }
+            }
+
             // Remove #page-top scroll button completely from DOM
             function purgeScrollToTop() {
                 $('.scroll-to-top, a[href="#page-top"], a[href$="#page-top"]').remove();
@@ -706,7 +844,7 @@
 
             // Close when clicking outside chat window
             $(document).on('click', function (e) {
-                if (!$(e.target).closest('#ai-chatbot').length) {
+                if (!$(e.target).closest('#ai-chatbot, #ai-chat-widget').length) {
                     if ($('#ai-chat-window').hasClass('is-open')) {
                         toggleChat(false);
                     }
@@ -752,10 +890,24 @@
 
                 input.val('');
 
+                // Localized Loading & Error Messages
+                const currentLang = $('html').attr('lang') || 'en';
+                const loadingText = currentLang === 'ar' ? 'جارٍ التفكير...' :
+                                    currentLang === 'fr' ? 'Réflexion en cours...' :
+                                    currentLang === 'es' ? 'Pensando...' :
+                                    currentLang === 'it' ? 'Sto pensando...' :
+                                    currentLang === 'de' ? 'Ich denke nach...' : 'Thinking...';
+
+                const errorText = currentLang === 'ar' ? 'عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى.' :
+                                  currentLang === 'fr' ? 'Désolé, une erreur s\'est produite. Veuillez réessayer.' :
+                                  currentLang === 'es' ? 'Lo sentimos, algo salió mal. Inténtalo de nuevo.' :
+                                  currentLang === 'it' ? 'Spiacenti, si è verificato un errore. Riprova.' :
+                                  currentLang === 'de' ? 'Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.' : 'Sorry, something went wrong. Please try again.';
+
                 // Loading message
                 const loadingMessage = $(`
                     <div class="ai-message" id="ai-loading">
-                        Thinking...
+                        ${loadingText}
                     </div>
                 `);
 
@@ -793,7 +945,7 @@
 
                         $('#ai-chat-messages').append(`
                             <div class="ai-message">
-                                Sorry, something went wrong. Please try again.
+                                ${errorText}
                             </div>
                         `);
 

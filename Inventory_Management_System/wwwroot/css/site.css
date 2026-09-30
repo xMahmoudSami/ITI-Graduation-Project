@@ -3085,6 +3085,35 @@ canvas {
 }
 
 /* --------------------------------------------------------------------------
+   DETAILS VIEW LAYOUT & KPI CARDS (Prevent vertical stretching in LTR & RTL)
+   -------------------------------------------------------------------------- */
+.details-layout-row {
+  align-items: flex-start !important;
+}
+
+.details-layout-row > [class*="col-"] {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-self: flex-start !important;
+}
+
+.details-kpi-card {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.details-kpi-card .card-body {
+  flex: initial !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* --------------------------------------------------------------------------
    PRINT STYLES (@media print)
    Clean, paper-ready printing for Invoices, Stock Valuation, and Sales Reports
    -------------------------------------------------------------------------- */

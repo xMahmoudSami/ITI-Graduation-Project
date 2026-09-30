@@ -1,15 +1,15 @@
 @model Inventory_Management_System.ViewModels.SaleDeleteViewModel
 
 @{
-    ViewData["Title"] = $"Delete Sale #{Model.SaleID}";
+    ViewData["Title"] = $"{Loc["Delete"]} #{Model.SaleID}";
 }
 
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index">Sales</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Delete #@Model.SaleID</li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@Loc["Nav_Sales"]</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Loc["Delete"] #@Model.SaleID</li>
     </ol>
 </nav>
 
@@ -18,7 +18,7 @@
         <div class="card shadow-sm mb-4 border-left-danger delete-card">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-danger">
-                    <i class="fas fa-trash-alt mr-2"></i>Delete Sale Order & Revert Stock
+                    <i class="fas fa-trash-alt mr-2"></i>@Loc["DeleteSaleOrderAndRevert"]
                 </h6>
             </div>
             <div class="card-body">
@@ -26,49 +26,49 @@
                 <div class="alert alert-warning border-left-warning d-flex align-items-center mb-4" role="alert">
                     <i class="fas fa-exclamation-triangle mr-3 text-warning fa-lg"></i>
                     <div>
-                        <strong>Warning:</strong> Deleting this sale order will permanently remove the transaction and automatically restore <strong>@Model.Items.Sum(i => i.Quantity) unit(s)</strong> of stock back to warehouse inventory.
+                        @Loc["DeleteSaleWarning"]
                     </div>
                 </div>
 
                 <!-- Order Summary Details -->
                 <dl class="row mb-4">
-                    <dt class="col-sm-4 text-slate-400 mb-2">Order ID</dt>
+                    <dt class="col-sm-4 text-slate-400 mb-2">@Loc["OrderNumber"]</dt>
                     <dd class="col-sm-8 mb-2">
                         <code class="font-weight-bold" style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155; padding: 2px 8px; border-radius: 4px;">INV-@Model.SaleID.ToString("D6")</code>
                     </dd>
 
-                    <dt class="col-sm-4 text-slate-400 mb-2">Customer Info</dt>
+                    <dt class="col-sm-4 text-slate-400 mb-2">@Loc["Customer"]</dt>
                     <dd class="col-sm-8 font-weight-bold text-white mb-2">
                         <i class="fas fa-user text-primary mr-1"></i>@Model.CustomerInfo
                     </dd>
 
-                    <dt class="col-sm-4 text-slate-400 mb-2">Sale Date</dt>
+                    <dt class="col-sm-4 text-slate-400 mb-2">@Loc["SaleDate"]</dt>
                     <dd class="col-sm-8 text-white mb-2">
                         <i class="far fa-calendar-alt mr-1 text-slate-400"></i>@Model.SaleDate.ToString("MMMM dd, yyyy")
                     </dd>
 
-                    <dt class="col-sm-4 text-slate-400 mb-2">Total Order Amount</dt>
+                    <dt class="col-sm-4 text-slate-400 mb-2">@Loc["TotalAmount"]</dt>
                     <dd class="col-sm-8 font-weight-bold text-success h5 mb-2">$@Model.TotalAmount.ToString("N2")</dd>
 
-                    <dt class="col-sm-4 text-slate-400 mb-0">Line Items Count</dt>
+                    <dt class="col-sm-4 text-slate-400 mb-0">@Loc["TotalLineItems"]</dt>
                     <dd class="col-sm-8 mb-0">
-                        <span class="badge px-2 py-1 font-weight-bold" style="background: #1e293b; color: #e2e8f0; border: 1px solid #334155;">@Model.ItemsCount line item(s)</span>
+                        <span class="badge px-2 py-1 font-weight-bold" style="background: #1e293b; color: #e2e8f0; border: 1px solid #334155;">@Model.ItemsCount @Loc["LineItems"]</span>
                     </dd>
                 </dl>
 
                 <!-- Items to Revert Section (Full Width Table with proper rhythm) -->
                 <div class="mb-4">
                     <h6 class="font-weight-bold text-white mb-3">
-                        <i class="fas fa-boxes text-warning mr-2"></i>Items to Revert to Stock
+                        <i class="fas fa-boxes text-warning mr-2"></i>@Loc["ItemsToRevertToStock"]
                     </h6>
                     <div class="table-responsive rounded" style="border: 1px solid #1F2937;">
                         <table class="table table-bordered mb-0" style="background: #111827;">
                             <thead class="thead-light">
                                 <tr>
-                                    <th class="py-2 px-3">Product Name</th>
-                                    <th class="text-center py-2 px-3">SKU</th>
-                                    <th class="text-center py-2 px-3">Qty to Restore</th>
-                                    <th class="text-right py-2 px-3">Unit Price</th>
+                                    <th class="py-2 px-3">@Loc["ProductName"]</th>
+                                    <th class="text-center py-2 px-3">@Loc["SKU"]</th>
+                                    <th class="text-center py-2 px-3">@Loc["QtyToRestore"]</th>
+                                    <th class="text-right py-2 px-3">@Loc["UnitPrice"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -94,13 +94,13 @@
 
                 <div class="d-flex justify-content-between align-items-center">
                     <a asp-action="Index" class="btn btn-outline-secondary" style="border-color: #475569; color: #cbd5e1;">
-                        <i class="fas fa-arrow-left mr-1"></i> Cancel & Keep Sale
+                        <i class="fas fa-arrow-left mr-1"></i> @Loc["CancelAndKeepSale"]
                     </a>
                     <form asp-action="Delete" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@Model.SaleID" />
                         <button type="submit" class="btn btn-danger px-4 shadow-sm">
-                            <i class="fas fa-trash mr-1"></i> Confirm Delete & Revert Stock
+                            <i class="fas fa-trash mr-1"></i> @Loc["ConfirmDeleteAndRevert"]
                         </button>
                     </form>
                 </div>

@@ -1,15 +1,15 @@
 @model Inventory_Management_System.ViewModels.SaleFormViewModel
 
 @{
-    ViewData["Title"] = "New Sale Order";
+    ViewData["Title"] = Loc["NewSaleOrder"].Value;
 }
 
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index">Sales</a></li>
-        <li class="breadcrumb-item active text-slate-400" aria-current="page">New Sale Order</li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@Loc["Nav_Sales"]</a></li>
+        <li class="breadcrumb-item active text-slate-400" aria-current="page">@Loc["NewSaleOrder"]</li>
     </ol>
 </nav>
 
@@ -20,7 +20,7 @@
     <div class="card shadow-sm mb-4 form-card">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-cash-register text-primary mr-2"></i>Record New Sale Transaction
+                <i class="fas fa-cash-register text-primary mr-2"></i>@Loc["RecordNewSaleTransaction"]
             </h6>
         </div>
         <div class="card-body">
@@ -30,20 +30,20 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="CustomerInfo" class="font-weight-bold text-slate-300">
-                            Customer Info / Name
+                            @Loc["CustomerInfoOrName"]
                         </label>
-                        <input asp-for="CustomerInfo" class="form-control" placeholder="e.g. Acme Corp / Walk-in Customer / John Doe" />
-                        <small class="form-text text-slate-400">Leave empty or specify client details, phone, or company name.</small>
+                        <input asp-for="CustomerInfo" class="form-control" placeholder="@Loc["CustomerNameOrPhone"]" />
+                        <small class="form-text text-slate-400">@Loc["CustomerInfoHelp"]</small>
                         <span asp-validation-for="CustomerInfo" class="text-danger small font-weight-bold"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="SaleDate" class="font-weight-bold text-slate-300">
-                            Sale Date <span class="text-danger">*</span>
+                            @Loc["SaleDate"] <span class="text-danger">*</span>
                         </label>
                         <input asp-for="SaleDate" class="form-control" type="date" />
-                        <small class="form-text text-slate-400">Date the sale transaction took place.</small>
+                        <small class="form-text text-slate-400">@Loc["SaleDateHelp"]</small>
                         <span asp-validation-for="SaleDate" class="text-danger small font-weight-bold"></span>
                     </div>
                 </div>
@@ -55,10 +55,10 @@
     <div class="card shadow-sm mb-4 table-card">
         <div class="card-header py-3 d-flex align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-white">
-                <i class="fas fa-boxes text-primary mr-2"></i>Sale Order Line Items
+                <i class="fas fa-boxes text-primary mr-2"></i>@Loc["SaleOrderLineItems"]
             </h6>
             <button type="button" id="btnAddItem" class="btn btn-sm btn-success shadow-sm">
-                <i class="fas fa-plus mr-1"></i> Add Another Product
+                <i class="fas fa-plus mr-1"></i> @Loc["AddAnotherProduct"]
             </button>
         </div>
         <div class="card-body p-0">
@@ -66,11 +66,11 @@
                 <table class="table table-bordered align-middle mb-0" id="saleItemsTable">
                     <thead class="thead-light">
                         <tr>
-                            <th style="width: 42%;">PRODUCT <span class="text-danger">*</span></th>
-                            <th style="width: 18%;">QUANTITY <span class="text-danger">*</span></th>
-                            <th style="width: 20%;">SNAPSHOT PRICE ($)</th>
-                            <th style="width: 15%;">SUBTOTAL</th>
-                            <th style="width: 5%;" class="text-center">ACTION</th>
+                            <th style="width: 42%;">@Loc["Product"] <span class="text-danger">*</span></th>
+                            <th style="width: 18%;">@Loc["Quantity"] <span class="text-danger">*</span></th>
+                            <th style="width: 20%;">@Loc["SnapshotPrice"]</th>
+                            <th style="width: 15%;">@Loc["Subtotal"]</th>
+                            <th style="width: 5%;" class="text-center">@Loc["Actions"]</th>
                         </tr>
                     </thead>
                     <tbody id="itemsContainer">
@@ -86,7 +86,7 @@
                                 <tr class="item-row">
                                     <td>
                                         <select name="Items[@i].ProductID" class="custom-select product-select">
-                                            <option value="0" data-price="0" data-stock="0">— Select Product —</option>
+                                            <option value="0" data-price="0" data-stock="0">— @Loc["SelectProduct"] —</option>
                                             @foreach (var prod in Model.ProductCatalog)
                                             {
                                                 <option value="@prod.ProductID"
@@ -94,7 +94,7 @@
                                                         data-stock="@prod.StockQuantity"
                                                         data-name="@prod.ProductName"
                                                         selected="@(prod.ProductID == selectedItem.ProductID)">
-                                                    @prod.ProductName (SKU: @prod.SKU) - $@prod.UnitPrice.ToString("N2") [@prod.StockQuantity in stock]
+                                                    @prod.ProductName (SKU: @prod.SKU) - $@prod.UnitPrice.ToString("N2") [@prod.StockQuantity @Loc["InStock"]]
                                                 </option>
                                             }
                                         </select>
@@ -102,7 +102,7 @@
                                             @if (matchingCatalog != null)
                                             {
                                                 <span class="badge @(itemStock > 0 ? "badge-info" : "badge-danger") font-weight-normal">
-                                                    Available Stock: @itemStock
+                                                    @Loc["AvailableStock"] @itemStock
                                                 </span>
                                             }
                                         </div>
@@ -131,13 +131,13 @@
                                                    step="0.01"
                                                    readonly />
                                         </div>
-                                        <small class="form-text text-slate-400">Auto-captured snapshot</small>
+                                        <small class="form-text text-slate-400">@Loc["AutoCapturedSnapshot"]</small>
                                     </td>
                                     <td class="align-middle font-weight-bold text-success subtotal-cell">
                                         $@((selectedItem.Quantity * itemPrice).ToString("N2"))
                                     </td>
                                     <td class="text-center align-middle">
-                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item" title="Remove row">
+                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item" title="@Loc["Delete"]">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -151,15 +151,15 @@
             <!-- Footer Section: Total & Actions -->
             <div class="p-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-center" style="background: #1a2234; border-color: #1F2937 !important;">
                 <a asp-action="Index" class="btn btn-outline-secondary mb-2 mb-md-0">
-                    <i class="fas fa-arrow-left mr-1"></i> Back to Sales
+                    <i class="fas fa-arrow-left mr-1"></i> @Loc["BackToSales"]
                 </a>
                 <div class="d-flex align-items-center">
                     <div class="mr-4 text-right">
-                        <span class="small text-uppercase font-weight-bold d-block text-slate-400">Grand Total</span>
+                        <span class="small text-uppercase font-weight-bold d-block text-slate-400">@Loc["GrandTotal"]</span>
                         <h4 class="mb-0 font-weight-bold text-success" id="totalAmount">$0.00</h4>
                     </div>
                     <button type="submit" class="btn btn-primary px-4 shadow-sm" id="btnSubmit">
-                        <i class="fas fa-check-circle mr-1"></i> Complete Sale & Deduct Stock
+                        <i class="fas fa-check-circle mr-1"></i> @Loc["CompleteSaleAndDeductStock"]
                     </button>
                 </div>
             </div>
@@ -181,11 +181,11 @@
             ];
 
             function generateProductOptionsHtml(selectedId) {
-                let html = '<option value="0" data-price="0" data-stock="0">— Select Product —</option>';
+                let html = '<option value="0" data-price="0" data-stock="0">— @Loc["SelectProduct"] —</option>';
                 for (let i = 0; i < productCatalog.length; i++) {
                     let prod = productCatalog[i];
                     let isSelected = (prod.id === selectedId) ? 'selected' : '';
-                    let stockClass = prod.stock === 0 ? ' [OUT OF STOCK]' : ` [${prod.stock} in stock]`;
+                    let stockClass = prod.stock === 0 ? ' [@Loc["OutOfStock"]]' : ` [${prod.stock} @Loc["InStock"]]`;
                     html += `<option value="${prod.id}" data-price="${prod.price}" data-stock="${prod.stock}" data-name="${prod.name}" ${isSelected}>
                                 ${prod.name} (SKU: ${prod.sku}) - $${prod.price.toFixed(2)}${stockClass}
                              </option>`;

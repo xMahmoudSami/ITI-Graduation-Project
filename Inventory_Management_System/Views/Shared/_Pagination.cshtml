@@ -38,18 +38,18 @@
         <span class="pagination-entries-text text-muted mr-3">
             @if (Model.TotalItems == 0)
             {
-                <text>Showing <span class="text-white font-weight-bold">0</span> of <span class="text-white font-weight-bold">0</span> entries</text>
+                <text>@Loc["Showing"] <span class="text-white font-weight-bold">0</span> @Loc["Of"] <span class="text-white font-weight-bold">0</span> @Loc["Entries"]</text>
             }
             else
             {
-                <text>Showing <span class="text-white font-weight-bold">@Model.StartItemIndex</span>–<span class="text-white font-weight-bold">@Model.EndItemIndex</span> of <span class="text-white font-weight-bold">@Model.TotalItems</span> entries</text>
+                <text>@Loc["Showing"] <span class="text-white font-weight-bold">@Model.StartItemIndex</span>–<span class="text-white font-weight-bold">@Model.EndItemIndex</span> @Loc["Of"] <span class="text-white font-weight-bold">@Model.TotalItems</span> @Loc["Entries"]</text>
             }
         </span>
 
         <span class="pagination-divider mx-2 text-muted d-none d-sm-inline" style="opacity: 0.35;">|</span>
 
         <div class="pagination-pagesize-group d-inline-flex align-items-center ml-sm-2">
-            <label for="pageSizeSelect" class="small text-muted mb-0 mr-2">Show:</label>
+            <label for="pageSizeSelect" class="small text-muted mb-0 mr-2">@Loc["Show"]</label>
             <select id="pageSizeSelect" class="custom-select custom-select-sm form-control form-control-sm" style="width: auto; min-width: 68px;" onchange="window.location.href=this.value;">
                 <option value="@GetPageUrl(1, 10)" selected="@(Model.PageSize == 10)">10</option>
                 <option value="@GetPageUrl(1, 25)" selected="@(Model.PageSize == 25)">25</option>
@@ -68,14 +68,14 @@
                     <!-- First Page -->
                     <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
                         <a class="page-link" href="@(Model.HasPreviousPage ? GetPageUrl(1) : "#")" tabindex="@(!Model.HasPreviousPage ? "-1" : "0")" aria-label="First">
-                            <span aria-hidden="true">&laquo;&laquo; First</span>
+                            <span aria-hidden="true">&laquo;&laquo; @Loc["First"]</span>
                         </a>
                     </li>
 
                     <!-- Previous Page -->
                     <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
                         <a class="page-link" href="@(Model.HasPreviousPage ? GetPageUrl(current - 1) : "#")" tabindex="@(!Model.HasPreviousPage ? "-1" : "0")" aria-label="Previous">
-                            <span aria-hidden="true">&laquo; Prev</span>
+                            <span aria-hidden="true">&laquo; @Loc["Prev"]</span>
                         </a>
                     </li>
 
@@ -117,14 +117,14 @@
                     <!-- Next Page -->
                     <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
                         <a class="page-link" href="@(Model.HasNextPage ? GetPageUrl(current + 1) : "#")" tabindex="@(!Model.HasNextPage ? "-1" : "0")" aria-label="Next">
-                            <span aria-hidden="true">Next &raquo;</span>
+                            <span aria-hidden="true">@Loc["Next"] &raquo;</span>
                         </a>
                     </li>
 
                     <!-- Last Page -->
                     <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
                         <a class="page-link" href="@(Model.HasNextPage ? GetPageUrl(total) : "#")" tabindex="@(!Model.HasNextPage ? "-1" : "0")" aria-label="Last">
-                            <span aria-hidden="true">Last &raquo;&raquo;</span>
+                            <span aria-hidden="true">@Loc["Last"] &raquo;&raquo;</span>
                         </a>
                     </li>
                 </ul>
@@ -135,13 +135,13 @@
             <nav aria-label="Page navigation">
                 <ul class="pagination pagination-sm justify-content-center justify-content-md-end mb-0">
                     <li class="page-item disabled">
-                        <span class="page-link">&laquo; Prev</span>
+                        <span class="page-link">&laquo; @Loc["Prev"]</span>
                     </li>
                     <li class="page-item active" aria-current="page">
                         <span class="page-link">1 <span class="sr-only">(current)</span></span>
                     </li>
                     <li class="page-item disabled">
-                        <span class="page-link">Next &raquo;</span>
+                        <span class="page-link">@Loc["Next"] &raquo;</span>
                     </li>
                 </ul>
             </nav>

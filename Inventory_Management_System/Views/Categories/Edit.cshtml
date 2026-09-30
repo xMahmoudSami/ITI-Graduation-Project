@@ -1,16 +1,16 @@
 @model Inventory_Management_System.ViewModels.CategoryFormViewModel
 
 @{
-    ViewData["Title"] = "Edit Category - " + Model.CategoryName;
+    ViewData["Title"] = Loc["EditCategory"].Value + " - " + Model.CategoryName;
 }
 
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index">Categories</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@Loc["Nav_Categories"]</a></li>
         <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.CategoryID">@Model.CategoryName</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        <li class="breadcrumb-item active" aria-current="page">@Loc["Edit"]</li>
     </ol>
 </nav>
 
@@ -19,7 +19,7 @@
         <div class="card shadow-sm mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-edit mr-2"></i>Edit Category: @Model.CategoryName
+                    <i class="fas fa-edit mr-2"></i>@Loc["EditCategory"]: @Model.CategoryName
                 </h6>
             </div>
             <div class="card-body">
@@ -31,17 +31,15 @@
 
                     <div class="form-group">
                         <label asp-for="CategoryName" class="font-weight-bold">
-                            Category Name <span class="text-danger">*</span>
+                            @Loc["Category"] <span class="text-danger">*</span>
                         </label>
                         <input asp-for="CategoryName" class="form-control" />
-                        <small class="form-text text-muted">Must be between 2 and 100 characters.</small>
                         <span asp-validation-for="CategoryName" class="text-danger small font-weight-bold"></span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="Description" class="font-weight-bold">Description</label>
+                        <label asp-for="Description" class="font-weight-bold">@Loc["Description"]</label>
                         <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                        <small class="form-text text-muted">Optional description (up to 500 characters).</small>
                         <span asp-validation-for="Description" class="text-danger small font-weight-bold"></span>
                     </div>
 
@@ -49,10 +47,10 @@
 
                     <div class="d-flex justify-content-between align-items-center">
                         <a asp-action="Details" asp-route-id="@Model.CategoryID" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left mr-1"></i> Cancel
+                            <i class="fas fa-arrow-left mr-1"></i> @Loc["Cancel"]
                         </a>
                         <button type="submit" class="btn btn-primary px-4">
-                            <i class="fas fa-save mr-1"></i> Update Category
+                            <i class="fas fa-save mr-1"></i> @Loc["Save"]
                         </button>
                     </div>
                 </form>

@@ -1,15 +1,15 @@
 @model Inventory_Management_System.ViewModels.ProductDeleteViewModel
 
 @{
-    ViewData["Title"] = "Delete Product";
+    ViewData["Title"] = Loc["DeleteProduct"].Value;
 }
 
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index">Products</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Delete</li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@Loc["Nav_Products"]</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Loc["Delete"]</li>
     </ol>
 </nav>
 
@@ -19,7 +19,7 @@
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-@(Model.CanDelete ? "danger" : "warning")">
                     <i class="fas fa-@(Model.CanDelete ? "trash-alt" : "exclamation-triangle") mr-2"></i>
-                    @(Model.CanDelete ? "Delete Product" : "Cannot Delete Product")
+                    @(Model.CanDelete ? Loc["DeleteProduct"] : Loc["CannotDeleteTitle"])
                 </h6>
             </div>
             <div class="card-body">
@@ -28,7 +28,7 @@
                     <div class="alert alert-danger border-left-danger d-flex align-items-center mb-4" role="alert">
                         <i class="fas fa-ban mr-3 text-danger fa-lg"></i>
                         <div>
-                            <strong>Deletion Blocked:</strong> @Model.BlockingReason
+                            <strong>@Loc["DeletionBlocked"]</strong> @Model.BlockingReason
                         </div>
                     </div>
                 }
@@ -37,54 +37,54 @@
                     <div class="alert alert-warning border-left-warning d-flex align-items-center mb-4" role="alert">
                         <i class="fas fa-exclamation-triangle mr-3 text-warning fa-lg"></i>
                         <div>
-                            <strong>Warning:</strong> This action cannot be undone.
+                            <strong>@Loc["DeleteWarningMessage"]</strong>
                             @if (Model.SupplierProductsCount > 0)
                             {
-                                <text> Deleting this product will also remove @Model.SupplierProductsCount supplier mapping(s).</text>
+                                <text> @Model.SupplierProductsCount mapping(s).</text>
                             }
                         </div>
                     </div>
                 }
 
                 <dl class="row mb-0">
-                    <dt class="col-sm-4 text-slate-400">SKU</dt>
+                    <dt class="col-sm-4 text-slate-400">@Loc["SKU"]</dt>
                     <dd class="col-sm-8"><code class="font-weight-bold" style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px;">@Model.SKU</code></dd>
 
-                    <dt class="col-sm-4 text-slate-400">Product Name</dt>
+                    <dt class="col-sm-4 text-slate-400">@Loc["ProductName"]</dt>
                     <dd class="col-sm-8 font-weight-bold text-white">
                         <i class="fas fa-box text-primary mr-1"></i>@Model.ProductName
                     </dd>
 
-                    <dt class="col-sm-4 text-slate-400">Category</dt>
+                    <dt class="col-sm-4 text-slate-400">@Loc["Category"]</dt>
                     <dd class="col-sm-8 text-white">@Model.CategoryName</dd>
 
-                    <dt class="col-sm-4 text-slate-400">Unit Price</dt>
+                    <dt class="col-sm-4 text-slate-400">@Loc["UnitPrice"]</dt>
                     <dd class="col-sm-8 font-weight-bold text-white">$@Model.UnitPrice.ToString("N2")</dd>
 
-                    <dt class="col-sm-4 text-slate-400">Stock Quantity</dt>
+                    <dt class="col-sm-4 text-slate-400">@Loc["StockQuantity"]</dt>
                     <dd class="col-sm-8 font-weight-bold text-white">@Model.StockQuantity</dd>
 
                     @if (Model.SupplierProductsCount > 0)
                     {
-                        <dt class="col-sm-4 text-gray-600">Supplier Mappings</dt>
+                        <dt class="col-sm-4 text-gray-600">@Loc["Nav_SupplierMappings"]</dt>
                         <dd class="col-sm-8">
-                            <span class="badge badge-info px-2 py-1">@Model.SupplierProductsCount mapping(s)</span>
+                            <span class="badge badge-info px-2 py-1">@Model.SupplierProductsCount</span>
                         </dd>
                     }
 
                     @if (Model.PurchaseItemsCount > 0)
                     {
-                        <dt class="col-sm-4 text-gray-600">Purchase Records</dt>
+                        <dt class="col-sm-4 text-gray-600">@Loc["Nav_Purchases"]</dt>
                         <dd class="col-sm-8">
-                            <span class="badge badge-success px-2 py-1">@Model.PurchaseItemsCount record(s)</span>
+                            <span class="badge badge-success px-2 py-1">@Model.PurchaseItemsCount</span>
                         </dd>
                     }
 
                     @if (Model.SaleItemsCount > 0)
                     {
-                        <dt class="col-sm-4 text-gray-600">Sales Records</dt>
+                        <dt class="col-sm-4 text-gray-600">@Loc["Nav_Sales"]</dt>
                         <dd class="col-sm-8">
-                            <span class="badge badge-warning px-2 py-1">@Model.SaleItemsCount record(s)</span>
+                            <span class="badge badge-warning px-2 py-1">@Model.SaleItemsCount</span>
                         </dd>
                     }
                 </dl>
@@ -95,23 +95,23 @@
                     @if (Model.CanDelete)
                     {
                         <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left mr-1"></i> Cancel
+                            <i class="fas fa-arrow-left mr-1"></i> @Loc["CancelAndKeep"]
                         </a>
                         <form asp-action="Delete" method="post">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@Model.ProductID" />
                             <button type="submit" class="btn btn-danger px-4">
-                                <i class="fas fa-trash mr-1"></i> Delete Product
+                                <i class="fas fa-trash mr-1"></i> @Loc["ConfirmDelete"]
                             </button>
                         </form>
                     }
                     else
                     {
                         <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left mr-1"></i> Back to Products
+                            <i class="fas fa-arrow-left mr-1"></i> @Loc["BackToProducts"]
                         </a>
                         <a asp-action="Details" asp-route-id="@Model.ProductID" class="btn btn-info">
-                            <i class="fas fa-eye mr-1"></i> View Details
+                            <i class="fas fa-eye mr-1"></i> @Loc["Details"]
                         </a>
                     }
                 </div>
