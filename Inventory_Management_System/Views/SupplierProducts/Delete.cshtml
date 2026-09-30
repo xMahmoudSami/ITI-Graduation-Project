@@ -1,15 +1,15 @@
 @model Inventory_Management_System.ViewModels.SupplierProductDeleteViewModel
 
 @{
-    ViewData["Title"] = "Remove Supplier-Product Mapping";
+    ViewData["Title"] = Loc["RemoveSupplierProductMapping"].Value;
 }
 
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index">Supplier Mappings</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Remove Mapping</li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@Loc["Nav_SupplierMappings"]</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Loc["RemoveMapping"]</li>
     </ol>
 </nav>
 
@@ -18,47 +18,47 @@
         <div class="card shadow-sm mb-4 border-left-danger">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-danger">
-                    <i class="fas fa-unlink mr-2"></i>Remove Supplier-Product Mapping
+                    <i class="fas fa-unlink mr-2"></i>@Loc["RemoveSupplierProductMapping"]
                 </h6>
             </div>
             <div class="card-body">
                 <div class="alert alert-danger mb-3" role="alert">
                     <i class="fas fa-exclamation-triangle mr-2"></i>
-                    <strong>Warning:</strong> Are you sure you want to remove this mapping? The relationship between this supplier and product will be unlinked.
+                    @Loc["RemoveMappingWarning"]
                 </div>
 
                 <dl class="row mb-0">
-                    <dt class="col-sm-4 text-gray-600">Supplier</dt>
+                    <dt class="col-sm-4 text-gray-600">@Loc["Supplier"]</dt>
                     <dd class="col-sm-8 font-weight-bold text-gray-800">
                         <i class="fas fa-truck text-primary mr-1"></i>@Model.SupplierName
                     </dd>
 
-                    <dt class="col-sm-4 text-gray-600">Product</dt>
+                    <dt class="col-sm-4 text-gray-600">@Loc["Product"]</dt>
                     <dd class="col-sm-8 font-weight-bold text-gray-800">
                         <i class="fas fa-box text-primary mr-1"></i>@Model.ProductName
                     </dd>
 
-                    <dt class="col-sm-4 text-gray-600">Supplier SKU</dt>
+                    <dt class="col-sm-4 text-gray-600">@Loc["SupplierSKU"]</dt>
                     <dd class="col-sm-8"><code>@Model.SupplierSKU</code></dd>
 
-                    <dt class="col-sm-4 text-gray-600">Contract Price</dt>
+                    <dt class="col-sm-4 text-gray-600">@Loc["ContractPrice"]</dt>
                     <dd class="col-sm-8 font-weight-bold">$@Model.ContractPrice.ToString("N2")</dd>
 
-                    <dt class="col-sm-4 text-gray-600">Lead Time</dt>
-                    <dd class="col-sm-8">@Model.LeadTimeDays days</dd>
+                    <dt class="col-sm-4 text-gray-600">@Loc["LeadTimeDays"]</dt>
+                    <dd class="col-sm-8">@Model.LeadTimeDays @Loc["Days"]</dd>
                 </dl>
 
                 <hr class="my-4">
 
                 <div class="d-flex justify-content-between align-items-center">
                     <a asp-action="Index" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left mr-1"></i> Cancel
+                        <i class="fas fa-arrow-left mr-1"></i> @Loc["Cancel"]
                     </a>
                     <form asp-action="Delete" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@Model.SupplierProductID" />
                         <button type="submit" class="btn btn-danger px-4">
-                            <i class="fas fa-unlink mr-1"></i> Remove Mapping
+                            <i class="fas fa-unlink mr-1"></i> @Loc["RemoveMapping"]
                         </button>
                     </form>
                 </div>

@@ -1,15 +1,15 @@
-﻿@model Inventory_Management_System.ViewModels.PurchaseFormViewModel
+@model Inventory_Management_System.ViewModels.PurchaseFormViewModel
 
 @{
-    ViewData["Title"] = "Add Purchase Order";
+    ViewData["Title"] = Loc["NewPurchaseOrder"].Value;
 }
 
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index">Purchases</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Add Purchase</li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@Loc["Purchases"]</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Loc["AddPurchase"]</li>
     </ol>
 </nav>
 
@@ -20,7 +20,7 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">
-                <i class="fas fa-shopping-cart mr-2"></i>Create New Purchase Order
+                <i class="fas fa-shopping-cart mr-2"></i>@Loc["NewPurchaseOrder"]
             </h6>
         </div>
         <div class="card-body">
@@ -30,22 +30,22 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="SupplierID" class="font-weight-bold">
-                            Supplier <span class="text-danger">*</span>
+                            @Loc["Supplier"] <span class="text-danger">*</span>
                         </label>
                         <select asp-for="SupplierID" asp-items="Model.Suppliers" class="custom-select">
-                            <option value="0">— Select Supplier —</option>
+                            <option value="0">— @Loc["SelectSupplier"] —</option>
                         </select>
-                        <small class="form-text text-muted">Select supplier for this order.</small>
+                        <small class="form-text text-muted">@Loc["SelectSupplierForOrder"]</small>
                         <span asp-validation-for="SupplierID" class="text-danger small font-weight-bold"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="PurchaseDate" class="font-weight-bold">
-                            Purchase Date <span class="text-danger">*</span>
+                            @Loc["PurchaseDate"] <span class="text-danger">*</span>
                         </label>
                         <input asp-for="PurchaseDate" class="form-control" type="date" />
-                        <small class="form-text text-muted">Date the order was issued.</small>
+                        <small class="form-text text-muted">@Loc["DateOrderIssued"]</small>
                         <span asp-validation-for="PurchaseDate" class="text-danger small font-weight-bold"></span>
                     </div>
                 </div>
@@ -57,10 +57,10 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3 d-flex align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">
-                <i class="fas fa-boxes mr-2"></i>Purchase Order Items
+                <i class="fas fa-boxes mr-2"></i>@Loc["PurchaseOrderItems"]
             </h6>
             <button type="button" id="btnAddItem" class="btn btn-sm btn-success shadow-sm">
-                <i class="fas fa-plus mr-1"></i> Add Another Product
+                <i class="fas fa-plus mr-1"></i> @Loc["AddAnotherProduct"]
             </button>
         </div>
         <div class="card-body p-0">
@@ -68,11 +68,11 @@
                 <table class="table table-bordered align-middle mb-0" id="itemsTable">
                     <thead class="thead-light">
                         <tr>
-                            <th style="width: 40%;">PRODUCT <span class="text-danger">*</span></th>
-                            <th style="width: 20%;">QUANTITY <span class="text-danger">*</span></th>
-                            <th style="width: 20%;">UNIT COST ($) <span class="text-danger">*</span></th>
-                            <th style="width: 15%;">SUBTOTAL</th>
-                            <th style="width: 5%;" class="text-center">ACTION</th>
+                            <th style="width: 40%;">@Loc["Product"] <span class="text-danger">*</span></th>
+                            <th style="width: 20%;">@Loc["Quantity"] <span class="text-danger">*</span></th>
+                            <th style="width: 20%;">@Loc["UnitCost"] ($) <span class="text-danger">*</span></th>
+                            <th style="width: 15%;">@Loc["Subtotal"]</th>
+                            <th style="width: 5%;" class="text-center">@Loc["Actions"]</th>
                         </tr>
                     </thead>
                     <tbody id="itemsContainer">
@@ -81,30 +81,42 @@
                             for (int i = 0; i < Model.Items.Count; i++)
                             {
                                 <tr class="item-row">
+                                    <input type="hidden" name="Items[@i].PurchaseItemID" value="@Model.Items[i].PurchaseItemID" />
                                     <td>
-                                        <select name="Items[@i].ProductID" class="custom-select product-select">
-                                            <option value="0">— Select Product —</option>
-                                            @if (Model.Products != null)
+                                        <select name="Items[@i].ProductID" class="custom-select product-select" required>
+                                            <option value="">— @Loc["SelectProduct"] —</option>
+                                            @if (Model.AvailableProducts != null && Model.AvailableProducts.Any())
                                             {
-                                                foreach (var prod in Model.Products)
+                                                foreach (var prod in Model.AvailableProducts)
                                                 {
-                                                    <option value="@prod.Value" selected="@(prod.Value == Model.Items[i].ProductID.ToString())">@prod.Text</option>
+                                                    if (prod.ProductID == Model.Items[i].ProductID)
+                                                    {
+                                                        <option value="@prod.ProductID" data-cost="@prod.ContractPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)" selected="selected">
+                                                            @prod.ProductName (SKU: @prod.SKU) - $@prod.ContractPrice.ToString("N2")
+                                                        </option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@prod.ProductID" data-cost="@prod.ContractPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)">
+                                                            @prod.ProductName (SKU: @prod.SKU) - $@prod.ContractPrice.ToString("N2")
+                                                        </option>
+                                                    }
                                                 }
                                             }
                                         </select>
                                         <span class="text-danger small font-weight-bold field-validation-valid" data-valmsg-for="Items[@i].ProductID" data-valmsg-replace="true"></span>
                                     </td>
                                     <td>
-                                        <input name="Items[@i].Quantity" value="@Model.Items[i].Quantity" class="form-control quantity-input" type="number" min="1" placeholder="1" />
+                                        <input name="Items[@i].Quantity" value="@(Model.Items[i].Quantity > 0 ? Model.Items[i].Quantity : 1)" class="form-control qty-input quantity-input" type="number" min="1" max="10000" placeholder="1" required />
                                     </td>
                                     <td>
-                                        <input name="Items[@i].UnitCost" value="@Model.Items[i].UnitCost" class="form-control cost-input" type="number" step="0.01" min="0.01" placeholder="0.00" />
+                                        <input name="Items[@i].UnitCost" value="@Model.Items[i].UnitCost.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)" class="form-control cost-input unit-cost-input" type="number" step="0.01" min="0.01" max="100000" placeholder="0.00" required />
                                     </td>
-                                    <td class="align-middle font-weight-bold text-success subtotal-cell">
-                                        $0.00
+                                    <td class="subtotal-cell text-right align-middle font-weight-bold text-success">
+                                        $<span class="subtotal-text">@Model.Items[i].Subtotal.ToString("F2")</span>
                                     </td>
                                     <td class="text-center align-middle">
-                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item">
+                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item btn-remove-row">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -118,14 +130,14 @@
             <!-- Footer Section inside Card -->
             <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
                 <a asp-action="Index" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left mr-1"></i> Back to Purchases
+                    <i class="fas fa-arrow-left mr-1"></i> @Loc["BackToPurchases"]
                 </a>
                 <div class="d-flex align-items-center">
                     <h5 class="mb-0 mr-4 font-weight-bold text-gray-800">
-                        Total Amount: <span id="totalAmount" class="text-primary">$0.00</span>
+                        @Loc["TotalAmount"]: <span id="totalAmount" class="text-primary">$<span id="grandTotalText">@Model.TotalAmount.ToString("F2")</span></span>
                     </h5>
                     <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                        <i class="fas fa-save mr-1"></i> Save Purchase Order
+                        <i class="fas fa-save mr-1"></i> @Loc["SavePurchaseOrder"]
                     </button>
                 </div>
             </div>
@@ -133,73 +145,249 @@
     </div>
 </form>
 
+<!-- Template Option for Products Dropdown -->
+<select id="productOptionsTemplate" class="d-none">
+    <option value="">— @Loc["SelectProduct"] —</option>
+    @if (Model.AvailableProducts != null && Model.AvailableProducts.Any())
+    {
+        foreach (var prod in Model.AvailableProducts)
+        {
+            <option value="@prod.ProductID" data-cost="@prod.ContractPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)">
+                @prod.ProductName (SKU: @prod.SKU) - $@prod.ContractPrice.ToString("N2")
+            </option>
+        }
+    }
+</select>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
         $(document).ready(function () {
-            // Products options template
-            let productOptions = `<option value="0">— Select Product —</option>`;
-            @if (Model.Products != null)
-                {
-                            foreach (var prod in Model.Products)
-                    {
-                        <text>productOptions += `<option value="@prod.Value">@prod.Text</option>`; </text>
-                }
-                }
+            const selectProductText = '@Loc["SelectProduct"]';
+            const selectSupplierFirstText = '@Loc["SelectSupplierForOrder"]';
+            const duplicateAlertText = '@Loc["DuplicateProductInOrder"]' || 'You cannot select the same product more than once.';
+            const atLeastOneItemText = '@Loc["AtLeastOneItemRequired"]' || 'At least one product item is required.';
+            const pleaseSelectSupplierText = '@Loc["PleaseSelectSupplierFirst"]' || 'Please select a supplier first.';
 
-                function reindexRows() {
-                    $('#itemsContainer tr.item-row').each(function (index) {
-                        $(this).find('.product-select').attr('name', `Items[${index}].ProductID`);
-                        $(this).find('.quantity-input').attr('name', `Items[${index}].Quantity`);
-                        $(this).find('.cost-input').attr('name', `Items[${index}].UnitCost`);
-                    });
-                }
+            // 1. Calculate row subtotal
+            function calculateRowSubtotal(row) {
+                const qty = parseFloat(row.find('.qty-input, .quantity-input').val()) || 0;
+                const cost = parseFloat(row.find('.cost-input, .unit-cost-input').val()) || 0;
+                const subtotal = qty * cost;
+                row.find('.subtotal-text').text(subtotal.toFixed(2));
+                return subtotal;
+            }
 
+            // 2. Calculate grand total
             function calculateTotals() {
                 let grandTotal = 0;
                 $('#itemsContainer tr.item-row').each(function () {
-                    let qty = parseFloat($(this).find('.quantity-input').val()) || 0;
-                    let cost = parseFloat($(this).find('.cost-input').val()) || 0;
-                    let subtotal = qty * cost;
-                    $(this).find('.subtotal-cell').text('$' + subtotal.toFixed(2));
-                    grandTotal += subtotal;
+                    grandTotal += calculateRowSubtotal($(this));
                 });
-                $('#totalAmount').text('$' + grandTotal.toFixed(2));
+                $('#grandTotalText').text(grandTotal.toFixed(2));
             }
 
-            // Ensure at least one row exists
-            if ($('#itemsContainer tr.item-row').length === 0) {
-                addNewRow();
-            } else {
+            // 3. Reindex row names for model binding
+            function reindexRows() {
+                $('#itemsContainer tr.item-row').each(function (index, row) {
+                    $(row).find('input[name*="PurchaseItemID"]').attr('name', `Items[${index}].PurchaseItemID`);
+                    $(row).find('.product-select').attr('name', `Items[${index}].ProductID`);
+                    $(row).find('.qty-input, .quantity-input').attr('name', `Items[${index}].Quantity`);
+                    $(row).find('.cost-input, .unit-cost-input').attr('name', `Items[${index}].UnitCost`);
+                    $(row).find('[data-valmsg-for*="ProductID"]').attr('data-valmsg-for', `Items[${index}].ProductID`);
+                });
+            }
+
+            // 4. Update duplicate prevention (disabling options in other rows)
+            function updateDuplicateOptions() {
+                const selectedProductIds = [];
+                $('#itemsContainer tr.item-row').each(function () {
+                    const val = $(this).find('.product-select').val();
+                    if (val && val !== '0' && val !== '') {
+                        selectedProductIds.push(val.toString());
+                    }
+                });
+
+                $('#itemsContainer tr.item-row').each(function () {
+                    const currentSelect = $(this).find('.product-select');
+                    const currentVal = currentSelect.val() ? currentSelect.val().toString() : '';
+
+                    currentSelect.find('option').each(function () {
+                        const optVal = $(this).val() ? $(this).val().toString() : '';
+                        if (optVal && optVal !== '0' && optVal !== '') {
+                            if (selectedProductIds.includes(optVal) && optVal !== currentVal) {
+                                $(this).prop('disabled', true);
+                            } else {
+                                $(this).prop('disabled', false);
+                            }
+                        }
+                    });
+                });
+            }
+
+            // 5. On Product Dropdown Change: Auto-populate Unit Cost & Recalculate
+            $(document).on('change', '.product-select', function () {
+                const select = $(this);
+                const selectedVal = select.val();
+                const currentRow = select.closest('tr.item-row');
+
+                if (selectedVal && selectedVal !== '0' && selectedVal !== '') {
+                    // Check for duplicates across other rows
+                    let isDuplicate = false;
+                    $('#itemsContainer tr.item-row').not(currentRow).each(function () {
+                        if ($(this).find('.product-select').val() == selectedVal) {
+                            isDuplicate = true;
+                            return false;
+                        }
+                    });
+
+                    if (isDuplicate) {
+                        alert(duplicateAlertText);
+                        select.val('');
+                        currentRow.find('.cost-input, .unit-cost-input').val('0.00');
+                        calculateRowSubtotal(currentRow);
+                        calculateTotals();
+                        updateDuplicateOptions();
+                        return;
+                    }
+
+                    // Auto-populate Unit Cost from data-cost attribute
+                    const selectedOption = select.find('option:selected');
+                    const costAttr = selectedOption.data('cost') !== undefined ? selectedOption.data('cost') : selectedOption.attr('data-cost');
+                    const cost = parseFloat(costAttr);
+
+                    if (!isNaN(cost) && cost >= 0) {
+                        currentRow.find('.cost-input, .unit-cost-input').val(cost.toFixed(2));
+                    }
+
+                    // Default quantity to 1 if empty or 0
+                    const qtyInput = currentRow.find('.qty-input, .quantity-input');
+                    if (!qtyInput.val() || parseFloat(qtyInput.val()) <= 0) {
+                        qtyInput.val('1');
+                    }
+                } else {
+                    currentRow.find('.cost-input, .unit-cost-input').val('0.00');
+                }
+
+                calculateRowSubtotal(currentRow);
                 calculateTotals();
-            }
+                updateDuplicateOptions();
+            });
 
+            // 6. On Quantity or Cost Input Change: Live recalculate
+            $(document).on('input change', '.qty-input, .quantity-input, .cost-input, .unit-cost-input', function () {
+                const row = $(this).closest('tr.item-row');
+                calculateRowSubtotal(row);
+                calculateTotals();
+            });
+
+            // 7. On Supplier Dropdown Change: Reload supplier's mapped products
+            $('#SupplierID').on('change', function () {
+                const supplierId = $(this).val();
+
+                if (!supplierId || supplierId === '0') {
+                    const emptyTemplate = `<option value="">— ${selectSupplierFirstText} —</option>`;
+                    $('#productOptionsTemplate').html(emptyTemplate);
+                    $('#itemsContainer tr.item-row').each(function () {
+                        $(this).find('.product-select').html(emptyTemplate);
+                        $(this).find('.cost-input, .unit-cost-input').val('0.00');
+                        calculateRowSubtotal($(this));
+                    });
+                    calculateTotals();
+                    return;
+                }
+
+                // Fetch supplier's mapped products via AJAX
+                $.ajax({
+                    url: '/Purchases/GetProductsBySupplier',
+                    type: 'GET',
+                    data: { supplierId: supplierId },
+                    success: function (products) {
+                        let optionsHtml = `<option value="">— ${selectProductText} —</option>`;
+
+                        if (products && products.length > 0) {
+                            $.each(products, function (i, p) {
+                                const cost = parseFloat(p.contractPrice).toFixed(2);
+                                optionsHtml += `<option value="${p.productId}" data-cost="${cost}">${p.productName} (SKU: ${p.sku}) - $${cost}</option>`;
+                            });
+                        } else {
+                            optionsHtml = `<option value="">— No products mapped to this supplier —</option>`;
+                        }
+
+                        $('#productOptionsTemplate').html(optionsHtml);
+
+                        // Update existing rows
+                        $('#itemsContainer tr.item-row').each(function () {
+                            const row = $(this);
+                            const currentProductSelect = row.find('.product-select');
+                            const prevVal = currentProductSelect.val();
+
+                            currentProductSelect.html(optionsHtml);
+
+                            // Check if previous product is still available under the new supplier
+                            if (prevVal && currentProductSelect.find(`option[value="${prevVal}"]`).length > 0) {
+                                currentProductSelect.val(prevVal);
+                                const cost = parseFloat(currentProductSelect.find('option:selected').data('cost'));
+                                if (!isNaN(cost)) {
+                                    row.find('.cost-input, .unit-cost-input').val(cost.toFixed(2));
+                                }
+                            } else {
+                                currentProductSelect.val('');
+                                row.find('.cost-input, .unit-cost-input').val('0.00');
+                            }
+
+                            calculateRowSubtotal(row);
+                        });
+
+                        calculateTotals();
+                        updateDuplicateOptions();
+                    },
+                    error: function () {
+                        alert('Failed to load products for the selected supplier.');
+                    }
+                });
+            });
+
+            // 8. Add New Item Row
             function addNewRow() {
-                let index = $('#itemsContainer tr.item-row').length;
-                let rowHtml = `
-                            <tr class="item-row">
-                                <td>
-                                    <select name="Items[${index}].ProductID" class="custom-select product-select">
-                                        ${productOptions}
-                                    </select>
-                                </td>
-                                <td>
-                                    <input name="Items[${index}].Quantity" class="form-control quantity-input" type="number" min="1" value="1" placeholder="1" />
-                                </td>
-                                <td>
-                                    <input name="Items[${index}].UnitCost" class="form-control cost-input" type="number" step="0.01" min="0.01" value="0.00" placeholder="0.00" />
-                                </td>
-                                <td class="align-middle font-weight-bold text-success subtotal-cell">
-                                    $0.00
-                                </td>
-                                <td class="text-center align-middle">
-                                    <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>`;
+                const supplierId = $('#SupplierID').val();
+                if (!supplierId || supplierId === '0') {
+                    alert(pleaseSelectSupplierText);
+                    $('#SupplierID').focus();
+                    return;
+                }
+
+                const productOptions = $('#productOptionsTemplate').html() || `<option value="">— ${selectProductText} —</option>`;
+                const newIndex = $('#itemsContainer tr.item-row').length;
+
+                const rowHtml = `
+                    <tr class="item-row">
+                        <input type="hidden" name="Items[${newIndex}].PurchaseItemID" value="0" />
+                        <td>
+                            <select name="Items[${newIndex}].ProductID" class="custom-select product-select" required>
+                                ${productOptions}
+                            </select>
+                        </td>
+                        <td>
+                            <input name="Items[${newIndex}].Quantity" class="form-control qty-input quantity-input" type="number" min="1" max="10000" value="1" placeholder="1" required />
+                        </td>
+                        <td>
+                            <input name="Items[${newIndex}].UnitCost" class="form-control cost-input unit-cost-input" type="number" step="0.01" min="0.01" max="100000" value="0.00" placeholder="0.00" required />
+                        </td>
+                        <td class="subtotal-cell text-right align-middle font-weight-bold text-success">
+                            $<span class="subtotal-text">0.00</span>
+                        </td>
+                        <td class="text-center align-middle">
+                            <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item btn-remove-row">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+
                 $('#itemsContainer').append(rowHtml);
+                reindexRows();
+                updateDuplicateOptions();
                 calculateTotals();
             }
 
@@ -207,19 +395,106 @@
                 addNewRow();
             });
 
-            $(document).on('click', '.btn-remove-item', function () {
+            // 9. Remove Item Row
+            $(document).on('click', '.btn-remove-item, .btn-remove-row', function () {
                 if ($('#itemsContainer tr.item-row').length > 1) {
-                    $(this).closest('tr').remove();
+                    $(this).closest('tr.item-row').remove();
                     reindexRows();
+                    updateDuplicateOptions();
                     calculateTotals();
                 } else {
-                    alert('At least one product item is required.');
+                    alert(atLeastOneItemText);
                 }
             });
 
-            $(document).on('input change', '.quantity-input, .cost-input', function () {
-                calculateTotals();
+            // 10. Form Submission Validation (Prevent duplicate and empty products)
+            $('#purchaseForm').on('submit', function (e) {
+                const supplierId = $('#SupplierID').val();
+                if (!supplierId || supplierId === '0') {
+                    alert(pleaseSelectSupplierText);
+                    $('#SupplierID').focus();
+                    e.preventDefault();
+                    return false;
+                }
+
+                let hasError = false;
+                const selected = [];
+
+                $('#itemsContainer tr.item-row').each(function () {
+                    const prodId = $(this).find('.product-select').val();
+                    const qty = parseFloat($(this).find('.qty-input, .quantity-input').val()) || 0;
+
+                    if (!prodId || prodId === '0' || prodId === '') {
+                        alert('Please select a valid product for all rows.');
+                        $(this).find('.product-select').focus();
+                        hasError = true;
+                        return false;
+                    }
+
+                    if (selected.includes(prodId)) {
+                        alert(duplicateAlertText);
+                        hasError = true;
+                        return false;
+                    }
+                    selected.push(prodId);
+
+                    if (qty <= 0) {
+                        alert('Quantity must be greater than zero.');
+                        $(this).find('.qty-input, .quantity-input').focus();
+                        hasError = true;
+                        return false;
+                    }
+
+                    // Auto-fill cost if 0
+                    const costInput = $(this).find('.cost-input, .unit-cost-input');
+                    const costVal = parseFloat(costInput.val()) || 0;
+                    if (costVal <= 0) {
+                        const optCost = parseFloat($(this).find('.product-select option:selected').data('cost'));
+                        if (!isNaN(optCost) && optCost > 0) {
+                            costInput.val(optCost.toFixed(2));
+                        }
+                    }
+                });
+
+                if (hasError) {
+                    e.preventDefault();
+                    return false;
+                }
             });
+
+            // Ensure at least one row exists on initial load
+            if ($('#itemsContainer tr.item-row').length === 0) {
+                const initialIndex = 0;
+                const initialProductOptions = $('#productOptionsTemplate').html() || `<option value="">— ${selectProductText} —</option>`;
+                const initialRow = `
+                    <tr class="item-row">
+                        <input type="hidden" name="Items[${initialIndex}].PurchaseItemID" value="0" />
+                        <td>
+                            <select name="Items[${initialIndex}].ProductID" class="custom-select product-select" required>
+                                ${initialProductOptions}
+                            </select>
+                        </td>
+                        <td>
+                            <input name="Items[${initialIndex}].Quantity" class="form-control qty-input quantity-input" type="number" min="1" max="10000" value="1" placeholder="1" required />
+                        </td>
+                        <td>
+                            <input name="Items[${initialIndex}].UnitCost" class="form-control cost-input unit-cost-input" type="number" step="0.01" min="0.01" max="100000" value="0.00" placeholder="0.00" required />
+                        </td>
+                        <td class="subtotal-cell text-right align-middle font-weight-bold text-success">
+                            $<span class="subtotal-text">0.00</span>
+                        </td>
+                        <td class="text-center align-middle">
+                            <button type="button" class="btn btn-outline-danger btn-sm btn-remove-item btn-remove-row">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+                $('#itemsContainer').append(initialRow);
+            }
+
+            // Initial calculation & duplicate checks
+            updateDuplicateOptions();
+            calculateTotals();
         });
     </script>
 }

@@ -1,0 +1,286 @@
+@model Inventory_Management_System.ViewModels.SalesReportViewModel
+
+@{
+    ViewData["Title"] = Loc["Nav_SalesReport"].Value;
+}
+
+<!-- Breadcrumbs (Hidden when printing) -->
+<nav aria-label="breadcrumb" class="no-print">
+    <ol class="breadcrumb bg-transparent p-0 mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item text-slate-400">@Loc["Nav_Reports"]</li>
+        <li class="breadcrumb-item active text-slate-400" aria-current="page">@Loc["Nav_SalesReport"]</li>
+    </ol>
+</nav>
+
+<!-- Page Header (Hidden when printing) -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4 no-print">
+    <div>
+        <h1 class="h3 mb-1 text-white font-weight-bold">
+            <i class="fas fa-chart-line text-primary mr-2"></i>@Loc["SalesPerformanceReport"]
+        </h1>
+        <p class="small mb-0 text-slate-400">
+            @Loc["SalesOrdersSubtitle"]
+        </p>
+    </div>
+    <div class="btn-group mt-3 mt-sm-0">
+        <a asp-action="ExportSalesCsv"
+           asp-route-preset="@Model.DatePreset"
+           asp-route-fromDate="@Model.StartDate.ToString("yyyy-MM-dd")"
+           asp-route-toDate="@Model.EndDate.ToString("yyyy-MM-dd")"
+           asp-route-search="@Model.Search"
+           class="btn btn-outline-success shadow-sm">
+            <i class="fas fa-file-csv mr-1"></i> @Loc["ExportCSV"]
+        </a>
+        <button type="button" class="btn btn-primary shadow-sm" onclick="window.print();">
+            <i class="fas fa-print mr-1"></i> @Loc["PrintReport"]
+        </button>
+    </div>
+</div>
+
+<!-- Printable Header (Visible ONLY when printing) -->
+<div class="print-only mb-4 border-bottom pb-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="font-weight-bold mb-0">IMS Enterprise &bull; @Loc["SalesPerformanceReport"]</h2>
+            <p class="text-muted small mb-0">
+                @Loc["Period"] @Model.StartDate.ToString("yyyy-MM-dd") @Loc["ToDate"] @Model.EndDate.ToString("yyyy-MM-dd") &bull; @Loc["Generated"] @DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            </p>
+        </div>
+        <div class="text-right">
+            <h4 class="font-weight-bold text-success mb-0">@Loc["TotalRevenue"]: $@Model.TotalRevenue.ToString("N2")</h4>
+            <span class="small text-muted">@Model.TotalSalesCount @Loc["OrdersCompleted"]</span>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Cards Row -->
+<div class="row mb-4 kpi-row">
+    <!-- Total Revenue Card -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-left-primary shadow-sm h-100 py-2 kpi-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            @Loc["TotalPeriodRevenue"]
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-white">
+                            $@Model.TotalRevenue.ToString("N2")
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-primary" style="opacity: 0.45;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Orders Card -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-left-success shadow-sm h-100 py-2 kpi-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            @Loc["CompletedOrders"]
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-white">
+                            @Model.TotalSalesCount.ToString("N0")
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-shopping-cart fa-2x text-success" style="opacity: 0.45;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Units Sold Card -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-left-info shadow-sm h-100 py-2 kpi-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            @Loc["TotalUnitsSold"]
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-white">
+                            @Model.TotalUnitsSold.ToString("N0")
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-boxes fa-2x text-info" style="opacity: 0.45;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Average Order Value Card -->
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card border-left-warning shadow-sm h-100 py-2 kpi-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            @Loc["AverageOrderValue"]
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-white">
+                            $@Model.AverageOrderValue.ToString("N2")
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-receipt fa-2x text-warning" style="opacity: 0.45;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Card (Hidden when printing) -->
+<div class="card shadow-sm mb-4 filter-card no-print">
+    <div class="card-body py-3">
+        <!-- Date Preset Quick Links -->
+        <div class="d-flex align-items-center mb-3 pb-2 border-bottom" style="border-color: #1F2937 !important;">
+            <span class="small font-weight-bold text-slate-400 mr-3"><i class="far fa-calendar-check mr-1"></i>@Loc["QuickRanges"]</span>
+            <div class="btn-group btn-group-sm">
+                <a asp-action="Sales" asp-route-preset="Today" class="btn @(Model.DatePreset == "Today" ? "btn-primary font-weight-bold" : "btn-outline-secondary")" style="@(Model.DatePreset == "Today" ? "" : "border-color: #475569; color: #cbd5e1;")">
+                    @Loc["Today"]
+                </a>
+                <a asp-action="Sales" asp-route-preset="ThisWeek" class="btn @(Model.DatePreset == "ThisWeek" ? "btn-primary font-weight-bold" : "btn-outline-secondary")" style="@(Model.DatePreset == "ThisWeek" ? "" : "border-color: #475569; color: #cbd5e1;")">
+                    @Loc["ThisWeek"]
+                </a>
+                <a asp-action="Sales" asp-route-preset="ThisMonth" class="btn @(Model.DatePreset == "ThisMonth" ? "btn-primary font-weight-bold" : "btn-outline-secondary")" style="@(Model.DatePreset == "ThisMonth" ? "" : "border-color: #475569; color: #cbd5e1;")">
+                    @Loc["ThisMonth"]
+                </a>
+            </div>
+        </div>
+
+        <!-- Custom Date Range & Search Form -->
+        <form method="get" asp-action="Sales" class="form-row align-items-end">
+            <input type="hidden" name="preset" value="Custom" />
+            <div class="col-md-4 mb-2 mb-md-0">
+                <label class="small font-weight-bold text-slate-400 mb-1">@Loc["CustomerOrOrderNumber"]</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text border-right-0" style="background: #1a2234; border-color: #334155;"><i class="fas fa-search text-slate-400"></i></span>
+                    </div>
+                    <input type="text" name="search" value="@Model.Search" class="form-control border-left-0" style="background: #0f172a; border-color: #334155; color: #ffffff;" placeholder="@Loc["SearchCustomerOrOrder"]" />
+                </div>
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="small font-weight-bold text-slate-400 mb-1">@Loc["FromDate"]</label>
+                <input type="date" name="fromDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" class="form-control" style="background: #0f172a; border-color: #334155; color: #ffffff;" />
+            </div>
+            <div class="col-md-3 mb-2 mb-md-0">
+                <label class="small font-weight-bold text-slate-400 mb-1">@Loc["ToDate"]</label>
+                <input type="date" name="toDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" class="form-control" style="background: #0f172a; border-color: #334155; color: #ffffff;" />
+            </div>
+            <div class="col-md-2 d-flex">
+                <button type="submit" class="btn btn-primary btn-block mr-1">
+                    <i class="fas fa-filter mr-1"></i> @Loc["Apply"]
+                </button>
+                <a asp-action="Sales" class="btn btn-outline-secondary" style="border-color: #475569; color: #cbd5e1;" title="@Loc["Reset"]">
+                    <i class="fas fa-undo"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sales Orders Table Card -->
+<div class="card shadow-sm mb-4 table-card">
+    <div class="card-header py-3 d-flex align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-white">
+            <i class="fas fa-file-invoice-dollar text-primary mr-2"></i>@Loc["SalesOrdersBreakdown"] (@Model.SalesRecords.Count @Loc["TotalOrders"])
+        </h6>
+        <span class="badge border text-slate-300 px-2 py-1" style="background: #1e293b; border-color: #334155;">
+            @Loc["Period"] @Model.StartDate.ToString("MMM dd, yyyy") &ndash; @Model.EndDate.ToString("MMM dd, yyyy")
+        </span>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.SalesRecords.Any())
+        {
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="fas fa-receipt fa-3x" style="color: #475569;"></i>
+                </div>
+                <h5 class="text-white font-weight-bold">@Loc["NoSalesRecordsInRange"]</h5>
+                <p class="text-slate-400 mb-3">@Loc["AdjustDateFilterHint"]</p>
+                <a asp-action="Sales" asp-route-preset="ThisMonth" class="btn btn-primary btn-sm px-3 shadow-sm">
+                    @Loc["ViewThisMonthSales"]
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0" id="salesReportTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 12%;">@Loc["OrderNumber"]</th>
+                            <th style="width: 15%;">@Loc["Date"]</th>
+                            <th style="width: 30%;">@Loc["Customer"]</th>
+                            <th class="text-center" style="width: 13%;">@Loc["LineItems"]</th>
+                            <th class="text-center" style="width: 13%;">@Loc["UnitsSold"]</th>
+                            <th class="text-right" style="width: 17%;">@Loc["TotalAmount"] ($)</th>
+                            <th class="text-center no-print" style="width: 10%;">@Loc["Invoice"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sale in Model.SalesRecords)
+                        {
+                            <tr class="sales-row">
+                                <td>
+                                    <span class="badge px-2 py-1 font-weight-bold" style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155;">
+                                        INV-@sale.SaleID.ToString("D6")
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="text-slate-400">
+                                        <i class="far fa-calendar-alt mr-1"></i>@sale.SaleDate.ToString("yyyy-MM-dd")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="font-weight-bold text-white">
+                                        <i class="fas fa-user text-primary mr-1"></i>
+                                        @sale.CustomerInfo
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge border px-2 py-1 font-weight-bold" style="background: #1e293b; color: #e2e8f0; border-color: #334155;">
+                                        @sale.ItemsCount @Loc["LineItems"]
+                                    </span>
+                                </td>
+                                <td class="text-center font-weight-bold text-white">
+                                    @sale.TotalUnitsSold
+                                </td>
+                                <td class="text-right font-weight-bold text-success h6 mb-0">
+                                    $@sale.TotalAmount.ToString("N2")
+                                </td>
+                                <td class="text-center no-print">
+                                    <a asp-controller="Sales" asp-action="Details" asp-route-id="@sale.SaleID" class="btn btn-sm btn-outline-info" title="@Loc["PrintInvoice"]">
+                                        <i class="fas fa-eye mr-1"></i> @Loc["Details"]
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="thead-light font-weight-bold">
+                        <tr>
+                            <td colspan="4" class="text-right text-uppercase small text-slate-300">@Loc["TotalPeriodSum"]</td>
+                            <td class="text-center text-white font-weight-bold">@Model.TotalUnitsSold @Loc["Units"]</td>
+                            <td class="text-right text-success h5 mb-0">$@Model.TotalRevenue.ToString("N2")</td>
+                            <td class="no-print"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+

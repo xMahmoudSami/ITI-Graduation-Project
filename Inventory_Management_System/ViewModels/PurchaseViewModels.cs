@@ -1,4 +1,4 @@
-﻿namespace Inventory_Management_System.ViewModels
+namespace Inventory_Management_System.ViewModels
 {
     public class PurchaseListItemViewModel
     {
@@ -62,6 +62,15 @@
         public decimal Subtotal => Quantity * UnitCost;
     }
 
+    public class SupplierProductOptionViewModel
+    {
+        public int ProductID { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string SKU { get; set; } = string.Empty;
+        public decimal ContractPrice { get; set; }
+        public string DisplayText => $"{ProductName} (SKU: {SKU}) - ${ContractPrice:N2}";
+    }
+
     public class PurchaseFormViewModel
     {
         public int PurchaseID { get; set; }
@@ -83,6 +92,7 @@
 
         public List<SelectListItem> Suppliers { get; set; } = new();
         public List<SelectListItem> Products { get; set; } = new();
+        public List<SupplierProductOptionViewModel> AvailableProducts { get; set; } = new();
     }
 
     public class PurchaseItemDetailsViewModel

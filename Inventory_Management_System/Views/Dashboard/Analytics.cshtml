@@ -1,14 +1,14 @@
 @model Inventory_Management_System.ViewModels.DashboardViewModels
 
 @{
-    ViewData["Title"] = "Analytics Dashboard";
+    ViewData["Title"] = Loc["AnalyticsDashboard"].Value;
 }
 
 <div class="container-fluid_analytics">
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Analytics Dashboard</h1>
+        <h1 class="h3 mb-0 text-gray-800">@Loc["AnalyticsDashboard"]</h1>
     </div>
 
     <!-- 1. KPI Cards Row -->
@@ -20,7 +20,7 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Products</div>
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">@Loc["TotalProducts"]</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalProducts</div>
                         </div>
                         <div class="col-auto">
@@ -37,7 +37,7 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Categories</div>
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">@Loc["Categories"]</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalCategories</div>
                         </div>
                         <div class="col-auto">
@@ -54,7 +54,7 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Sales Revenue</div>
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">@Loc["TotalSalesRevenue"]</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">$@Model.TotalSalesRevenue.ToString("N2")</div>
                         </div>
                         <div class="col-auto">
@@ -71,7 +71,7 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Low Stock Items</div>
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">@Loc["LowStockItems"]</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.LowStockCount</div>
                         </div>
                         <div class="col-auto">
@@ -91,7 +91,7 @@
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Sales vs Purchases (Current Year)</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">@Loc["SalesVsPurchasesYear"]</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-area" style="position: relative; height: 320px;">
@@ -105,7 +105,7 @@
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Category Share</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">@Loc["CategoryShare"]</h6>
                 </div>
                 <div class="card-body">
                     <div class="chart-pie pt-4 pb-2" style="position: relative; height: 280px;">
@@ -124,18 +124,18 @@
         <div class="col-lg-6 mb-4">
             <div class="card shadow mb-4" id="lowStockAlertsCard">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-danger">Low Stock Alerts</h6>
+                    <h6 class="m-0 font-weight-bold text-danger">@Loc["LowStockAlerts"]</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>SKU</th>
-                                    <th>Product Name</th>
-                                    <th>Category</th>
-                                    <th>Stock</th>
-                                    <th>Threshold</th>
+                                    <th>@Loc["SKU"]</th>
+                                    <th>@Loc["ProductName"]</th>
+                                    <th>@Loc["Category"]</th>
+                                    <th>@Loc["Stock"]</th>
+                                    <th>@Loc["Threshold"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -155,7 +155,7 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted">No low stock items found.</td>
+                                        <td colspan="5" class="text-center text-muted">@Loc["NoLowStockItems"]</td>
                                     </tr>
                                 }
                             </tbody>
@@ -169,16 +169,16 @@
         <div class="col-lg-6 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-success">Top Selling Products</h6>
+                    <h6 class="m-0 font-weight-bold text-success">@Loc["TopSellingProducts"]</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Product Name</th>
-                                    <th>Units Sold</th>
-                                    <th>Total Revenue</th>
+                                    <th>@Loc["ProductName"]</th>
+                                    <th>@Loc["UnitsSold"]</th>
+                                    <th>@Loc["TotalRevenue"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -196,7 +196,7 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="3" class="text-center text-muted">No sales records available.</td>
+                                        <td colspan="3" class="text-center text-muted">@Loc["NoSalesRecords"]</td>
                                     </tr>
                                 }
                             </tbody>
@@ -213,18 +213,18 @@
         <div class="col-lg-12 mb-4">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Recent Transactions Log</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">@Loc["RecentTransactionsLog"]</h6>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Type</th>
-                                    <th>Ref ID</th>
-                                    <th>Date</th>
-                                    <th>Entity / Customer</th>
-                                    <th>Total Amount</th>
+                                    <th>@Loc["Type"]</th>
+                                    <th>@Loc["RefID"]</th>
+                                    <th>@Loc["Date"]</th>
+                                    <th>@Loc["EntityOrCustomer"]</th>
+                                    <th>@Loc["TotalAmount"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -236,11 +236,11 @@
                                             <td>
                                                 @if (activity.ActivityType == "Sale")
                                                 {
-                                                    <span class="badge badge-success">Sale</span>
+                                                    <span class="badge badge-success">@Loc["Sale"]</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge badge-primary">Purchase</span>
+                                                    <span class="badge badge-primary">@Loc["Purchase"]</span>
                                                 }
                                             </td>
                                             <td>#@activity.ReferenceID</td>
@@ -253,7 +253,7 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center text-muted">No recent transactions found.</td>
+                                        <td colspan="5" class="text-center text-muted">@Loc["NoRecentTransactions"]</td>
                                     </tr>
                                 }
                             </tbody>
@@ -284,7 +284,7 @@
                             labels: data.labels,
                             datasets: [
                                 {
-                                    label: "Sales ($)",
+                                    label: "@Loc["Nav_Sales"] ($)",
                                     lineTension: 0.3,
                                     backgroundColor: "rgba(28, 200, 138, 0.05)",
                                     borderColor: "rgba(28, 200, 138, 1)",
@@ -293,7 +293,7 @@
                                     data: data.salesData
                                 },
                                 {
-                                    label: "Purchases ($)",
+                                    label: "@Loc["Nav_Purchases"] ($)",
                                     lineTension: 0.3,
                                     backgroundColor: "rgba(78, 115, 223, 0.05)",
                                     borderColor: "rgba(78, 115, 223, 1)",

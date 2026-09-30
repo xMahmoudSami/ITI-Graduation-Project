@@ -1,0 +1,552 @@
+/*
+ * rtl.css
+ * -------
+ * Comprehensive RTL (Right-To-Left) overrides for the IMS Portal.
+ * Applied only when <html dir="rtl"> is present (Arabic culture).
+ * Targets SB-Admin-2 / Bootstrap 4 components.
+ */
+
+/* ===================================================================
+   1. GLOBAL RESETS
+   =================================================================== */
+html[dir="rtl"] body {
+    font-family: 'Segoe UI', 'Tahoma', Arial, sans-serif;
+    text-align: right;
+    direction: rtl;
+}
+
+/* ===================================================================
+   2. SIDEBAR
+   =================================================================== */
+
+/* Anchor sidebar properly in RTL without reversing layout wrapper */
+html[dir="rtl"] #accordionSidebar {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+html[dir="rtl"] .sidebar {
+    border-left: 1px solid var(--border-subtle) !important;
+    border-right: none !important;
+}
+
+/* Navigation items text and icons */
+html[dir="rtl"] .sidebar .nav-item .nav-link {
+    text-align: right;
+}
+
+html[dir="rtl"] .sidebar .nav-item .nav-link i {
+    margin-left: 0.75rem;
+    margin-right: 0 !important;
+}
+
+/* Sidebar active page indicator border */
+html[dir="rtl"] .sidebar .nav-item.active-page > .nav-link:not([data-toggle="collapse"]),
+html[dir="rtl"] .sidebar .nav-item > .nav-link.active-page:not([data-toggle="collapse"]) {
+    border-right: 4px solid #818cf8 !important;
+    border-left: 4px solid transparent !important;
+}
+
+html[dir="rtl"] .sidebar .collapse .nav-link.active-page {
+    border-right: none !important;
+    border-left: none !important;
+    box-shadow: inset -4px 0 0 #818cf8 !important;
+}
+
+/* Sidebar brand icon / text spacing */
+html[dir="rtl"] .sidebar-brand {
+    justify-content: flex-start;
+}
+
+html[dir="rtl"] .sidebar-brand-text {
+    margin-right: 0.75rem !important;
+    margin-left: 0 !important;
+}
+
+/* Sidebar chevron direction for collapsible menus */
+html[dir="rtl"] .sidebar .sidebar-chevron {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+html[dir="rtl"] .sidebar .nav-link:not(.collapsed) .sidebar-chevron {
+    transform: rotate(90deg);
+}
+
+/* Sidebar collapse sub-items indentation */
+html[dir="rtl"] .sidebar #collapseProducts .nav-link,
+html[dir="rtl"] .sidebar #collapseTransactions .nav-link,
+html[dir="rtl"] .sidebar #collapseReports .nav-link {
+    padding-right: 2.5rem;
+    padding-left: 1rem;
+}
+
+/* Sidebar heading text */
+html[dir="rtl"] .sidebar-heading {
+    text-align: right;
+    padding-right: 1.5rem !important;
+    padding-left: 0 !important;
+}
+
+/* Sidebar toggle button position and chevron direction */
+html[dir="rtl"] .text-center.d-none.d-md-inline {
+    text-align: center !important;
+}
+
+html[dir="rtl"] #sidebarToggle::after {
+    display: inline-block;
+    transform: rotate(180deg);
+}
+
+html[dir="rtl"] .sidebar.toggled #sidebarToggle::after,
+html[dir="rtl"] body.sidebar-toggled .sidebar #sidebarToggle::after {
+    display: inline-block;
+    transform: rotate(0deg);
+    content: '\f104' !important;
+}
+
+/* Collapsed submenu flyout positioning */
+html[dir="rtl"] .sidebar.toggled .nav-item .collapse,
+html[dir="rtl"] body.sidebar-toggled .sidebar .nav-item .collapse,
+html[dir="rtl"] .sidebar.toggled .collapse,
+html[dir="rtl"] body.sidebar-toggled .sidebar .collapse {
+    right: 6.5rem !important;
+    left: auto !important;
+    margin-right: 0.5rem !important;
+    margin-left: 0 !important;
+}
+
+html[dir="rtl"] .sidebar.toggled .collapse .nav-link,
+html[dir="rtl"] body.sidebar-toggled .sidebar .collapse .nav-link {
+    text-align: right !important;
+    justify-content: flex-start !important;
+}
+
+/* ===================================================================
+   3. TOPBAR / NAVBAR
+   =================================================================== */
+
+html[dir="rtl"] .topbar .navbar-nav {
+    padding-right: 0;
+}
+
+html[dir="rtl"] .dropdown-menu {
+    text-align: right;
+}
+
+/* Sidebar toggle button (mobile) */
+html[dir="rtl"] #sidebarToggleTop {
+    margin-right: 0;
+    margin-left: 0.75rem;
+}
+
+/* Search form */
+html[dir="rtl"] .navbar-search {
+    margin-right: 0.75rem !important;
+    margin-left: auto !important;
+    direction: rtl;
+}
+
+html[dir="rtl"] .navbar-search .input-group-append {
+    border-radius: 0.35rem 0 0 0.35rem;
+}
+
+html[dir="rtl"] .navbar-search .form-control {
+    border-radius: 0 0.35rem 0.35rem 0;
+    text-align: right;
+}
+
+/* Search results dropdown */
+html[dir="rtl"] #searchResultsDropdown {
+    right: 0 !important;
+    left: auto !important;
+    text-align: right;
+}
+
+/* Topbar divider */
+html[dir="rtl"] .topbar-divider {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+/* Alerts dropdown */
+html[dir="rtl"] .alerts-header-icon {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+html[dir="rtl"] .alert-product-item {
+    text-align: right;
+}
+
+html[dir="rtl"] .alert-icon-box {
+    margin-right: 0;
+    margin-left: 0.75rem;
+}
+
+html[dir="rtl"] .alert-action-arrow {
+    margin-left: 0;
+    margin-right: 0.5rem;
+    transform: rotate(180deg);
+}
+
+html[dir="rtl"] .alert-progress-wrap {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+
+html[dir="rtl"] .alerts-footer-link i.fa-arrow-right {
+    transform: rotate(180deg);
+}
+
+/* User info dropdown */
+html[dir="rtl"] #userDropdown .mr-2 {
+    margin-right: 0 !important;
+    margin-left: 0.5rem !important;
+}
+
+/* Dropdowns open to the left in RTL */
+html[dir="rtl"] .dropdown-menu-right {
+    right: auto !important;
+    left: 0 !important;
+}
+
+html[dir="rtl"] .dropdown-menu {
+    text-align: right;
+}
+
+/* ===================================================================
+   4. CONTENT & CARDS
+   =================================================================== */
+
+html[dir="rtl"] .container-fluid {
+    text-align: right;
+}
+
+/* Card headers */
+html[dir="rtl"] .card-header {
+    text-align: right;
+}
+
+
+/* ===================================================================
+   5. TABLES
+   =================================================================== */
+
+html[dir="rtl"] table {
+    direction: rtl;
+    text-align: right;
+}
+
+html[dir="rtl"] th,
+html[dir="rtl"] td {
+    text-align: right !important;
+}
+
+/* Action buttons column — keep them on the left (logical end) */
+html[dir="rtl"] td:last-child {
+    text-align: left !important;
+}
+
+/* ===================================================================
+   6. FORMS & INPUTS
+   =================================================================== */
+
+html[dir="rtl"] .form-control,
+html[dir="rtl"] .form-select,
+html[dir="rtl"] .input-group-text {
+    text-align: right;
+}
+
+html[dir="rtl"] .form-group label,
+html[dir="rtl"] .form-label {
+    display: block;
+    text-align: right;
+}
+
+/* Input groups — swap prepend/append radius */
+html[dir="rtl"] .input-group > .input-group-prepend > .input-group-text {
+    border-radius: 0 0.35rem 0.35rem 0;
+    border-left: 0;
+    border-right: 1px solid #d1d3e2;
+}
+
+html[dir="rtl"] .input-group > .input-group-append > .input-group-text,
+html[dir="rtl"] .input-group > .input-group-append > .btn {
+    border-radius: 0.35rem 0 0 0.35rem;
+    border-right: 0;
+    border-left: 1px solid #d1d3e2;
+}
+
+/* Validation messages */
+html[dir="rtl"] .text-danger,
+html[dir="rtl"] .field-validation-error {
+    text-align: right;
+    display: block;
+}
+
+/* ===================================================================
+   7. BREADCRUMBS
+   =================================================================== */
+
+html[dir="rtl"] .breadcrumb {
+    padding-right: 0;
+}
+
+html[dir="rtl"] .breadcrumb-item + .breadcrumb-item::before {
+    float: right;
+    padding-left: 0.5rem;
+    padding-right: 0;
+    content: "/";
+}
+
+/* ===================================================================
+   8. BUTTONS
+   =================================================================== */
+
+/* Icon + text inside buttons */
+html[dir="rtl"] .btn i {
+    margin-left: 0.35rem;
+    margin-right: 0;
+}
+
+/* ===================================================================
+   9. BADGES & PILLS
+   =================================================================== */
+
+html[dir="rtl"] .badge {
+    direction: ltr; /* Keep numbers LTR inside badges */
+}
+
+/* ===================================================================
+   10. PAGINATION
+   =================================================================== */
+
+html[dir="rtl"] .pagination {
+    padding-right: 0;
+}
+
+html[dir="rtl"] .page-item:first-child .page-link {
+    border-radius: 0 0.35rem 0.35rem 0;
+}
+
+html[dir="rtl"] .page-item:last-child .page-link {
+    border-radius: 0.35rem 0 0 0.35rem;
+}
+
+/* ===================================================================
+   11. MODALS
+   =================================================================== */
+
+html[dir="rtl"] .modal-header .close {
+    margin: -1rem auto -1rem -1rem !important;
+}
+
+html[dir="rtl"] .modal-footer {
+    justify-content: flex-start;
+}
+
+html[dir="rtl"] .modal-title {
+    text-align: right;
+}
+
+html[dir="rtl"] .modal-body {
+    text-align: right;
+}
+
+/* ===================================================================
+   12. ALERTS / TOAST NOTIFICATIONS
+   =================================================================== */
+
+html[dir="rtl"] .alert {
+    text-align: right;
+}
+
+html[dir="rtl"] .alert-dismissible .close {
+    left: 0;
+    right: auto;
+}
+
+/* ===================================================================
+   13. AI CHATBOT (Dynamic RTL Support)
+   =================================================================== */
+
+html[dir="rtl"] .chat-widget-btn,
+html[dir="rtl"] #ai-chat-button,
+html[dir="rtl"] .chat-widget-window,
+html[dir="rtl"] #ai-chat-window {
+    left: 25px !important;
+    right: auto !important;
+}
+
+html[dir="rtl"] #ai-chatbot {
+    left: 25px !important;
+    right: auto !important;
+}
+
+html[dir="rtl"] .chat-widget-window,
+html[dir="rtl"] #ai-chat-window {
+    transform-origin: 20px calc(100% + 20px) !important;
+}
+
+html[dir="rtl"] #ai-chat-header {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+html[dir="rtl"] .chat-input-container,
+html[dir="rtl"] #ai-chat-input-area {
+    flex-direction: row-reverse !important;
+}
+
+html[dir="rtl"] .chat-input-container input,
+html[dir="rtl"] #ai-chat-input {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+html[dir="rtl"] #ai-chat-send {
+    margin-left: 0 !important;
+    margin-right: 0.5rem !important;
+}
+
+/* Align message bubbles naturally in RTL:
+   User messages dock to the left; Assistant responses dock to the right */
+html[dir="rtl"] .user-message {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    border-radius: 14px 14px 14px 4px !important;
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+html[dir="rtl"] .ai-message {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+    border-radius: 14px 14px 4px 14px !important;
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+@media (max-width: 576px) {
+    html[dir="rtl"] .chat-widget-window,
+    html[dir="rtl"] #ai-chat-window {
+        left: 10px !important;
+        right: auto !important;
+    }
+
+    html[dir="rtl"] .chat-widget-btn,
+    html[dir="rtl"] #ai-chat-button {
+        left: 15px !important;
+        right: auto !important;
+    }
+}
+
+/* ===================================================================
+   14. LANGUAGE SWITCHER DROPDOWN
+   =================================================================== */
+
+html[dir="rtl"] .lang-switcher-dropdown .dropdown-menu {
+    right: auto;
+    left: 0;
+    text-align: right;
+}
+
+html[dir="rtl"] .lang-switcher-dropdown .lang-flag {
+    margin-right: 0;
+    margin-left: 0.4rem;
+}
+
+/* ===================================================================
+   15. FOOTER
+   =================================================================== */
+
+html[dir="rtl"] .sticky-footer .copyright {
+    text-align: center; /* keep centered */
+}
+
+/* ===================================================================
+   16. UTILITY — Margin / Padding Direction Swaps
+   =================================================================== */
+
+/* Bootstrap 4 uses mr-* / ml-* class names; swap their effective direction */
+html[dir="rtl"] .mr-auto { margin-right: 0 !important; margin-left: auto !important; }
+html[dir="rtl"] .ml-auto { margin-left: 0 !important;  margin-right: auto !important; }
+html[dir="rtl"] .mr-1    { margin-right: 0 !important; margin-left: 0.25rem !important; }
+html[dir="rtl"] .ml-1    { margin-left: 0 !important;  margin-right: 0.25rem !important; }
+html[dir="rtl"] .mr-2    { margin-right: 0 !important; margin-left: 0.5rem !important; }
+html[dir="rtl"] .ml-2    { margin-left: 0 !important;  margin-right: 0.5rem !important; }
+html[dir="rtl"] .mr-3    { margin-right: 0 !important; margin-left: 1rem !important; }
+html[dir="rtl"] .ml-3    { margin-left: 0 !important;  margin-right: 1rem !important; }
+html[dir="rtl"] .mr-4    { margin-right: 0 !important; margin-left: 1.5rem !important; }
+html[dir="rtl"] .ml-4    { margin-left: 0 !important;  margin-right: 1.5rem !important; }
+
+/* Text alignment flips */
+html[dir="rtl"] .text-left  { text-align: right !important; }
+html[dir="rtl"] .text-right { text-align: left  !important; }
+
+/* Float flips */
+html[dir="rtl"] .float-left  { float: right !important; }
+html[dir="rtl"] .float-right { float: left  !important; }
+
+/* ===================================================================
+   17. PRINT STYLES FOR RTL
+   =================================================================== */
+@media print {
+    html[dir="rtl"],
+    html[dir="rtl"] body {
+        direction: rtl !important;
+        text-align: right !important;
+    }
+    html[dir="rtl"] .invoice-card,
+    html[dir="rtl"] .card {
+        text-align: right !important;
+    }
+    html[dir="rtl"] .print-only .text-right,
+    html[dir="rtl"] .table .text-right,
+    html[dir="rtl"] .text-right {
+        text-align: left !important;
+    }
+    html[dir="rtl"] .print-only .text-left,
+    html[dir="rtl"] .table .text-left,
+    html[dir="rtl"] .text-left {
+        text-align: right !important;
+    }
+}
+
+/* ===================================================================
+   18. DETAILS VIEW VERTICAL STRETCHING PREVENTION (RTL & LTR)
+   =================================================================== */
+
+html[dir="rtl"] .details-layout-row,
+.details-layout-row {
+    align-items: flex-start !important;
+}
+
+html[dir="rtl"] .details-layout-row > [class*="col-"],
+.details-layout-row > [class*="col-"] {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-self: flex-start !important;
+}
+
+html[dir="rtl"] .details-kpi-card,
+.details-kpi-card {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 1.25rem !important;
+}
+
+html[dir="rtl"] .details-kpi-card .card-body,
+.details-kpi-card .card-body {
+    flex: initial !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+

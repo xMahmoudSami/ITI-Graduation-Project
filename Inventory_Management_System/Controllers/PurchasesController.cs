@@ -1,4 +1,4 @@
-﻿namespace Inventory_Management_System.Controllers
+namespace Inventory_Management_System.Controllers
 {
     public class PurchasesController : Controller
     {
@@ -79,32 +79,71 @@
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PurchaseFormViewModel model)
         {
+            if (model.SupplierID <= 0)
+            {
+                ModelState.AddModelError("SupplierID", "Please select a valid supplier.");
+            }
+
+            if (model.Items == null || !model.Items.Any())
+            {
+                ModelState.AddModelError("", "At least one product is required.");
+            }
+            else
+            {
+                var duplicateProducts = model.Items
+                    .GroupBy(x => x.ProductID)
+                    .Where(x => x.Key > 0 && x.Count() > 1)
+                    .ToList();
+
+                if (duplicateProducts.Any())
+                {
+                    ModelState.AddModelError("", "You cannot add the same product more than once.");
+                }
+
+                if (model.SupplierID > 0)
+                {
+                    var contractPrices = await _context.SupplierProducts
+                        .Where(sp => sp.SupplierID == model.SupplierID)
+                        .ToDictionaryAsync(sp => sp.ProductID, sp => sp.ContractPrice);
+
+                    for (int i = 0; i < model.Items.Count; i++)
+                    {
+                        var item = model.Items[i];
+                        if (item.ProductID <= 0)
+                        {
+                            ModelState.AddModelError($"Items[{i}].ProductID", "Please select a valid product.");
+                            continue;
+                        }
+
+                        if (!contractPrices.TryGetValue(item.ProductID, out decimal contractPrice))
+                        {
+                            var prod = await _context.Products.FindAsync(item.ProductID);
+                            ModelState.AddModelError("", $"Product '{prod?.ProductName ?? item.ProductID.ToString()}' is not supplied by the selected supplier.");
+                            continue;
+                        }
+
+                        // Validates that UnitCost matches or defaults to the supplier's ContractPrice
+                        if (item.UnitCost <= 0)
+                        {
+                            item.UnitCost = contractPrice;
+                            ModelState.Remove($"Items[{i}].UnitCost");
+                        }
+                        else if (contractPrice > 0 && Math.Abs(item.UnitCost - contractPrice) > 0.01m)
+                        {
+                            var prod = await _context.Products.FindAsync(item.ProductID);
+                            ModelState.AddModelError("", $"Unit cost for '{prod?.ProductName ?? item.ProductID.ToString()}' (${item.UnitCost:N2}) must match the supplier's contract price (${contractPrice:N2}).");
+                        }
+                    }
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 await PopulateSelectListsAsync(model);
                 return View(model);
             }
 
-            if (model.Items == null || !model.Items.Any())
-            {
-                ModelState.AddModelError("", "At least one product is required.");
-                await PopulateSelectListsAsync(model);
-                return View(model);
-            }
-
-            var duplicateProducts = model.Items
-                .GroupBy(x => x.ProductID)
-                .Where(x => x.Count() > 1)
-                .ToList();
-
-            if (duplicateProducts.Any())
-            {
-                ModelState.AddModelError("", "You cannot add the same product more than once.");
-                await PopulateSelectListsAsync(model);
-                return View(model);
-            }
-
-            decimal totalAmount = model.Items.Sum(item => item.Quantity * item.UnitCost);
+            decimal totalAmount = model.Items!.Sum(item => item.Quantity * item.UnitCost);
 
             var purchase = new Purchase
             {
@@ -116,7 +155,7 @@
             _context.Purchases.Add(purchase);
             await _context.SaveChangesAsync();
 
-            foreach (var item in model.Items)
+            foreach (var item in model.Items!)
             {
                 var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == item.ProductID);
 
@@ -178,20 +217,66 @@
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PurchaseFormViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (model.SupplierID <= 0)
             {
-                await PopulateSelectListsAsync(model);
-                return View(model);
+                ModelState.AddModelError("SupplierID", "Please select a valid supplier.");
             }
 
-            var duplicateProducts = model.Items
-                .GroupBy(x => x.ProductID)
-                .Where(x => x.Count() > 1)
-                .ToList();
-
-            if (duplicateProducts.Any())
+            if (model.Items == null || !model.Items.Any())
             {
-                ModelState.AddModelError("", "You cannot add the same product more than once.");
+                ModelState.AddModelError("", "At least one product item is required.");
+            }
+            else
+            {
+                var duplicateProducts = model.Items
+                    .GroupBy(x => x.ProductID)
+                    .Where(x => x.Key > 0 && x.Count() > 1)
+                    .ToList();
+
+                if (duplicateProducts.Any())
+                {
+                    ModelState.AddModelError("", "You cannot add the same product more than once.");
+                }
+
+                if (model.SupplierID > 0)
+                {
+                    var contractPrices = await _context.SupplierProducts
+                        .Where(sp => sp.SupplierID == model.SupplierID)
+                        .ToDictionaryAsync(sp => sp.ProductID, sp => sp.ContractPrice);
+
+                    for (int i = 0; i < model.Items.Count; i++)
+                    {
+                        var item = model.Items[i];
+                        if (item.ProductID <= 0)
+                        {
+                            ModelState.AddModelError($"Items[{i}].ProductID", "Please select a valid product.");
+                            continue;
+                        }
+
+                        if (!contractPrices.TryGetValue(item.ProductID, out decimal contractPrice))
+                        {
+                            var prod = await _context.Products.FindAsync(item.ProductID);
+                            ModelState.AddModelError("", $"Product '{prod?.ProductName ?? item.ProductID.ToString()}' is not supplied by the selected supplier.");
+                            continue;
+                        }
+
+                        // Validates that UnitCost matches or defaults to the supplier's ContractPrice
+                        if (item.UnitCost <= 0)
+                        {
+                            item.UnitCost = contractPrice;
+                            ModelState.Remove($"Items[{i}].UnitCost");
+                        }
+                        else if (contractPrice > 0 && Math.Abs(item.UnitCost - contractPrice) > 0.01m)
+                        {
+                            var prod = await _context.Products.FindAsync(item.ProductID);
+                            ModelState.AddModelError("", $"Unit cost for '{prod?.ProductName ?? item.ProductID.ToString()}' (${item.UnitCost:N2}) must match the supplier's contract price (${contractPrice:N2}).");
+                        }
+                    }
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
                 await PopulateSelectListsAsync(model);
                 return View(model);
             }
@@ -219,7 +304,7 @@
 
             decimal totalAmount = 0;
 
-            foreach (var item in model.Items)
+            foreach (var item in model.Items!)
             {
                 var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductID == item.ProductID);
 
@@ -337,23 +422,97 @@
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: /Purchases/GetProductsBySupplier?supplierId={id}
+        [HttpGet]
+        [Route("Purchases/GetProductsBySupplier")]
+        [Route("api/Purchases/GetSupplierProducts")]
+        public async Task<IActionResult> GetProductsBySupplier(int supplierId)
+        {
+            if (supplierId <= 0)
+            {
+                return Json(new List<object>());
+            }
+
+            var products = await _context.SupplierProducts
+                .Include(sp => sp.Product)
+                .Where(sp => sp.SupplierID == supplierId && sp.Product != null)
+                .OrderBy(sp => sp.Product!.ProductName)
+                .Select(sp => new
+                {
+                    productId = sp.ProductID,
+                    productName = sp.Product!.ProductName,
+                    sku = sp.Product!.SKU,
+                    contractPrice = sp.ContractPrice,
+                    displayText = $"{sp.Product!.ProductName} (SKU: {sp.Product!.SKU}) - ${sp.ContractPrice:N2}"
+                })
+                .ToListAsync();
+
+            return Json(products);
+        }
+
         // Helper Method To Populate Dropdown Lists inside ViewModel
         private async Task PopulateSelectListsAsync(PurchaseFormViewModel model)
         {
-            var suppliers = await _context.Suppliers.ToListAsync();
-            var products = await _context.Products.ToListAsync();
+            var suppliers = await _context.Suppliers.OrderBy(s => s.SupplierName).ToListAsync();
 
             model.Suppliers = suppliers.Select(s => new SelectListItem
             {
                 Value = s.SupplierID.ToString(),
-                Text = s.SupplierName
+                Text = s.SupplierName,
+                Selected = s.SupplierID == model.SupplierID
             }).ToList();
 
-            model.Products = products.Select(p => new SelectListItem
+            if (model.SupplierID > 0)
             {
-                Value = p.ProductID.ToString(),
-                Text = $"{p.ProductName} (SKU: {p.SKU})"
-            }).ToList();
+                var supplierProducts = await _context.SupplierProducts
+                    .Include(sp => sp.Product)
+                    .Where(sp => sp.SupplierID == model.SupplierID && sp.Product != null)
+                    .OrderBy(sp => sp.Product!.ProductName)
+                    .ToListAsync();
+
+                model.AvailableProducts = supplierProducts.Select(sp => new SupplierProductOptionViewModel
+                {
+                    ProductID = sp.ProductID,
+                    ProductName = sp.Product!.ProductName,
+                    SKU = sp.Product!.SKU,
+                    ContractPrice = sp.ContractPrice
+                }).ToList();
+
+                // If editing an existing purchase, make sure any already-selected product is included in AvailableProducts
+                if (model.Items != null && model.Items.Any())
+                {
+                    var existingProductIds = model.Items.Select(i => i.ProductID).Where(id => id > 0).Distinct().ToList();
+                    foreach (var prodId in existingProductIds)
+                    {
+                        if (!model.AvailableProducts.Any(ap => ap.ProductID == prodId))
+                        {
+                            var prod = await _context.Products.FindAsync(prodId);
+                            if (prod != null)
+                            {
+                                var itemCost = model.Items.FirstOrDefault(i => i.ProductID == prodId)?.UnitCost ?? prod.UnitPrice;
+                                model.AvailableProducts.Add(new SupplierProductOptionViewModel
+                                {
+                                    ProductID = prod.ProductID,
+                                    ProductName = prod.ProductName,
+                                    SKU = prod.SKU,
+                                    ContractPrice = itemCost
+                                });
+                            }
+                        }
+                    }
+                }
+
+                model.Products = model.AvailableProducts.Select(p => new SelectListItem
+                {
+                    Value = p.ProductID.ToString(),
+                    Text = $"{p.ProductName} (SKU: {p.SKU}) - ${p.ContractPrice:N2}"
+                }).ToList();
+            }
+            else
+            {
+                model.AvailableProducts = new List<SupplierProductOptionViewModel>();
+                model.Products = new List<SelectListItem>();
+            }
         }
     }
 }

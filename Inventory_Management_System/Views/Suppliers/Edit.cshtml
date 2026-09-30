@@ -1,15 +1,15 @@
 @model Inventory_Management_System.ViewModels.SupplierFormViewModel
 
 @{
-    ViewData["Title"] = "Edit Supplier";
+    ViewData["Title"] = Loc["EditSupplier"].Value;
 }
 
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index">Suppliers</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@Loc["Nav_Suppliers"]</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Loc["Edit"]</li>
     </ol>
 </nav>
 
@@ -18,7 +18,7 @@
         <div class="card shadow-sm mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-edit mr-2"></i>Edit Supplier
+                    <i class="fas fa-edit mr-2"></i>@Loc["EditSupplier"]
                 </h6>
             </div>
             <div class="card-body">
@@ -32,20 +32,18 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="SupplierName" class="font-weight-bold">
-                                    Supplier Name <span class="text-danger">*</span>
+                                    @Loc["Supplier"] <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="SupplierName" class="form-control" placeholder="e.g. Acme Supplies Inc." />
-                                <small class="form-text text-muted">Company or business name (2–100 characters).</small>
+                                <input asp-for="SupplierName" class="form-control" placeholder="@Loc["Supplier"]" />
                                 <span asp-validation-for="SupplierName" class="text-danger small font-weight-bold"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="ContactName" class="font-weight-bold">
-                                    Contact Person <span class="text-danger">*</span>
+                                    @Loc["ContactPerson"] <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="ContactName" class="form-control" placeholder="e.g. John Smith" />
-                                <small class="form-text text-muted">Primary contact person name.</small>
+                                <input asp-for="ContactName" class="form-control" placeholder="@Loc["ContactPerson"]" />
                                 <span asp-validation-for="ContactName" class="text-danger small font-weight-bold"></span>
                             </div>
                         </div>
@@ -55,18 +53,18 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="Phone" class="font-weight-bold">
-                                    Phone Number <span class="text-danger">*</span>
+                                    @Loc["Phone"] <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="Phone" class="form-control" placeholder="e.g. +1-555-123-4567" type="tel" />
+                                <input asp-for="Phone" class="form-control" placeholder="@Loc["Phone"]" type="tel" />
                                 <span asp-validation-for="Phone" class="text-danger small font-weight-bold"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="Email" class="font-weight-bold">
-                                    Email Address <span class="text-danger">*</span>
+                                    @Loc["Email"] <span class="text-danger">*</span>
                                 </label>
-                                <input asp-for="Email" class="form-control" placeholder="e.g. contact@supplier.com" type="email" />
+                                <input asp-for="Email" class="form-control" placeholder="@Loc["Email"]" type="email" />
                                 <span asp-validation-for="Email" class="text-danger small font-weight-bold"></span>
                             </div>
                         </div>
@@ -74,10 +72,9 @@
 
                     <div class="form-group">
                         <label asp-for="Address" class="font-weight-bold">
-                            Address <span class="text-danger">*</span>
+                            @Loc["Address"] <span class="text-danger">*</span>
                         </label>
-                        <textarea asp-for="Address" class="form-control" rows="3" placeholder="Full mailing address..."></textarea>
-                        <small class="form-text text-muted">Up to 200 characters.</small>
+                        <textarea asp-for="Address" class="form-control" rows="3" placeholder="@Loc["Address"]"></textarea>
                         <span asp-validation-for="Address" class="text-danger small font-weight-bold"></span>
                     </div>
 
@@ -85,10 +82,10 @@
 
                     <div class="d-flex justify-content-between align-items-center">
                         <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left mr-1"></i> Back to Suppliers
+                            <i class="fas fa-arrow-left mr-1"></i> @Loc["BackToSuppliers"]
                         </a>
                         <button type="submit" class="btn btn-primary px-4">
-                            <i class="fas fa-save mr-1"></i> Update Supplier
+                            <i class="fas fa-save mr-1"></i> @Loc["Save"]
                         </button>
                     </div>
                 </form>

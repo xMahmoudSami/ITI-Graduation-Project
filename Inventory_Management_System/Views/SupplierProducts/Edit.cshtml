@@ -1,15 +1,15 @@
 @model Inventory_Management_System.ViewModels.SupplierProductFormViewModel
 
 @{
-    ViewData["Title"] = "Edit Supplier-Product Mapping";
+    ViewData["Title"] = Loc["EditMapping"].Value;
 }
 
 <!-- Breadcrumbs -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
-        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-action="Index">Supplier Mappings</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Edit Mapping</li>
+        <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="Analytics">@Loc["Nav_Dashboard"]</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">@Loc["Nav_SupplierMappings"]</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Loc["EditMapping"]</li>
     </ol>
 </nav>
 
@@ -18,7 +18,7 @@
         <div class="card shadow-sm mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-edit mr-2"></i>Edit Supplier-Product Mapping
+                    <i class="fas fa-edit mr-2"></i>@Loc["EditMapping"]
                 </h6>
             </div>
             <div class="card-body">
@@ -32,10 +32,10 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="SupplierID" class="font-weight-bold">
-                                    Supplier <span class="text-danger">*</span>
+                                    @Loc["Supplier"] <span class="text-danger">*</span>
                                 </label>
                                 <select asp-for="SupplierID" asp-items="Model.Suppliers" class="custom-select">
-                                    <option value="0">— Select Supplier —</option>
+                                    <option value="0">— @Loc["SelectSupplier"] —</option>
                                 </select>
                                 <span asp-validation-for="SupplierID" class="text-danger small font-weight-bold"></span>
                             </div>
@@ -43,10 +43,10 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="ProductID" class="font-weight-bold">
-                                    Product <span class="text-danger">*</span>
+                                    @Loc["Product"] <span class="text-danger">*</span>
                                 </label>
                                 <select asp-for="ProductID" asp-items="Model.Products" class="custom-select">
-                                    <option value="0">— Select Product —</option>
+                                    <option value="0">— @Loc["SelectProduct"] —</option>
                                 </select>
                                 <span asp-validation-for="ProductID" class="text-danger small font-weight-bold"></span>
                             </div>
@@ -55,10 +55,10 @@
 
                     <div class="form-group">
                         <label asp-for="SupplierSKU" class="font-weight-bold">
-                            Supplier SKU / Part Number <span class="text-danger">*</span>
+                            @Loc["SupplierSKUPartNumber"] <span class="text-danger">*</span>
                         </label>
                         <input asp-for="SupplierSKU" class="form-control" placeholder="e.g. VEN-SKU-9921" />
-                        <small class="form-text text-muted">The vendor's catalog or part identifier for this product.</small>
+                        <small class="form-text text-muted">@Loc["SupplierSKUHelp"]</small>
                         <span asp-validation-for="SupplierSKU" class="text-danger small font-weight-bold"></span>
                     </div>
 
@@ -66,20 +66,20 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="ContractPrice" class="font-weight-bold">
-                                    Contract Price ($) <span class="text-danger">*</span>
+                                    @Loc["ContractPrice"] ($) <span class="text-danger">*</span>
                                 </label>
                                 <input asp-for="ContractPrice" class="form-control" type="number" step="0.01" min="0.01" placeholder="0.00" />
-                                <small class="form-text text-muted">Agreed purchase price per unit from this supplier.</small>
+                                <small class="form-text text-muted">@Loc["ContractPriceHelp"]</small>
                                 <span asp-validation-for="ContractPrice" class="text-danger small font-weight-bold"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label asp-for="LeadTimeDays" class="font-weight-bold">
-                                    Lead Time (Days) <span class="text-danger">*</span>
+                                    @Loc["LeadTimeDays"] <span class="text-danger">*</span>
                                 </label>
                                 <input asp-for="LeadTimeDays" class="form-control" type="number" min="1" max="365" placeholder="7" />
-                                <small class="form-text text-muted">Estimated days between order and delivery.</small>
+                                <small class="form-text text-muted">@Loc["LeadTimeHelp"]</small>
                                 <span asp-validation-for="LeadTimeDays" class="text-danger small font-weight-bold"></span>
                             </div>
                         </div>
@@ -89,10 +89,10 @@
 
                     <div class="d-flex justify-content-between align-items-center">
                         <a asp-action="Index" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left mr-1"></i> Back to Mappings
+                            <i class="fas fa-arrow-left mr-1"></i> @Loc["BackToList"]
                         </a>
                         <button type="submit" class="btn btn-primary px-4">
-                            <i class="fas fa-save mr-1"></i> Update Mapping
+                            <i class="fas fa-save mr-1"></i> @Loc["UpdateMapping"]
                         </button>
                     </div>
                 </form>
