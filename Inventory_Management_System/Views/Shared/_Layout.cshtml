@@ -55,7 +55,8 @@
 
     // ── Localized Chatbot Strings with culture-aware fallbacks ────────
     var chatTitle = Loc["AIChatbotTitle"].IsResourceNotFound || Loc["AIChatbotTitle"].Value == "AIChatbotTitle"
-        ? (currentCulture switch {
+        ? (currentCulture switch
+        {
             "ar" => "المساعد الذكي للمخزون",
             "fr" => "Assistant d'inventaire IA",
             "es" => "Asistente de inventario IA",
@@ -66,7 +67,8 @@
         : Loc["AIChatbotTitle"].Value;
 
     var chatGreeting = Loc["AIChatGreeting"].IsResourceNotFound || Loc["AIChatGreeting"].Value == "AIChatGreeting"
-        ? (currentCulture switch {
+        ? (currentCulture switch
+        {
             "ar" => "مرحباً! أنا مساعدك الذكي للمخزون، كيف يمكنني مساعدتك اليوم؟",
             "fr" => "Bonjour! Je suis votre assistant d'inventaire. Comment puis-je vous aider?",
             "es" => "¡Hola! Soy tu asistente de inventario. ¿Cómo puedo ayudarte?",
@@ -77,7 +79,8 @@
         : Loc["AIChatGreeting"].Value;
 
     var chatPlaceholder = Loc["AskAIPlaceholder"].IsResourceNotFound || Loc["AskAIPlaceholder"].Value == "AskAIPlaceholder"
-        ? (currentCulture switch {
+        ? (currentCulture switch
+        {
             "ar" => "اسأل عن مخزونك...",
             "fr" => "Posez une question sur votre inventaire...",
             "es" => "Pregunte sobre su inventario...",
@@ -96,18 +99,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <!-- Anti-flicker theme detection (must run synchronously before styles render) -->
     <script>
-        (function () {
-            try {
-                var savedTheme = localStorage.getItem('ims_theme') || localStorage.getItem('theme') || 'dark';
-                if (savedTheme === 'light') {
-                    document.documentElement.setAttribute('data-theme', 'light');
-                } else {
+            (function () {
+                try {
+                    var savedTheme = localStorage.getItem('ims_theme') || localStorage.getItem('theme') || 'dark';
+                    if (savedTheme === 'light') {
+                        document.documentElement.setAttribute('data-theme', 'light');
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                    }
+                } catch (e) {
                     document.documentElement.setAttribute('data-theme', 'dark');
                 }
-            } catch (e) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-        })();
+            })();
     </script>
     <title>@ViewData["Title"] - Inventory Management System</title>
 
@@ -309,10 +312,10 @@
             <!-- Theme Switcher (Separate at the very bottom corner of the sidebar) -->
             <div class="sidebar-bottom-corner mt-auto w-100 pb-3">
                 <div class="sidebar-theme-item">
-                    <button type="button" 
-                            id="themeToggleBtn" 
-                            class="sidebar-theme-toggle" 
-                            title="@Loc["Theme_Toggle"]" 
+                    <button type="button"
+                            id="themeToggleBtn"
+                            class="sidebar-theme-toggle"
+                            title="@Loc["Theme_Toggle"]"
                             aria-label="@Loc["Theme_Toggle"]"
                             data-light-text="@Loc["Theme_Light"]"
                             data-dark-text="@Loc["Theme_Dark"]">
@@ -333,7 +336,6 @@
 
         </ul>
         <!-- End of Sidebar -->
-
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
@@ -438,8 +440,6 @@
                             </div>
                         </li>
                         <!-- ── /Language Switcher ── -->
-
-
                         <!-- Alerts -->
                         <li class="nav-item dropdown no-arrow mx-1">
 
@@ -484,64 +484,64 @@
 
                                 <!-- Items List -->
                                 <div class="alerts-dropdown-body">
-                                @if (lowStockProducts.Any())
-                                {
-                                    foreach (var item in lowStockProducts)
+                                    @if (lowStockProducts.Any())
                                     {
-                                        bool isCritical = item.StockQuantity == 0 || item.StockQuantity <= Math.Max(1, item.LowStockThreshold / 3);
-                                        int stockPercent = item.LowStockThreshold > 0 
-                                            ? Math.Min(100, Math.Max(6, (int)((double)item.StockQuantity / item.LowStockThreshold * 100))) 
-                                            : 0;
+                                        foreach (var item in lowStockProducts)
+                                        {
+                                            bool isCritical = item.StockQuantity == 0 || item.StockQuantity <= Math.Max(1, item.LowStockThreshold / 3);
+                                            int stockPercent = item.LowStockThreshold > 0
+                                                ? Math.Min(100, Math.Max(6, (int)((double)item.StockQuantity / item.LowStockThreshold * 100)))
+                                                : 0;
 
-                                        <a class="dropdown-item alert-product-item d-flex align-items-center"
-                                           asp-controller="Products"
-                                           asp-action="Details"
-                                           asp-route-id="@item.ProductID">
+                                            <a class="dropdown-item alert-product-item d-flex align-items-center"
+                                               asp-controller="Products"
+                                               asp-action="Details"
+                                               asp-route-id="@item.ProductID">
 
-                                            <div class="alert-icon-box @(isCritical ? "is-critical" : "is-warning") mr-3">
-                                                <i class="fas @(item.StockQuantity == 0 ? "fa-times-circle" : "fa-exclamation-triangle")"></i>
-                                            </div>
-
-                                            <div class="alert-content-box flex-grow-1 min-w-0">
-                                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                                    <span class="alert-sku-code text-truncate">@item.SKU</span>
-                                                    <span class="alert-status-badge @(item.StockQuantity == 0 ? "badge-out-of-stock" : isCritical ? "badge-critical" : "badge-low")">
-                                                        @(item.StockQuantity == 0 ? "OUT OF STOCK" : $"{item.StockQuantity} LEFT")
-                                                    </span>
+                                                <div class="alert-icon-box @(isCritical ? "is-critical" : "is-warning") mr-3">
+                                                    <i class="fas @(item.StockQuantity == 0 ? "fa-times-circle" : "fa-exclamation-triangle")"></i>
                                                 </div>
 
-                                                <div class="alert-product-title text-truncate mb-1" title="@item.ProductName">
-                                                    @item.ProductName
-                                                </div>
-
-                                                <div class="d-flex align-items-center justify-content-between alert-meta-row">
-                                                    <div class="alert-progress-wrap flex-grow-1 mr-2">
-                                                        <div class="alert-progress-bar @(isCritical ? "progress-critical" : "progress-warning")" 
-                                                             style="width: @(stockPercent)%;"></div>
+                                                <div class="alert-content-box flex-grow-1 min-w-0">
+                                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                                        <span class="alert-sku-code text-truncate">@item.SKU</span>
+                                                        <span class="alert-status-badge @(item.StockQuantity == 0 ? "badge-out-of-stock" : isCritical ? "badge-critical" : "badge-low")">
+                                                            @(item.StockQuantity == 0 ? "OUT OF STOCK" : $"{item.StockQuantity} LEFT")
+                                                        </span>
                                                     </div>
-                                                    <span class="alert-threshold-label">
-                                                        Thresh: @item.LowStockThreshold
-                                                    </span>
+
+                                                    <div class="alert-product-title text-truncate mb-1" title="@item.ProductName">
+                                                        @item.ProductName
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center justify-content-between alert-meta-row">
+                                                        <div class="alert-progress-wrap flex-grow-1 mr-2">
+                                                            <div class="alert-progress-bar @(isCritical ? "progress-critical" : "progress-warning")"
+                                                                 style="width: @(stockPercent)%;"></div>
+                                                        </div>
+                                                        <span class="alert-threshold-label">
+                                                            Thresh: @item.LowStockThreshold
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="alert-action-arrow ml-2">
-                                                <i class="fas fa-chevron-right"></i>
-                                            </div>
+                                                <div class="alert-action-arrow ml-2">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </div>
 
-                                        </a>
+                                            </a>
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    <div class="alerts-empty-state text-center py-4 px-3">
-                                        <div class="alerts-empty-icon mb-2">
-                                            <i class="fas fa-check-circle"></i>
+                                    else
+                                    {
+                                        <div class="alerts-empty-state text-center py-4 px-3">
+                                            <div class="alerts-empty-icon mb-2">
+                                                <i class="fas fa-check-circle"></i>
+                                            </div>
+                                            <div class="alerts-empty-title">@Loc["Lbl_AllStocksHealthy"]</div>
+                                            <div class="alerts-empty-desc">@Loc["Lbl_NoProductsBelowThreshold"]</div>
                                         </div>
-                                        <div class="alerts-empty-title">@Loc["Lbl_AllStocksHealthy"]</div>
-                                        <div class="alerts-empty-desc">@Loc["Lbl_NoProductsBelowThreshold"]</div>
-                                    </div>
-                                }
+                                    }
                                 </div>
 
                                 <!-- Footer -->
@@ -590,7 +590,6 @@
 
                 </nav>
                 <!-- End of Topbar -->
-
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     @RenderBody()
@@ -598,7 +597,6 @@
 
             </div>
             <!-- End of Main Content -->
-
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
 
@@ -619,8 +617,6 @@
 
     </div>
     <!-- End of Page Wrapper -->
-
-
     <!-- AI Chatbot -->
     <div id="ai-chatbot" class="chat-widget ai-chat-widget"
          data-title="@chatTitle"
@@ -677,11 +673,11 @@
 
     <!-- Pre-load Chatbot Translations for client-side scripts -->
     <script>
-        window.ChatbotTranslations = {
-            title: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatTitle))",
-            greeting: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatGreeting))",
-            placeholder: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatPlaceholder))"
-        };
+            window.ChatbotTranslations = {
+                title: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatTitle))",
+                greeting: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatGreeting))",
+                placeholder: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatPlaceholder))"
+            };
     </script>
 
     <!-- Scripts -->
@@ -690,376 +686,392 @@
     <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="~/js/sb-admin-2.min.js"></script>
 
+    <!-- Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+
+    <!-- HTML Sanitization -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
     <!-- Theme Switcher Script -->
     <script>
-        (function () {
-            function initThemeSwitcher() {
-                var btn = document.getElementById('themeToggleBtn');
-                var statusText = document.getElementById('themeStatusText');
-                if (!btn) return;
+            (function () {
+                function initThemeSwitcher() {
+                    var btn = document.getElementById('themeToggleBtn');
+                    var statusText = document.getElementById('themeStatusText');
+                    if (!btn) return;
 
-                var lightLabel = btn.getAttribute('data-light-text') || 'Light Mode';
-                var darkLabel = btn.getAttribute('data-dark-text') || 'Dark Mode';
+                    var lightLabel = btn.getAttribute('data-light-text') || 'Light Mode';
+                    var darkLabel = btn.getAttribute('data-dark-text') || 'Dark Mode';
 
-                function updateUI(theme) {
-                    if (statusText) {
-                        statusText.textContent = (theme === 'light') ? lightLabel : darkLabel;
+                    function updateUI(theme) {
+                        if (statusText) {
+                            statusText.textContent = (theme === 'light') ? lightLabel : darkLabel;
+                        }
+                        btn.setAttribute('data-current-theme', theme);
                     }
-                    btn.setAttribute('data-current-theme', theme);
+
+                    var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+                    updateUI(currentTheme);
+
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        var active = document.documentElement.getAttribute('data-theme') || 'dark';
+                        var next = (active === 'light') ? 'dark' : 'light';
+
+                        document.documentElement.setAttribute('data-theme', next);
+                        try {
+                            localStorage.setItem('ims_theme', next);
+                            localStorage.setItem('theme', next);
+                        } catch (err) { }
+
+                        updateUI(next);
+                    });
                 }
 
-                var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-                updateUI(currentTheme);
-
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    var active = document.documentElement.getAttribute('data-theme') || 'dark';
-                    var next = (active === 'light') ? 'dark' : 'light';
-
-                    document.documentElement.setAttribute('data-theme', next);
-                    try {
-                        localStorage.setItem('ims_theme', next);
-                        localStorage.setItem('theme', next);
-                    } catch (err) { }
-
-                    updateUI(next);
-                });
-            }
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initThemeSwitcher);
-            } else {
-                initThemeSwitcher();
-            }
-        })();
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initThemeSwitcher);
+                } else {
+                    initThemeSwitcher();
+                }
+            })();
     </script>
 
     <!-- Global Search Script -->
     <script>
-        $(document).ready(function () {
+            $(document).ready(function () {
 
-            let searchTimeout = null;
+                let searchTimeout = null;
 
-            $('#globalSearchInput').on('keyup input', function () {
+                $('#globalSearchInput').on('keyup input', function () {
 
-                let term = $(this).val().trim();
-                let dropdown = $('#searchResultsDropdown');
+                    let term = $(this).val().trim();
+                    let dropdown = $('#searchResultsDropdown');
 
-                clearTimeout(searchTimeout);
+                    clearTimeout(searchTimeout);
 
-                if (term.length < 1) {
-                    dropdown.hide().empty();
-                    return;
-                }
+                    if (term.length < 1) {
+                        dropdown.hide().empty();
+                        return;
+                    }
 
-                searchTimeout = setTimeout(function () {
+                    searchTimeout = setTimeout(function () {
 
-                    $.ajax({
-                        url: '/Dashboard/GlobalSearch',
-                        type: 'GET',
-                        data: { term: term },
+                        $.ajax({
+                            url: '/Dashboard/GlobalSearch',
+                            type: 'GET',
+                            data: { term: term },
 
-                        success: function (data) {
+                            success: function (data) {
 
-                            dropdown.empty();
+                                dropdown.empty();
 
-                            let hasResults = false;
-                            const lblProducts = '@Loc["Products"]';
-                            const lblCategories = '@Loc["Categories"]';
-                            const lblSuppliers = '@Loc["Suppliers"]';
-                            const lblNoResults = '@Loc["NoResultsFound"]';
+                                let hasResults = false;
+                                const lblProducts = '@Loc["Products"]';
+                                const lblCategories = '@Loc["Categories"]';
+                                const lblSuppliers = '@Loc["Suppliers"]';
+                                const lblNoResults = '@Loc["NoResultsFound"]';
 
-                            if (data.products && data.products.length > 0) {
+                                if (data.products && data.products.length > 0) {
 
-                                hasResults = true;
+                                    hasResults = true;
 
-                                dropdown.append(
-                                    `<h6 class="dropdown-header">${lblProducts}</h6>`
-                                );
+                                    dropdown.append(
+                                        `<h6 class="dropdown-header">${lblProducts}</h6>`
+                                    );
 
-                                $.each(data.products, function (i, item) {
+                                    $.each(data.products, function (i, item) {
 
-                                    dropdown.append(`
-                                        <a class="dropdown-item py-1"
-                                           href="/Products/Details/${item.productID}">
-                                            <div class="font-weight-bold text-dark">
-                                                ${item.productName}
-                                            </div>
-                                            <div class="small text-gray-500">
-                                                SKU: ${item.sku}
-                                            </div>
-                                        </a>
-                                    `);
+                                        dropdown.append(`
+                                            <a class="dropdown-item py-1"
+                                               href="/Products/Details/${item.productID}">
+                                                <div class="font-weight-bold text-dark">
+                                                    ${item.productName}
+                                                </div>
+                                                <div class="small text-gray-500">
+                                                    SKU: ${item.sku}
+                                                </div>
+                                            </a>
+                                        `);
 
-                                });
+                                    });
+                                }
+
+                                if (data.categories && data.categories.length > 0) {
+
+                                    hasResults = true;
+
+                                    dropdown.append(
+                                        `<h6 class="dropdown-header">${lblCategories}</h6>`
+                                    );
+
+                                    $.each(data.categories, function (i, item) {
+
+                                        dropdown.append(`
+                                            <a class="dropdown-item py-1"
+                                               href="/Categories/Details/${item.categoryID}">
+                                                <div class="font-weight-bold text-dark">
+                                                    ${item.categoryName}
+                                                </div>
+                                            </a>
+                                        `);
+
+                                    });
+                                }
+
+                                if (data.suppliers && data.suppliers.length > 0) {
+
+                                    hasResults = true;
+
+                                    dropdown.append(
+                                        `<h6 class="dropdown-header">${lblSuppliers}</h6>`
+                                    );
+
+                                    $.each(data.suppliers, function (i, item) {
+
+                                        dropdown.append(`
+                                            <a class="dropdown-item py-1"
+                                               href="/Suppliers/Details/${item.supplierID}">
+                                                <div class="font-weight-bold text-dark">
+                                                    ${item.supplierName}
+                                                </div>
+                                            </a>
+                                        `);
+
+                                    });
+                                }
+
+                                if (hasResults) {
+                                    dropdown.show();
+                                }
+                                else {
+                                    dropdown.append(
+                                        `<div class="dropdown-item small text-gray-500 p-2 text-center">${lblNoResults}</div>`
+                                    );
+
+                                    dropdown.show();
+                                }
+                            },
+
+                            error: function () {
+                                dropdown.hide().empty();
                             }
+                        });
 
-                            if (data.categories && data.categories.length > 0) {
+                    }, 300);
 
-                                hasResults = true;
+                });
 
-                                dropdown.append(
-                                    `<h6 class="dropdown-header">${lblCategories}</h6>`
-                                );
+                $(document).on('click', function (e) {
 
-                                $.each(data.categories, function (i, item) {
+                    if (!$(e.target).closest('.navbar-search').length) {
+                        $('#searchResultsDropdown').hide();
+                    }
 
-                                    dropdown.append(`
-                                        <a class="dropdown-item py-1"
-                                           href="/Categories/Details/${item.categoryID}">
-                                            <div class="font-weight-bold text-dark">
-                                                ${item.categoryName}
-                                            </div>
-                                        </a>
-                                    `);
-
-                                });
-                            }
-
-                            if (data.suppliers && data.suppliers.length > 0) {
-
-                                hasResults = true;
-
-                                dropdown.append(
-                                    `<h6 class="dropdown-header">${lblSuppliers}</h6>`
-                                );
-
-                                $.each(data.suppliers, function (i, item) {
-
-                                    dropdown.append(`
-                                        <a class="dropdown-item py-1"
-                                           href="/Suppliers/Details/${item.supplierID}">
-                                            <div class="font-weight-bold text-dark">
-                                                ${item.supplierName}
-                                            </div>
-                                        </a>
-                                    `);
-
-                                });
-                            }
-
-                            if (hasResults) {
-                                dropdown.show();
-                            }
-                            else {
-                                dropdown.append(
-                                    `<div class="dropdown-item small text-gray-500 p-2 text-center">${lblNoResults}</div>`
-                                );
-
-                                dropdown.show();
-                            }
-                        },
-
-                        error: function () {
-                            dropdown.hide().empty();
-                        }
-                    });
-
-                }, 300);
+                });
 
             });
-
-            $(document).on('click', function (e) {
-
-                if (!$(e.target).closest('.navbar-search').length) {
-                    $('#searchResultsDropdown').hide();
-                }
-
-            });
-
-        });
     </script>
 
     <!-- AI Chatbot Script -->
     <script>
-        $(document).ready(function () {
+            $(document).ready(function () {
 
-            // Initialize / synchronize localized text from window.ChatbotTranslations or data attributes
-            const chatContainer = $('#ai-chatbot, #ai-chat-widget');
-            const translations = window.ChatbotTranslations || {
-                title: chatContainer.attr('data-title'),
-                greeting: chatContainer.attr('data-greeting'),
-                placeholder: chatContainer.attr('data-placeholder')
-            };
+                // Initialize / synchronize localized text from window.ChatbotTranslations or data attributes
+                const chatContainer = $('#ai-chatbot, #ai-chat-widget');
+                const translations = window.ChatbotTranslations || {
+                    title: chatContainer.attr('data-title'),
+                    greeting: chatContainer.attr('data-greeting'),
+                    placeholder: chatContainer.attr('data-placeholder')
+                };
 
-            if (translations) {
-                if (translations.title && $('#ai-chat-title-text').length) {
-                    $('#ai-chat-title-text').text(translations.title);
-                }
-                if (translations.greeting && $('#ai-initial-greeting').length) {
-                    $('#ai-initial-greeting').text(translations.greeting);
-                }
-                if (translations.placeholder && $('#ai-chat-input').length) {
-                    $('#ai-chat-input').attr('placeholder', translations.placeholder);
-                }
-            }
-
-            // Remove #page-top scroll button completely from DOM
-            function purgeScrollToTop() {
-                $('.scroll-to-top, a[href="#page-top"], a[href$="#page-top"]').remove();
-            }
-            purgeScrollToTop();
-            $(window).on('scroll', purgeScrollToTop);
-
-            // Toggle AI Chatbot with smooth animations
-            function toggleChat(open) {
-                const chatWindow = $('#ai-chat-window');
-                const chatButton = $('#ai-chat-button');
-                const isOpen = chatWindow.hasClass('is-open');
-                const shouldOpen = (open !== undefined) ? open : !isOpen;
-
-                if (shouldOpen) {
-                    chatWindow.addClass('is-open');
-                    chatButton.addClass('chat-is-open');
-                    setTimeout(function () {
-                        $('#ai-chat-input').focus();
-                    }, 250);
-                } else {
-                    chatWindow.removeClass('is-open');
-                    chatButton.removeClass('chat-is-open');
-                }
-            }
-
-            // Open / close on FAB click
-            $('#ai-chat-button').on('click', function (e) {
-                e.stopPropagation();
-                toggleChat();
-            });
-
-            // Close on header close button click
-            $('#ai-chat-close').on('click', function (e) {
-                e.stopPropagation();
-                toggleChat(false);
-            });
-
-            // Close when clicking outside chat window
-            $(document).on('click', function (e) {
-                if (!$(e.target).closest('#ai-chatbot, #ai-chat-widget').length) {
-                    if ($('#ai-chat-window').hasClass('is-open')) {
-                        toggleChat(false);
+                if (translations) {
+                    if (translations.title && $('#ai-chat-title-text').length) {
+                        $('#ai-chat-title-text').text(translations.title);
+                    }
+                    if (translations.greeting && $('#ai-initial-greeting').length) {
+                        $('#ai-initial-greeting').text(translations.greeting);
+                    }
+                    if (translations.placeholder && $('#ai-chat-input').length) {
+                        $('#ai-chat-input').attr('placeholder', translations.placeholder);
                     }
                 }
-            });
 
-            // Close on ESC key
-            $(document).on('keydown', function (e) {
-                if (e.key === 'Escape' && $('#ai-chat-window').hasClass('is-open')) {
+                // Remove #page-top scroll button completely from DOM
+                function purgeScrollToTop() {
+                    $('.scroll-to-top, a[href="#page-top"], a[href$="#page-top"]').remove();
+                }
+                purgeScrollToTop();
+                $(window).on('scroll', purgeScrollToTop);
+
+                // Toggle AI Chatbot with smooth animations
+                function toggleChat(open) {
+                    const chatWindow = $('#ai-chat-window');
+                    const chatButton = $('#ai-chat-button');
+                    const isOpen = chatWindow.hasClass('is-open');
+                    const shouldOpen = (open !== undefined) ? open : !isOpen;
+
+                    if (shouldOpen) {
+                        chatWindow.addClass('is-open');
+                        chatButton.addClass('chat-is-open');
+                        setTimeout(function () {
+                            $('#ai-chat-input').focus();
+                        }, 250);
+                    } else {
+                        chatWindow.removeClass('is-open');
+                        chatButton.removeClass('chat-is-open');
+                    }
+                }
+
+                // Open / close on FAB click
+                $('#ai-chat-button').on('click', function (e) {
+                    e.stopPropagation();
+                    toggleChat();
+                });
+
+                // Close on header close button click
+                $('#ai-chat-close').on('click', function (e) {
+                    e.stopPropagation();
                     toggleChat(false);
-                }
-            });
+                });
 
-            // Send message
-            $('#ai-chat-send').click(function () {
-                sendAIMessage();
-            });
+                // Close when clicking outside chat window
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('#ai-chatbot, #ai-chat-widget').length) {
+                        if ($('#ai-chat-window').hasClass('is-open')) {
+                            toggleChat(false);
+                        }
+                    }
+                });
 
-            // Send with Enter
-            $('#ai-chat-input').keypress(function (e) {
+                // Close on ESC key
+                $(document).on('keydown', function (e) {
+                    if (e.key === 'Escape' && $('#ai-chat-window').hasClass('is-open')) {
+                        toggleChat(false);
+                    }
+                });
 
-                if (e.which === 13) {
+                // Send message
+                $('#ai-chat-send').click(function () {
                     sendAIMessage();
-                }
+                });
 
-            });
+                // Send with Enter
+                $('#ai-chat-input').keypress(function (e) {
 
-            function sendAIMessage() {
-
-                const input = $('#ai-chat-input');
-                const message = input.val().trim();
-
-                if (!message) {
-                    return;
-                }
-
-                // Show user message
-                $('#ai-chat-messages').append(`
-                    <div class="user-message">
-                        ${message}
-                    </div>
-                `);
-
-                input.val('');
-
-                // Localized Loading & Error Messages
-                const currentLang = $('html').attr('lang') || 'en';
-                const loadingText = currentLang === 'ar' ? 'جارٍ التفكير...' :
-                                    currentLang === 'fr' ? 'Réflexion en cours...' :
-                                    currentLang === 'es' ? 'Pensando...' :
-                                    currentLang === 'it' ? 'Sto pensando...' :
-                                    currentLang === 'de' ? 'Ich denke nach...' : 'Thinking...';
-
-                const errorText = currentLang === 'ar' ? 'عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى.' :
-                                  currentLang === 'fr' ? 'Désolé, une erreur s\'est produite. Veuillez réessayer.' :
-                                  currentLang === 'es' ? 'Lo sentimos, algo salió mal. Inténtalo de nuevo.' :
-                                  currentLang === 'it' ? 'Spiacenti, si è verificato un errore. Riprova.' :
-                                  currentLang === 'de' ? 'Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.' : 'Sorry, something went wrong. Please try again.';
-
-                // Loading message
-                const loadingMessage = $(`
-                    <div class="ai-message" id="ai-loading">
-                        ${loadingText}
-                    </div>
-                `);
-
-                $('#ai-chat-messages').append(loadingMessage);
-
-                scrollChatToBottom();
-
-                // Call C# API
-                $.ajax({
-
-                    url: '/api/AI/chat',
-                    type: 'POST',
-                    contentType: 'application/json',
-
-                    data: JSON.stringify({
-                        message: message
-                    }),
-
-                    success: function (data) {
-
-                        $('#ai-loading').remove();
-
-                        $('#ai-chat-messages').append(`
-                            <div class="ai-message">
-                                ${data.response}
-                            </div>
-                        `);
-
-                        scrollChatToBottom();
-                    },
-
-                    error: function (xhr) {
-
-                        $('#ai-loading').remove();
-
-                        $('#ai-chat-messages').append(`
-                            <div class="ai-message">
-                                ${errorText}
-                            </div>
-                        `);
-
-                        console.error(xhr);
-
-                        scrollChatToBottom();
+                    if (e.which === 13) {
+                        sendAIMessage();
                     }
 
                 });
-            }
 
-            function scrollChatToBottom() {
+                function sendAIMessage() {
 
-                const messages = $('#ai-chat-messages');
+                    const input = $('#ai-chat-input');
+                    const message = input.val().trim();
 
-                messages.scrollTop(
-                    messages[0].scrollHeight
-                );
-            }
+                    if (!message) {
+                        return;
+                    }
 
-        });
+                    // Show user message
+                    $('#ai-chat-messages').append(`
+                        <div class="user-message">
+                            ${message}
+                        </div>
+                    `);
+
+                    input.val('');
+
+                    // Localized Loading & Error Messages
+                    const currentLang = $('html').attr('lang') || 'en';
+                    const loadingText = currentLang === 'ar' ? 'جارٍ التفكير...' :
+                                        currentLang === 'fr' ? 'Réflexion en cours...' :
+                                        currentLang === 'es' ? 'Pensando...' :
+                                        currentLang === 'it' ? 'Sto pensando...' :
+                                        currentLang === 'de' ? 'Ich denke nach...' : 'Thinking...';
+
+                    const errorText = currentLang === 'ar' ? 'عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى.' :
+                                      currentLang === 'fr' ? 'Désolé, une erreur s\'est produite. Veuillez réessayer.' :
+                                      currentLang === 'es' ? 'Lo sentimos, algo salió mal. Inténtalo de nuevo.' :
+                                      currentLang === 'it' ? 'Spiacenti, si è verificato un errore. Riprova.' :
+                                      currentLang === 'de' ? 'Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.' : 'Sorry, something went wrong. Please try again.';
+
+                    // Loading message
+                    const loadingMessage = $(`
+                        <div class="ai-message" id="ai-loading">
+                            ${loadingText}
+                        </div>
+                    `);
+
+                    $('#ai-chat-messages').append(loadingMessage);
+
+                    scrollChatToBottom();
+
+                    // Call C# API
+                    $.ajax({
+
+                        url: '/api/AI/chat',
+                        type: 'POST',
+                        contentType: 'application/json',
+
+                        data: JSON.stringify({
+                            message: message
+                        }),
+
+                        success: function (data) {
+
+                            $('#ai-loading').remove();
+
+                            // Convert Markdown response to HTML
+                            const renderedResponse = marked.parse(
+                                data.response || ''
+                            );
+
+                            // Sanitize generated HTML
+                            const safeResponse = DOMPurify.sanitize(
+                                renderedResponse
+                            );
+
+                            $('#ai-chat-messages').append(`
+                                <div class="ai-message ai-markdown">
+                                    ${safeResponse}
+                                </div>
+                            `);
+
+                            scrollChatToBottom();
+                        },
+
+                        error: function (xhr) {
+
+                            $('#ai-loading').remove();
+
+                            $('#ai-chat-messages').append(`
+                                <div class="ai-message">
+                                    ${errorText}
+                                </div>
+                            `);
+
+                            console.error(xhr);
+
+                            scrollChatToBottom();
+                        }
+
+                    });
+                }
+
+                function scrollChatToBottom() {
+
+                    const messages = $('#ai-chat-messages');
+
+                    messages.scrollTop(
+                        messages[0].scrollHeight
+                    );
+                }
+
+            });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
-</html>
+</html> 

@@ -143,3 +143,21 @@ a[href="#page-top"] {
         bottom: 15px;
     }
 }
+
+/* Light Mode - Chat Input */
+html[data-theme="light"] #ai-chat-input {
+    color: #212529 !important;
+    background-color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+    html[data-theme="light"] #ai-chat-input::placeholder {
+        color: #6c757d !important;
+        opacity: 1 !important;
+    }
+
+    html[data-theme="light"] #ai-chat-input:focus {
+        color: #212529 !important;
+        background-color: #ffffff !important;
+        opacity: 1 !important;
+    }
