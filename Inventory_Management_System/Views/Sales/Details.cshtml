@@ -1,7 +1,8 @@
 @model Inventory_Management_System.ViewModels.SaleDetailsViewModel
 
 @{
-    ViewData["Title"] = $"{Loc["Invoice"]} {Model.InvoiceNumber}";
+    ViewData["Title"] = $"{Loc["Invoice"].Value} {Model.InvoiceNumber}";
+    ViewData["DocumentTitle"] = Model.InvoiceNumber;
 }
 
 <!-- Breadcrumbs (Hidden when printing) -->
@@ -25,7 +26,7 @@
         <a asp-action="Index" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left mr-1"></i> @Loc["BackToSales"]
         </a>
-        <button type="button" class="btn btn-primary px-3 shadow-sm" onclick="window.print();">
+        <button type="button" class="btn btn-primary px-3 shadow-sm" onclick="triggerPrint('@Model.InvoiceNumber', event);">
             <i class="fas fa-print mr-1"></i> @Loc["PrintInvoice"]
         </button>
         <a asp-action="Delete" asp-route-id="@Model.SaleID" class="btn btn-outline-danger" title="@Loc["Delete"]">
@@ -35,7 +36,7 @@
 </div>
 
 <!-- Invoice Card (Print-ready) -->
-<div class="card shadow-sm mb-4 invoice-card">
+<div class="card shadow-sm mb-4 invoice-card" data-print-title="@Model.InvoiceNumber">
     <div class="card-body p-4 p-md-5">
         <!-- Invoice Header Row -->
         <div class="row align-items-start border-bottom pb-4 mb-4">
@@ -56,7 +57,7 @@
             </div>
             <div class="col-sm-6 text-sm-right mt-3 mt-sm-0">
                 <h3 class="font-weight-bold text-primary mb-1">@Loc["Invoice"]</h3>
-                <h5 class="text-white font-weight-bold mb-1"><code>@Model.InvoiceNumber</code></h5>
+                <h5 class="text-white font-weight-bold mb-1"><code class="sku">@Model.InvoiceNumber</code></h5>
                 <div class="small mb-2 text-slate-400">
                     <strong>@Loc["Date"]:</strong> @Model.SaleDate.ToString("MMMM dd, yyyy")
                 </div>
@@ -100,7 +101,7 @@
 
         <!-- Line Items Table -->
         <div class="table-responsive mb-4">
-            <table class="table table-bordered align-middle mb-0">
+            <table class="table table-bordered align-middle mb-0 invoice-table">
                 <thead class="thead-light">
                     <tr>
                         <th style="width: 5%;" class="text-center py-2 px-3">#</th>
@@ -116,18 +117,18 @@
                     {
                         var item = Model.Items[i];
                         <tr>
-                            <td class="text-center font-weight-bold text-slate-400 py-2 px-3 align-middle">@(i + 1)</td>
-                            <td class="py-2 px-3 align-middle">
-                                <div class="font-weight-bold text-white">
+                            <td class="text-center font-weight-bold text-slate-400 py-2 px-3 align-middle item-index">@(i + 1)</td>
+                            <td class="py-2 px-3 align-middle product-name-col">
+                                <div class="font-weight-bold text-white product-name">
                                     @item.ProductName
                                 </div>
                             </td>
-                            <td class="py-2 px-3 align-middle">
-                                <code>@item.SKU</code>
+                            <td class="py-2 px-3 align-middle sku-col">
+                                <code class="sku">@item.SKU</code>
                             </td>
-                            <td class="text-center font-weight-bold text-white py-2 px-3 align-middle">@item.Quantity</td>
-                            <td class="text-right font-weight-bold text-white py-2 px-3 align-middle">$@item.UnitPrice.ToString("N2")</td>
-                            <td class="text-right font-weight-bold text-success py-2 px-3 align-middle">$@item.Subtotal.ToString("N2")</td>
+                            <td class="text-center font-weight-bold text-white py-2 px-3 align-middle quantity">@item.Quantity</td>
+                            <td class="text-right font-weight-bold text-white py-2 px-3 align-middle unit-price">$@item.UnitPrice.ToString("N2")</td>
+                            <td class="text-right font-weight-bold text-success py-2 px-3 align-middle subtotal">$@item.Subtotal.ToString("N2")</td>
                         </tr>
                     }
                 </tbody>

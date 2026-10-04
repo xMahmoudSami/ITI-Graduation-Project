@@ -196,7 +196,18 @@
                 }
             })();
     </script>
-    <title>@ViewData["Title"] - Inventory Management System</title>
+    @if (!string.IsNullOrEmpty(ViewData["DocumentTitle"]?.ToString()))
+    {
+        <title>@ViewData["DocumentTitle"]</title>
+    }
+    else if (!string.IsNullOrEmpty(ViewData["Title"]?.ToString()))
+    {
+        <title>@ViewData["Title"] - Inventory Management System</title>
+    }
+    else
+    {
+        <title>Inventory Management System</title>
+    }
 
     <!-- Custom fonts -->
     <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
@@ -1542,6 +1553,7 @@
             });
     </script>
 
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

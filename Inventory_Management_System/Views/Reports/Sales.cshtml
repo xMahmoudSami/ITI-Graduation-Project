@@ -4,6 +4,81 @@
     ViewData["Title"] = Loc["Nav_SalesReport"].Value;
 }
 
+<style>
+    @@media print {
+        @@page {
+            size: A4 landscape !important;
+            margin: 0 !important;
+        }
+
+        /* Safe printable padding optimized for A4 Landscape */
+        .container-fluid,
+        .container {
+            padding: 8mm 12mm !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+
+        /* Landscape KPI row spacing */
+        .kpi-row {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 12px !important;
+            margin-bottom: 0.75rem !important;
+        }
+
+        .kpi-row > div,
+        .kpi-row > [class*="col-"] {
+            flex: 1 1 0 !important;
+            width: 25% !important;
+            max-width: 25% !important;
+            padding: 0 !important;
+        }
+
+        .kpi-card {
+            padding: 0.25rem 0.5rem !important;
+        }
+
+        .kpi-card .card-body {
+            padding: 0.35rem 0.5rem !important;
+        }
+
+        /* Landscape Table Layout: Expand naturally and avoid page splits */
+        .table-responsive {
+            overflow: visible !important;
+            display: block !important;
+        }
+
+        .table {
+            width: 100% !important;
+            table-layout: auto !important;
+            margin-bottom: 0 !important;
+        }
+
+        .table td,
+        .table th {
+            padding: 5px 8px !important;
+            vertical-align: middle !important;
+            white-space: nowrap !important;
+        }
+
+        /* Prevent table rows from mid-row page splits */
+        tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        thead {
+            display: table-header-group !important;
+        }
+
+        tfoot {
+            display: table-footer-group !important;
+        }
+    }
+</style>
+
 <!-- Breadcrumbs (Hidden when printing) -->
 <nav aria-label="breadcrumb" class="no-print">
     <ol class="breadcrumb bg-transparent p-0 mb-3">
@@ -32,7 +107,7 @@
            class="btn btn-outline-success shadow-sm">
             <i class="fas fa-file-csv mr-1"></i> @Loc["ExportCSV"]
         </a>
-        <button type="button" class="btn btn-primary shadow-sm" onclick="window.print();">
+        <button type="button" class="btn btn-primary shadow-sm" onclick="triggerPrint(null, event);">
             <i class="fas fa-print mr-1"></i> @Loc["PrintReport"]
         </button>
     </div>
@@ -246,7 +321,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="font-weight-bold text-white">
+                                    <div class="font-weight-bold text-white product-name">
                                         <i class="fas fa-user text-primary mr-1"></i>
                                         @sale.CustomerInfo
                                     </div>
@@ -256,10 +331,10 @@
                                         @sale.ItemsCount @Loc["LineItems"]
                                     </span>
                                 </td>
-                                <td class="text-center font-weight-bold text-white">
+                                <td class="text-center font-weight-bold text-white quantity">
                                     @sale.TotalUnitsSold
                                 </td>
-                                <td class="text-right font-weight-bold text-success h6 mb-0">
+                                <td class="text-right font-weight-bold text-success h6 mb-0 subtotal">
                                     $@sale.TotalAmount.ToString("N2")
                                 </td>
                                 <td class="text-center no-print">
@@ -273,8 +348,8 @@
                     <tfoot class="thead-light font-weight-bold">
                         <tr>
                             <td colspan="4" class="text-right text-uppercase small text-slate-300">@Loc["TotalPeriodSum"]</td>
-                            <td class="text-center text-white font-weight-bold">@Model.TotalUnitsSold @Loc["Units"]</td>
-                            <td class="text-right text-success h5 mb-0">$@Model.TotalRevenue.ToString("N2")</td>
+                            <td class="text-center text-white font-weight-bold quantity">@Model.TotalUnitsSold @Loc["Units"]</td>
+                            <td class="text-right text-success h5 mb-0 subtotal">$@Model.TotalRevenue.ToString("N2")</td>
                             <td class="no-print"></td>
                         </tr>
                     </tfoot>

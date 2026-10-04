@@ -102,17 +102,30 @@ namespace Inventory_Management_System.Controllers
             return View(pagedResult);
         }
 
-        // GET: /Sales/Details/{id}
+        // GET: /Sales/Details/{id} or /Sales/Invoice/{id}
         [HttpGet("Details/{id}")]
-        public async Task<IActionResult> Details(int id)
+        [HttpGet("Invoice/{id}")]
+        public async Task<IActionResult> Details(string id)
         {
-            if (id <= 0) return NotFound();
+            if (string.IsNullOrWhiteSpace(id)) return NotFound();
+
+            int saleId = 0;
+            if (id.StartsWith("INV-", StringComparison.OrdinalIgnoreCase))
+            {
+                int.TryParse(id.Substring(4), out saleId);
+            }
+            else
+            {
+                int.TryParse(id, out saleId);
+            }
+
+            if (saleId <= 0) return NotFound();
 
             var sale = await _context.Sales
                 .AsNoTracking()
                 .Include(s => s.SaleItems)
                 .ThenInclude(si => si.Product)
-                .FirstOrDefaultAsync(s => s.SaleID == id);
+                .FirstOrDefaultAsync(s => s.SaleID == saleId);
 
             if (sale == null) return NotFound();
 
@@ -133,7 +146,7 @@ namespace Inventory_Management_System.Controllers
                 }).ToList()
             };
 
-            return View(viewModel);
+            return View("Details", viewModel);
         }
 
         // GET: /Sales/Create

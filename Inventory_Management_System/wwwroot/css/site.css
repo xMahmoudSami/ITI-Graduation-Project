@@ -4271,10 +4271,36 @@ html[data-theme="light"] body.sidebar-toggled .sidebar .sidebar-theme-toggle:hov
 
 /* --------------------------------------------------------------------------
    PRINT STYLES (@media print)
-   Clean, paper-ready printing for Invoices, Stock Valuation, and Sales Reports
+   Full theme-aware, paper-ready printing for Invoices, Stock Valuation, and Sales Reports
    -------------------------------------------------------------------------- */
 @media print {
-  /* Hide interactive, navigation, and floating UI elements */
+  /* Enforce exact color & background reproduction across all print engines */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0 !important;
+  }
+
+  /* Global structural and print engine resets */
+  html,
+  body {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide navigation, interactive chrome, action buttons, modals, and chatbots */
   #accordionSidebar,
   .sidebar,
   .topbar,
@@ -4290,125 +4316,645 @@ html[data-theme="light"] body.sidebar-toggled .sidebar .sidebar-theme-toggle:hov
   .pagination,
   .badge-counter,
   .sidebar-toggler,
-  .alert-dismissible {
+  .alert-dismissible,
+  .modal,
+  .modal-backdrop,
+  .app-dialog-backdrop,
+  #app-dialog-backdrop {
     display: none !important;
   }
 
-  /* Show dedicated print headers */
+  /* Show dedicated print-only headers */
   .print-only {
     display: block !important;
   }
 
-  /* Global page canvas resets */
-  html, body {
+  .print-only .d-flex {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .print-only h2 {
+    font-size: 1.35rem !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .print-only h4 {
+    font-size: 1.15rem !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  /* Canvas and container structural resets */
+  #wrapper,
+  #content-wrapper,
+  #content {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+    position: static !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+  }
+
+  /* Safe printable margins inside the full-bleed canvas */
+  .container-fluid,
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    padding: 10mm 12mm !important;
+    box-sizing: border-box !important;
+    box-shadow: none !important;
+    animation: none !important;
+    background-color: transparent !important;
+  }
+
+  /* Cards & Tables Pagination */
+  .card,
+  .table-card {
+    box-shadow: none !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .invoice-card {
+    box-shadow: none !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .table-responsive {
+    overflow: visible !important;
+    display: block !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  .table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  /* Prevent individual rows from breaking awkwardly across page cuts */
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Repeat table headers cleanly on every printed page */
+  thead {
+    display: table-header-group !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
+  }
+
+  /* KPI Metrics Row: Keep in 1 compact horizontal row of 4 cards on A4 print */
+  .kpi-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: 0.85rem !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .kpi-row > div,
+  .kpi-row > [class*="col-"] {
+    flex: 1 1 0 !important;
+    width: 25% !important;
+    max-width: 25% !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .kpi-card {
+    height: auto !important;
+    min-height: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .kpi-card .card-body {
+    padding: 0.45rem 0.65rem !important;
+  }
+
+  .kpi-card .h5 {
+    font-size: 1.05rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  .kpi-card .text-xs {
+    font-size: 0.65rem !important;
+    margin-bottom: 0.2rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .kpi-card i.fa-2x {
+    font-size: 1.25rem !important;
+  }
+
+  /* ==========================================================================
+     1. DARK THEME PRINT STYLES (Enterprise Dark Print Mode)
+     Active when user is in Dark Theme (html[data-theme="dark"] or default)
+     ========================================================================== */
+  html[data-theme="dark"],
+  html[data-theme="dark"] body,
+  html:not([data-theme="light"]),
+  html:not([data-theme="light"]) body {
+    background-color: #111827 !important;
+    color: #f9fafb !important;
+    font-size: 10pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html[data-theme="dark"] #wrapper,
+  html[data-theme="dark"] #content-wrapper,
+  html[data-theme="dark"] #content,
+  html:not([data-theme="light"]) #wrapper,
+  html:not([data-theme="light"]) #content-wrapper,
+  html:not([data-theme="light"]) #content {
+    background-color: #111827 !important;
+    color: #f9fafb !important;
+  }
+
+  /* Dark Theme Card & Panels */
+  html[data-theme="dark"] .card,
+  html[data-theme="dark"] .invoice-card,
+  html:not([data-theme="light"]) .card,
+  html:not([data-theme="light"]) .invoice-card {
+    background-color: #1e293b !important;
+    border: 1px solid #374151 !important;
+    color: #f9fafb !important;
+  }
+
+  html[data-theme="dark"] .card-body,
+  html:not([data-theme="light"]) .card-body {
+    background-color: transparent !important;
+    color: #f9fafb !important;
+  }
+
+  html[data-theme="dark"] .invoice-info-panel,
+  html[data-theme="dark"] .invoice-totals-panel,
+  html:not([data-theme="light"]) .invoice-info-panel,
+  html:not([data-theme="light"]) .invoice-totals-panel {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    color: #f9fafb !important;
+  }
+
+  html[data-theme="dark"] .card-header,
+  html[data-theme="dark"] .card-footer,
+  html:not([data-theme="light"]) .card-header,
+  html:not([data-theme="light"]) .card-footer {
+    background-color: #0f172a !important;
+    color: #f9fafb !important;
+    border-color: #374151 !important;
+  }
+
+  /* Dark Theme Typography & Headings */
+  html[data-theme="dark"] h1,
+  html[data-theme="dark"] h2,
+  html[data-theme="dark"] h3,
+  html[data-theme="dark"] h4,
+  html[data-theme="dark"] h5,
+  html[data-theme="dark"] h6,
+  html[data-theme="dark"] .text-white,
+  html[data-theme="dark"] .text-dark,
+  html[data-theme="dark"] .text-gray-800,
+  html[data-theme="dark"] .text-gray-900,
+  html[data-theme="dark"] a.text-white,
+  html[data-theme="dark"] .text-white a,
+  html:not([data-theme="light"]) h1,
+  html:not([data-theme="light"]) h2,
+  html:not([data-theme="light"]) h3,
+  html:not([data-theme="light"]) h4,
+  html:not([data-theme="light"]) h5,
+  html:not([data-theme="light"]) h6,
+  html:not([data-theme="light"]) .text-white,
+  html:not([data-theme="light"]) .text-dark,
+  html:not([data-theme="light"]) .text-gray-800,
+  html:not([data-theme="light"]) .text-gray-900,
+  html:not([data-theme="light"]) a.text-white,
+  html:not([data-theme="light"]) .text-white a {
+    color: #f9fafb !important;
+  }
+
+  html[data-theme="dark"] .text-slate-400,
+  html[data-theme="dark"] .text-slate-300,
+  html[data-theme="dark"] .text-muted,
+  html:not([data-theme="light"]) .text-slate-400,
+  html:not([data-theme="light"]) .text-slate-300,
+  html:not([data-theme="light"]) .text-muted {
+    color: #94a3b8 !important;
+  }
+
+  html[data-theme="dark"] .text-primary,
+  html:not([data-theme="light"]) .text-primary {
+    color: #60a5fa !important;
+  }
+
+  html[data-theme="dark"] .text-success,
+  html[data-theme="dark"] .subtotal,
+  html:not([data-theme="light"]) .text-success,
+  html:not([data-theme="light"]) .subtotal {
+    color: #34d399 !important;
+    font-weight: 700 !important;
+  }
+
+  html[data-theme="dark"] .text-danger,
+  html:not([data-theme="light"]) .text-danger {
+    color: #f87171 !important;
+  }
+
+  html[data-theme="dark"] .text-warning,
+  html:not([data-theme="light"]) .text-warning {
+    color: #fbbf24 !important;
+  }
+
+  /* Dark Theme Dividers & Borders */
+  html[data-theme="dark"] hr,
+  html[data-theme="dark"] .border,
+  html[data-theme="dark"] .border-top,
+  html[data-theme="dark"] .border-bottom,
+  html:not([data-theme="light"]) hr,
+  html:not([data-theme="light"]) .border,
+  html:not([data-theme="light"]) .border-top,
+  html:not([data-theme="light"]) .border-bottom {
+    border-color: #334155 !important;
+  }
+
+  /* Dark Theme Tables */
+  html[data-theme="dark"] .table,
+  html:not([data-theme="light"]) .table {
+    background-color: transparent !important;
+    color: #f9fafb !important;
+  }
+
+  html[data-theme="dark"] .table td,
+  html[data-theme="dark"] .table th,
+  html[data-theme="dark"] .table-bordered th,
+  html[data-theme="dark"] .table-bordered td,
+  html:not([data-theme="light"]) .table td,
+  html:not([data-theme="light"]) .table th,
+  html:not([data-theme="light"]) .table-bordered th,
+  html:not([data-theme="light"]) .table-bordered td {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #f9fafb !important;
+    padding: 6px 10px !important;
+  }
+
+  html[data-theme="dark"] .table .thead-light th,
+  html[data-theme="dark"] thead.thead-light th,
+  html[data-theme="dark"] tfoot.thead-light td,
+  html:not([data-theme="light"]) .table .thead-light th,
+  html:not([data-theme="light"]) thead.thead-light th,
+  html:not([data-theme="light"]) tfoot.thead-light td {
+    background-color: #0f172a !important;
+    color: #f9fafb !important;
+    border: 1px solid #334155 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Dark Theme Table Columns (Explicit Contrast Definitions) */
+  html[data-theme="dark"] td.item-index,
+  html:not([data-theme="light"]) td.item-index {
+    color: #94a3b8 !important;
+  }
+
+  html[data-theme="dark"] td .product-name,
+  html[data-theme="dark"] .product-name,
+  html:not([data-theme="light"]) td .product-name,
+  html:not([data-theme="light"]) .product-name {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+
+  html[data-theme="dark"] td code,
+  html[data-theme="dark"] code.sku,
+  html[data-theme="dark"] .sku,
+  html:not([data-theme="light"]) td code,
+  html:not([data-theme="light"]) code.sku,
+  html:not([data-theme="light"]) .sku {
+    color: #93c5fd !important;
+    background-color: #0f172a !important;
+    border: 1px solid #1e3a8a !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+  }
+
+  html[data-theme="dark"] td.quantity,
+  html:not([data-theme="light"]) td.quantity {
+    color: #f9fafb !important;
+    font-weight: 700 !important;
+  }
+
+  html[data-theme="dark"] td.unit-price,
+  html:not([data-theme="light"]) td.unit-price {
+    color: #f9fafb !important;
+    font-weight: 700 !important;
+  }
+
+  html[data-theme="dark"] td.subtotal,
+  html:not([data-theme="light"]) td.subtotal {
+    color: #34d399 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Dark Theme Table Status Rows (Stock Health) */
+  html[data-theme="dark"] .table-danger-light,
+  html:not([data-theme="light"]) .table-danger-light {
+    background-color: rgba(185, 28, 28, 0.18) !important;
+  }
+
+  html[data-theme="dark"] .table-warning-light,
+  html:not([data-theme="light"]) .table-warning-light {
+    background-color: rgba(180, 83, 9, 0.18) !important;
+  }
+
+  /* Dark Theme Badges */
+  html[data-theme="dark"] .badge,
+  html:not([data-theme="light"]) .badge {
+    border: 1px solid #475569 !important;
+    font-size: 8.5pt !important;
+    padding: 3px 8px !important;
+  }
+
+  html[data-theme="dark"] .badge-success,
+  html:not([data-theme="light"]) .badge-success {
+    background-color: rgba(5, 150, 105, 0.25) !important;
+    color: #34d399 !important;
+    border-color: #059669 !important;
+  }
+
+  html[data-theme="dark"] .badge-warning,
+  html:not([data-theme="light"]) .badge-warning {
+    background-color: rgba(217, 119, 6, 0.25) !important;
+    color: #fbbf24 !important;
+    border-color: #d97706 !important;
+  }
+
+  html[data-theme="dark"] .badge-danger,
+  html:not([data-theme="light"]) .badge-danger {
+    background-color: rgba(220, 38, 38, 0.25) !important;
+    color: #f87171 !important;
+    border-color: #dc2626 !important;
+  }
+
+  html[data-theme="dark"] .badge-invoice,
+  html:not([data-theme="light"]) .badge-invoice {
+    background-color: rgba(37, 99, 235, 0.25) !important;
+    color: #93c5fd !important;
+    border-color: #2563eb !important;
+  }
+
+  html[data-theme="dark"] .badge-category,
+  html[data-theme="dark"] .badge-light,
+  html:not([data-theme="light"]) .badge-category,
+  html:not([data-theme="light"]) .badge-light {
+    background-color: rgba(51, 65, 85, 0.4) !important;
+    color: #cbd5e1 !important;
+    border-color: #475569 !important;
+  }
+
+  html[data-theme="dark"] .progress,
+  html:not([data-theme="light"]) .progress {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    height: 8px !important;
+  }
+
+
+  /* ==========================================================================
+     2. LIGHT THEME PRINT STYLES (Crisp Paper Light Print Mode)
+     Active when user is in Light Theme (html[data-theme="light"])
+     ========================================================================== */
+  html[data-theme="light"],
+  html[data-theme="light"] body {
     background-color: #ffffff !important;
     color: #111827 !important;
     font-size: 11pt !important;
     margin: 0 !important;
     padding: 0 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 
-  #wrapper,
-  #content-wrapper,
-  #content,
-  .container-fluid {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    box-shadow: none !important;
-  }
-
-  /* Clean Paper Cards */
-  .card, .invoice-card {
-    border: 1px solid #d1d5db !important;
-    box-shadow: none !important;
-    background: #ffffff !important;
+  html[data-theme="light"] #wrapper,
+  html[data-theme="light"] #content-wrapper,
+  html[data-theme="light"] #content,
+  html[data-theme="light"] .container-fluid {
+    background-color: #ffffff !important;
     color: #111827 !important;
-    page-break-inside: avoid;
-    margin-bottom: 1rem !important;
   }
 
-  .card-header,
-  .card-footer,
-  .bg-light {
-    background: #f9fafb !important;
+  /* Light Theme Card & Panels */
+  html[data-theme="light"] .card,
+  html[data-theme="light"] .invoice-card {
+    background-color: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+    color: #111827 !important;
+  }
+
+  html[data-theme="light"] .card-body {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  html[data-theme="light"] .invoice-info-panel,
+  html[data-theme="light"] .invoice-totals-panel {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #111827 !important;
+  }
+
+  html[data-theme="light"] .card-header,
+  html[data-theme="light"] .card-footer {
+    background-color: #f3f4f6 !important;
     color: #111827 !important;
     border-color: #e5e7eb !important;
   }
 
-  /* Text & Heading colors for print */
-  h1, h2, h3, h4, h5, h6,
-  .text-gray-800, .text-gray-900, .text-dark {
+  /* Light Theme Typography — Strict inversion of .text-white to high-contrast dark charcoal */
+  html[data-theme="light"] h1,
+  html[data-theme="light"] h2,
+  html[data-theme="light"] h3,
+  html[data-theme="light"] h4,
+  html[data-theme="light"] h5,
+  html[data-theme="light"] h6,
+  html[data-theme="light"] .text-white,
+  html[data-theme="light"] .text-dark,
+  html[data-theme="light"] .text-gray-800,
+  html[data-theme="light"] .text-gray-900,
+  html[data-theme="light"] a.text-white,
+  html[data-theme="light"] .text-white a {
     color: #111827 !important;
   }
 
-  .text-muted {
+  html[data-theme="light"] .text-slate-400,
+  html[data-theme="light"] .text-slate-300,
+  html[data-theme="light"] .text-muted {
     color: #4b5563 !important;
   }
 
-  .text-primary {
-    color: #4338ca !important;
+  html[data-theme="light"] .text-primary {
+    color: #1d4ed8 !important;
   }
 
-  .text-success {
+  html[data-theme="light"] .text-success,
+  html[data-theme="light"] .subtotal {
     color: #047857 !important;
+    font-weight: 700 !important;
   }
 
-  .text-danger {
+  html[data-theme="light"] .text-danger {
     color: #b91c1c !important;
   }
 
-  .text-warning {
+  html[data-theme="light"] .text-warning {
     color: #b45309 !important;
   }
 
-  /* Table styling for paper */
-  .table {
-    border-collapse: collapse !important;
-    width: 100% !important;
+  /* Light Theme Dividers & Borders */
+  html[data-theme="light"] hr,
+  html[data-theme="light"] .border,
+  html[data-theme="light"] .border-top,
+  html[data-theme="light"] .border-bottom {
+    border-color: #e5e7eb !important;
   }
 
-  .table-bordered th,
-  .table-bordered td {
+  /* Light Theme Tables */
+  html[data-theme="light"] .table {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  html[data-theme="light"] .table td,
+  html[data-theme="light"] .table th,
+  html[data-theme="light"] .table-bordered th,
+  html[data-theme="light"] .table-bordered td {
+    background-color: #ffffff !important;
     border: 1px solid #d1d5db !important;
     color: #111827 !important;
     padding: 6px 10px !important;
   }
 
-  .thead-light th {
+  html[data-theme="light"] .table .thead-light th,
+  html[data-theme="light"] thead.thead-light th,
+  html[data-theme="light"] tfoot.thead-light td {
     background-color: #f3f4f6 !important;
     color: #111827 !important;
+    border: 1px solid #d1d5db !important;
+    font-weight: 700 !important;
   }
 
-  /* Printable Badges */
-  .badge {
-    border: 1px solid #9ca3af !important;
+  /* Light Theme Table Columns (Explicit Contrast Definitions) */
+  html[data-theme="light"] td.item-index {
+    color: #4b5563 !important;
+  }
+
+  html[data-theme="light"] td .product-name,
+  html[data-theme="light"] .product-name {
     color: #111827 !important;
-    background: transparent !important;
-    font-size: 8.5pt !important;
+    font-weight: 700 !important;
   }
 
-  .badge-success {
-    border-color: #059669 !important;
+  html[data-theme="light"] td code,
+  html[data-theme="light"] code.sku,
+  html[data-theme="light"] .sku {
+    color: #1e40af !important;
+    background-color: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+  }
+
+  html[data-theme="light"] td.quantity {
+    color: #111827 !important;
+    font-weight: 700 !important;
+  }
+
+  html[data-theme="light"] td.unit-price {
+    color: #111827 !important;
+    font-weight: 700 !important;
+  }
+
+  html[data-theme="light"] td.subtotal {
     color: #047857 !important;
+    font-weight: 700 !important;
   }
 
-  .badge-warning {
-    border-color: #d97706 !important;
+  /* Light Theme Table Status Rows (Stock Health) */
+  html[data-theme="light"] .table-danger-light {
+    background-color: #fef2f2 !important;
+  }
+
+  html[data-theme="light"] .table-warning-light {
+    background-color: #fffbeb !important;
+  }
+
+  /* Light Theme Badges */
+  html[data-theme="light"] .badge {
+    border: 1px solid #d1d5db !important;
+    font-size: 8.5pt !important;
+    padding: 3px 8px !important;
+  }
+
+  html[data-theme="light"] .badge-success {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+    border-color: #a7f3d0 !important;
+  }
+
+  html[data-theme="light"] .badge-warning {
+    background-color: #fffbeb !important;
     color: #b45309 !important;
+    border-color: #fde68a !important;
   }
 
-  .badge-danger {
-    border-color: #dc2626 !important;
+  html[data-theme="light"] .badge-danger {
+    background-color: #fef2f2 !important;
     color: #b91c1c !important;
+    border-color: #fecaca !important;
   }
 
-  .progress {
-    border: 1px solid #9ca3af !important;
+  html[data-theme="light"] .badge-invoice {
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border-color: #bfdbfe !important;
+  }
+
+  html[data-theme="light"] .badge-category,
+  html[data-theme="light"] .badge-light {
+    background-color: #f8fafc !important;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  html[data-theme="light"] .progress {
+    background-color: #e5e7eb !important;
+    border: 1px solid #cbd5e1 !important;
     height: 8px !important;
   }
 }
