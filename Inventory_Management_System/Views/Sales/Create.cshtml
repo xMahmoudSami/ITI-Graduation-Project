@@ -322,7 +322,7 @@
                         calculateTotals();
                     });
                 } else {
-                    alert('At least one line item is required for a sale order.');
+                    appAlert('@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Loc["AtLeastOneItemRequired"].Value))', { type: 'warning', title: '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Loc["Warning"].Value))' });
                 }
             });
 

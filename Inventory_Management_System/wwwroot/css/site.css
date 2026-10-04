@@ -2810,6 +2810,40 @@ a[href*="page-top"],
   flex-shrink: 0 !important;
 }
 
+.chat-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#ai-chat-clear {
+  border: none !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease !important;
+  outline: none !important;
+}
+
+#ai-chat-clear:hover {
+  background: rgba(239, 68, 68, 0.35) !important;
+  color: #fca5a5 !important;
+  transform: scale(1.1) !important;
+}
+
+#ai-chat-clear:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
 #ai-chat-close {
   border: none !important;
   background: rgba(255, 255, 255, 0.12) !important;
@@ -2890,6 +2924,106 @@ a[href*="page-top"],
   margin-left: auto !important;
 }
 
+.message-time {
+  font-size: 0.7rem;
+  margin-top: 4px;
+  line-height: 1;
+}
+
+.ai-message .message-time {
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.user-message .message-time {
+  color: rgba(255, 255, 255, 0.8);
+  text-align: right;
+}
+
+.ai-message.ai-markdown {
+  word-break: break-word;
+  line-height: 1.55;
+}
+
+.ai-message.ai-markdown p {
+  margin-bottom: 0.5rem !important;
+}
+
+.ai-message.ai-markdown p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.ai-message.ai-markdown strong,
+.ai-message.ai-markdown b {
+  font-weight: 700 !important;
+  color: inherit !important;
+}
+
+.ai-message.ai-markdown ul,
+.ai-message.ai-markdown ol {
+  padding-left: 1.4rem !important;
+  margin-bottom: 0.6rem !important;
+  margin-top: 0.25rem !important;
+}
+
+.ai-message.ai-markdown li {
+  margin-bottom: 0.25rem !important;
+  line-height: 1.45;
+}
+
+.ai-message.ai-markdown h1,
+.ai-message.ai-markdown h2,
+.ai-message.ai-markdown h3,
+.ai-message.ai-markdown h4 {
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  margin-top: 0.6rem !important;
+  margin-bottom: 0.35rem !important;
+  color: var(--text-main) !important;
+}
+
+.ai-message.ai-markdown code {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace !important;
+  font-size: 0.85em !important;
+  padding: 0.15rem 0.35rem !important;
+  background: rgba(99, 102, 241, 0.12) !important;
+  color: var(--primary) !important;
+  border-radius: 4px !important;
+}
+
+.ai-message.ai-markdown pre {
+  margin: 0.5rem 0 !important;
+  padding: 0.6rem 0.8rem !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+  overflow-x: auto !important;
+}
+
+.ai-message.ai-markdown pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+.ai-message.ai-markdown table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 0.5rem 0 !important;
+  font-size: 0.85rem !important;
+}
+
+.ai-message.ai-markdown th,
+.ai-message.ai-markdown td {
+  border: 1px solid var(--border-subtle) !important;
+  padding: 4px 8px !important;
+  text-align: left !important;
+}
+
+.ai-message.ai-markdown th {
+  background: rgba(99, 102, 241, 0.08) !important;
+  font-weight: 600 !important;
+}
+
 @keyframes msgIn {
   from {
     opacity: 0;
@@ -2916,12 +3050,42 @@ a[href*="page-top"],
   flex: 1 !important;
   background-color: var(--bg-input) !important;
   border: 1px solid var(--border-default) !important;
-  color: #ffffff !important;
+  color: var(--text-main) !important;
   font-size: 0.9rem !important;
   border-radius: 20px !important;
   padding: 0.5rem 1rem !important;
   outline: none !important;
   transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+/* Light Mode Input Contrast */
+html[data-theme="light"] #ai-chat-input {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+
+html[data-theme="light"] #ai-chat-input::placeholder {
+  color: #1f2937 !important;
+  opacity: 0.7 !important;
+}
+
+html[data-theme="light"] #ai-chat-input:focus {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+  border-color: var(--primary) !important;
+}
+
+/* Dark Mode Input */
+html[data-theme="dark"] #ai-chat-input {
+  color: #f3f4f6 !important;
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+html[data-theme="dark"] #ai-chat-input::placeholder {
+  color: #9ca3af !important;
+  opacity: 0.8 !important;
 }
 
 #ai-chat-input:focus {
@@ -4248,3 +4412,198 @@ html[data-theme="light"] body.sidebar-toggled .sidebar .sidebar-theme-toggle:hov
     height: 8px !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   THEMED DIALOG & ALERT SYSTEM (Native alert/confirm replacement)
+   -------------------------------------------------------------------------- */
+.app-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(11, 15, 25, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+  padding: 1rem;
+}
+
+.app-dialog-backdrop.is-visible {
+  opacity: 1;
+}
+
+.app-dialog-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--bg-surface-elevated, #1a2234);
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-xl, 22px);
+  padding: 2rem 1.75rem 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--border-subtle, rgba(255, 255, 255, 0.05));
+  text-align: center;
+  transform: scale(0.92) translateY(12px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+.app-dialog-backdrop.is-visible .app-dialog-card {
+  transform: scale(1) translateY(0);
+}
+
+.app-dialog-icon-wrapper {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.65rem;
+  transition: transform 0.3s ease;
+}
+
+.app-dialog-backdrop.is-visible .app-dialog-icon-wrapper {
+  transform: scale(1.05);
+}
+
+.app-dialog-icon-wrapper.type-warning {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
+}
+
+.app-dialog-icon-wrapper.type-danger,
+.app-dialog-icon-wrapper.type-error {
+  background: rgba(239, 68, 68, 0.16);
+  color: #ef4444;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+}
+
+.app-dialog-icon-wrapper.type-success {
+  background: rgba(16, 185, 129, 0.16);
+  color: #10b981;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+}
+
+.app-dialog-icon-wrapper.type-info {
+  background: rgba(99, 102, 241, 0.16);
+  color: #6366f1;
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.3);
+}
+
+.app-dialog-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-heading, #ffffff);
+  margin-bottom: 0.65rem;
+  line-height: 1.3;
+}
+
+.app-dialog-body {
+  font-size: 0.95rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
+  word-break: break-word;
+  padding: 0 0.5rem;
+}
+
+.app-dialog-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-dialog-btn-cancel {
+  background-color: var(--bg-surface-hover, #222d44) !important;
+  color: var(--text-main, #f1f5f9) !important;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.14)) !important;
+  border-radius: var(--radius-md, 12px) !important;
+  padding: 0.6rem 1.4rem !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.app-dialog-btn-cancel:hover {
+  background-color: var(--bg-surface, #111827) !important;
+  border-color: var(--border-highlight, rgba(255, 255, 255, 0.25)) !important;
+  transform: translateY(-1px);
+}
+
+.app-dialog-btn-confirm {
+  background: var(--primary-gradient, linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: var(--radius-md, 12px) !important;
+  padding: 0.6rem 1.6rem !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.app-dialog-btn-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--primary-glow, 0 0 25px rgba(99, 102, 241, 0.5)) !important;
+}
+
+.app-dialog-btn-confirm.btn-destructive {
+  background: var(--danger-gradient, linear-gradient(135deg, #ef4444 0%, #dc2626 100%)) !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35) !important;
+}
+
+.app-dialog-btn-confirm.btn-destructive:hover {
+  box-shadow: var(--danger-glow, 0 0 25px rgba(239, 68, 68, 0.5)) !important;
+}
+
+.app-dialog-btn-confirm.btn-warning-dialog {
+  background: var(--warning-gradient, linear-gradient(135deg, #f59e0b 0%, #d97706 100%)) !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35) !important;
+}
+
+.app-dialog-btn-confirm.btn-warning-dialog:hover {
+  box-shadow: var(--warning-glow, 0 0 25px rgba(245, 158, 11, 0.5)) !important;
+}
+
+/* Light Theme Overrides */
+html[data-theme="light"] .app-dialog-backdrop {
+  background-color: rgba(15, 23, 42, 0.45);
+}
+
+html[data-theme="light"] .app-dialog-card {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="light"] .app-dialog-title {
+  color: #0f172a;
+}
+
+html[data-theme="light"] .app-dialog-body {
+  color: #475569;
+}
+
+html[data-theme="light"] .app-dialog-btn-cancel {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] .app-dialog-btn-cancel:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* RTL Support */
+html[dir="rtl"] .app-dialog-footer {
+  flex-direction: row-reverse;
+}
+

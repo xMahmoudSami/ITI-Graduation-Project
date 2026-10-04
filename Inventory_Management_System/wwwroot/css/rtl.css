@@ -430,6 +430,20 @@ html[dir="rtl"] .ai-message {
     direction: rtl !important;
 }
 
+html[dir="rtl"] .ai-message .message-time {
+    text-align: right !important;
+}
+
+html[dir="rtl"] .user-message .message-time {
+    text-align: left !important;
+}
+
+html[dir="rtl"] .ai-message.ai-markdown ul,
+html[dir="rtl"] .ai-message.ai-markdown ol {
+    padding-left: 0 !important;
+    padding-right: 1.25rem !important;
+}
+
 @media (max-width: 576px) {
     html[dir="rtl"] .chat-widget-window,
     html[dir="rtl"] #ai-chat-window {

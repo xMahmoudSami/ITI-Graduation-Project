@@ -89,6 +89,90 @@
             _ => "Ask about your inventory..."
         })
         : Loc["AskAIPlaceholder"].Value;
+
+    var chatClearTooltip = Loc["ClearChatHistory"].IsResourceNotFound || Loc["ClearChatHistory"].Value == "ClearChatHistory"
+        ? (currentCulture switch
+        {
+            "ar" => "مسح سجل المحادثة",
+            "fr" => "Effacer l'historique",
+            "es" => "Borrar historial",
+            "it" => "Cancella cronologia",
+            "de" => "Verlauf löschen",
+            _ => "Clear chat history"
+        })
+        : Loc["ClearChatHistory"].Value;
+
+    var chatClearConfirm = Loc["ClearChatConfirm"].IsResourceNotFound || Loc["ClearChatConfirm"].Value == "ClearChatConfirm"
+        ? (currentCulture switch
+        {
+            "ar" => "هل أنت متأكد من مسح جميع رسائل المحادثة؟",
+            "fr" => "Êtes-vous sûr de vouloir effacer tout l'historique du chat ?",
+            "es" => "¿Estás seguro de que deseas borrar todo el historial de chat?",
+            "it" => "Sei sicuro di voler cancellare l'intera cronologia della chat?",
+            "de" => "Möchten Sie wirklich den gesamten Chat-Verlauf löschen?",
+            _ => "Are you sure you want to clear the entire chat history?"
+        })
+        : Loc["ClearChatConfirm"].Value;
+
+    var dialogConfirmText = Loc["Confirm"].IsResourceNotFound || Loc["Confirm"].Value == "Confirm"
+        ? (currentCulture switch
+        {
+            "ar" => "تأكيد",
+            "fr" => "Confirmer",
+            "es" => "Confirmar",
+            "it" => "Conferma",
+            "de" => "Bestätigen",
+            _ => "Confirm"
+        })
+        : Loc["Confirm"].Value;
+
+    var dialogCancelText = Loc["Cancel"].IsResourceNotFound || Loc["Cancel"].Value == "Cancel"
+        ? (currentCulture switch
+        {
+            "ar" => "إلغاء",
+            "fr" => "Annuler",
+            "es" => "Cancelar",
+            "it" => "Annulla",
+            "de" => "Abbrechen",
+            _ => "Cancel"
+        })
+        : Loc["Cancel"].Value;
+
+    var dialogErrorText = Loc["Error"].IsResourceNotFound || Loc["Error"].Value == "Error"
+        ? (currentCulture switch
+        {
+            "ar" => "خطأ!",
+            "fr" => "Erreur !",
+            "es" => "¡Error!",
+            "it" => "Errore!",
+            "de" => "Fehler!",
+            _ => "Error!"
+        })
+        : Loc["Error"].Value;
+
+    var dialogWarningText = Loc["Warning"].IsResourceNotFound || Loc["Warning"].Value == "Warning"
+        ? (currentCulture switch
+        {
+            "ar" => "تحذير!",
+            "fr" => "Attention !",
+            "es" => "¡Advertencia!",
+            "it" => "Avviso!",
+            "de" => "Warnung!",
+            _ => "Warning!"
+        })
+        : Loc["Warning"].Value;
+
+    var dialogSuccessText = Loc["Success"].IsResourceNotFound || Loc["Success"].Value == "Success"
+        ? (currentCulture switch
+        {
+            "ar" => "تم بنجاح!",
+            "fr" => "Succès !",
+            "es" => "¡Éxito!",
+            "it" => "Operazione riuscita!",
+            "de" => "Erfolg!",
+            _ => "Success!"
+        })
+        : Loc["Success"].Value;
 }
 
 <!DOCTYPE html>
@@ -621,11 +705,14 @@
     <div id="ai-chatbot" class="chat-widget ai-chat-widget"
          data-title="@chatTitle"
          data-greeting="@chatGreeting"
-         data-placeholder="@chatPlaceholder">
+         data-placeholder="@chatPlaceholder"
+         data-clear-tooltip="@chatClearTooltip">
 
         <button id="ai-chat-button"
                 class="chat-widget-btn"
-                type="button">
+                type="button"
+                title="@chatTitle"
+                aria-label="@chatTitle">
             <i class="fas fa-robot"></i>
         </button>
 
@@ -638,10 +725,20 @@
                     <span id="ai-chat-title-text">@chatTitle</span>
                 </span>
 
-                <button id="ai-chat-close"
-                        type="button">
-                    &times;
-                </button>
+                <div class="chat-header-actions">
+                    <button id="ai-chat-clear"
+                            type="button"
+                            title="@chatClearTooltip"
+                            aria-label="@chatClearTooltip">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+
+                    <button id="ai-chat-close"
+                            type="button"
+                            aria-label="Close">
+                        &times;
+                    </button>
+                </div>
 
             </div>
 
@@ -661,7 +758,8 @@
                        autocomplete="off" />
 
                 <button id="ai-chat-send"
-                        type="button">
+                        type="button"
+                        aria-label="Send message">
                     <i class="fas fa-paper-plane"></i>
                 </button>
 
@@ -671,17 +769,182 @@
 
     </div>
 
-    <!-- Pre-load Chatbot Translations for client-side scripts -->
+    <!-- Built-in Themed Dialog Modal (Native Alert & Confirm Replacement) -->
+    <div id="app-dialog-backdrop" class="app-dialog-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="app-dialog-card" id="app-dialog-card">
+            <div class="app-dialog-icon-wrapper" id="app-dialog-icon-wrapper">
+                <i class="fas fa-exclamation-triangle" id="app-dialog-icon"></i>
+            </div>
+            <h4 class="app-dialog-title" id="app-dialog-title"></h4>
+            <div class="app-dialog-body" id="app-dialog-body"></div>
+            <div class="app-dialog-footer" id="app-dialog-footer">
+                <button type="button" class="btn app-dialog-btn-cancel" id="app-dialog-btn-cancel" style="display: none;">@dialogCancelText</button>
+                <button type="button" class="btn app-dialog-btn-confirm" id="app-dialog-btn-confirm">@dialogConfirmText</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pre-load Chatbot & Dialog Translations for client-side scripts -->
     <script>
             window.ChatbotTranslations = {
                 title: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatTitle))",
                 greeting: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatGreeting))",
-                placeholder: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatPlaceholder))"
+                placeholder: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatPlaceholder))",
+                clearTooltip: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatClearTooltip))",
+                clearConfirm: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatClearConfirm))",
+                confirm: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(dialogConfirmText))",
+                cancel: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(dialogCancelText))"
+            };
+
+            window.AppDialogTranslations = {
+                confirm: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(dialogConfirmText))",
+                cancel: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(dialogCancelText))",
+                error: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(dialogErrorText))",
+                warning: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(dialogWarningText))",
+                success: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(dialogSuccessText))",
+                info: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(chatTitle))"
             };
     </script>
 
     <!-- Scripts -->
     <script src="~/vendor/jquery/jquery.min.js"></script>
+
+    <!-- Global Themed Dialog & Alert Controller (Replaces native browser alert & confirm) -->
+    <script>
+        (function () {
+            let activeResolve = null;
+
+            function closeDialog(result) {
+                const backdrop = $('#app-dialog-backdrop');
+                backdrop.removeClass('is-visible');
+                setTimeout(function () {
+                    backdrop.hide().attr('aria-hidden', 'true');
+                    if (typeof activeResolve === 'function') {
+                        const cb = activeResolve;
+                        activeResolve = null;
+                        cb(result);
+                    }
+                }, 200);
+            }
+
+            window.appAlert = function (message, options) {
+                return new Promise(function (resolve) {
+                    activeResolve = resolve;
+                    const opt = (typeof options === 'string')
+                        ? { type: options }
+                        : (options || {});
+
+                    const dialogTrans = window.AppDialogTranslations || {};
+                    const type = opt.type || 'info';
+                    const defaultTitle =
+                        type === 'danger' || type === 'error' ? (dialogTrans.error || 'Error!') :
+                        type === 'warning' ? (dialogTrans.warning || 'Warning!') :
+                        type === 'success' ? (dialogTrans.success || 'Success!') : (dialogTrans.info || 'Information');
+                    const title = opt.title || defaultTitle;
+
+                    const iconClass =
+                        type === 'danger' || type === 'error' ? 'fa-times-circle' :
+                        type === 'warning' ? 'fa-exclamation-triangle' :
+                        type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+
+                    const iconWrapper = $('#app-dialog-icon-wrapper');
+                    iconWrapper.attr('class', 'app-dialog-icon-wrapper type-' + type);
+                    $('#app-dialog-icon').attr('class', 'fas ' + iconClass);
+
+                    $('#app-dialog-title').text(title);
+                    $('#app-dialog-body').text(message || '');
+
+                    $('#app-dialog-btn-cancel').hide();
+                    const confirmBtn = $('#app-dialog-btn-confirm');
+                    confirmBtn.text(opt.okText || opt.confirmText || dialogTrans.confirm || 'OK');
+                    confirmBtn.attr('class', 'btn app-dialog-btn-confirm');
+                    if (type === 'danger' || type === 'error') {
+                        confirmBtn.addClass('btn-destructive');
+                    } else if (type === 'warning') {
+                        confirmBtn.addClass('btn-warning-dialog');
+                    }
+
+                    const backdrop = $('#app-dialog-backdrop');
+                    backdrop.css('display', 'flex').attr('aria-hidden', 'false');
+                    setTimeout(function () {
+                        backdrop.addClass('is-visible');
+                        confirmBtn.focus();
+                    }, 20);
+                });
+            };
+
+            window.appConfirm = function (message, options) {
+                return new Promise(function (resolve) {
+                    activeResolve = resolve;
+                    const opt = (typeof options === 'string')
+                        ? { title: options }
+                        : (options || {});
+
+                    const dialogTrans = window.AppDialogTranslations || {};
+                    const type = opt.type || (opt.isDestructive ? 'danger' : 'warning');
+                    const title = opt.title || dialogTrans.confirm || 'Confirm';
+
+                    const iconClass =
+                        type === 'danger' ? 'fa-trash-alt' :
+                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-question-circle';
+
+                    const iconWrapper = $('#app-dialog-icon-wrapper');
+                    iconWrapper.attr('class', 'app-dialog-icon-wrapper type-' + type);
+                    $('#app-dialog-icon').attr('class', 'fas ' + iconClass);
+
+                    $('#app-dialog-title').text(title);
+                    $('#app-dialog-body').text(message || '');
+
+                    const cancelBtn = $('#app-dialog-btn-cancel');
+                    cancelBtn.show().text(opt.cancelText || dialogTrans.cancel || 'Cancel');
+
+                    const confirmBtn = $('#app-dialog-btn-confirm');
+                    confirmBtn.text(opt.confirmText || dialogTrans.confirm || 'Confirm');
+                    confirmBtn.attr('class', 'btn app-dialog-btn-confirm');
+                    if (opt.isDestructive || type === 'danger') {
+                        confirmBtn.addClass('btn-destructive');
+                    } else if (type === 'warning') {
+                        confirmBtn.addClass('btn-warning-dialog');
+                    }
+
+                    const backdrop = $('#app-dialog-backdrop');
+                    backdrop.css('display', 'flex').attr('aria-hidden', 'false');
+                    setTimeout(function () {
+                        backdrop.addClass('is-visible');
+                        confirmBtn.focus();
+                    }, 20);
+                });
+            };
+
+            // Wire dialog clicks
+            $(document).on('click', '#app-dialog-btn-confirm', function (e) {
+                e.preventDefault();
+                closeDialog(true);
+            });
+
+            $(document).on('click', '#app-dialog-btn-cancel', function (e) {
+                e.preventDefault();
+                closeDialog(false);
+            });
+
+            $(document).on('click', '#app-dialog-backdrop', function (e) {
+                if (e.target === this) {
+                    closeDialog(false);
+                }
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape' && $('#app-dialog-backdrop').hasClass('is-visible')) {
+                    closeDialog(false);
+                }
+            });
+
+            // Native alert override to route any alert() through the themed built-in dialog
+            window.alert = function (message) {
+                window.appAlert(message);
+            };
+        })();
+    </script>
     <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="~/js/sb-admin-2.min.js"></script>
@@ -881,7 +1144,9 @@
                 const translations = window.ChatbotTranslations || {
                     title: chatContainer.attr('data-title'),
                     greeting: chatContainer.attr('data-greeting'),
-                    placeholder: chatContainer.attr('data-placeholder')
+                    placeholder: chatContainer.attr('data-placeholder'),
+                    clearTooltip: chatContainer.attr('data-clear-tooltip'),
+                    clearConfirm: 'Are you sure you want to clear the chat history?'
                 };
 
                 if (translations) {
@@ -894,6 +1159,9 @@
                     if (translations.placeholder && $('#ai-chat-input').length) {
                         $('#ai-chat-input').attr('placeholder', translations.placeholder);
                     }
+                    if (translations.clearTooltip && $('#ai-chat-clear').length) {
+                        $('#ai-chat-clear').attr('title', translations.clearTooltip);
+                    }
                 }
 
                 // Remove #page-top scroll button completely from DOM
@@ -902,6 +1170,176 @@
                 }
                 purgeScrollToTop();
                 $(window).on('scroll', purgeScrollToTop);
+
+                // Helper: escape HTML for user messages
+                function escapeHtml(text) {
+                    if (!text) return '';
+                    return $('<div>').text(text).html();
+                }
+
+                // Helper: format ISO timestamp to localized time
+                function formatMessageTime(dateString) {
+                    if (!dateString) return '';
+                    try {
+                        const date = new Date(dateString);
+                        if (isNaN(date.getTime())) return '';
+                        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    } catch (e) {
+                        return '';
+                    }
+                }
+
+                function scrollChatToBottom(smooth = false) {
+                    const messages = $('#ai-chat-messages');
+                    if (!messages.length || !messages[0]) return;
+
+                    if (smooth) {
+                        messages.stop().animate({
+                            scrollTop: messages[0].scrollHeight
+                        }, 300);
+                    } else {
+                        messages.scrollTop(messages[0].scrollHeight);
+                    }
+                }
+
+                function renderUserMessage(text, timestamp) {
+                    const timeHtml = timestamp ? `<div class="message-time">${formatMessageTime(timestamp)}</div>` : '';
+                    return `
+                        <div class="user-message">
+                            <div class="message-content">${escapeHtml(text)}</div>
+                            ${timeHtml}
+                        </div>
+                    `;
+                }
+
+                function formatMarkdownFallback(raw) {
+                    if (!raw) return '';
+                    let str = escapeHtml(raw);
+                    // Code blocks
+                    str = str.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+                    // Inline code
+                    str = str.replace(/`([^`]+)`/g, '<code>$1</code>');
+                    // Headers
+                    str = str.replace(/^### (.*$)/gim, '<h4>$1</h4>');
+                    str = str.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+                    str = str.replace(/^# (.*$)/gim, '<h2>$1</h2>');
+                    // Bold
+                    str = str.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    // Italic
+                    str = str.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+                    // Bullet points
+                    str = str.replace(/^[\s]*[•\-\*]\s+(.*$)/gim, '<li>$1</li>');
+                    str = str.replace(/(<li>[\s\S]*?<\/li>)/gi, '<ul>$1</ul>');
+                    str = str.replace(/<\/ul>\s*<ul>/gi, '');
+                    // Line breaks
+                    str = str.replace(/\n/g, '<br/>');
+                    return str;
+                }
+
+                function renderAIMessage(text, timestamp) {
+                    let rendered = text || '';
+                    const markedObj = (typeof marked !== 'undefined') ? marked : (typeof window !== 'undefined' ? window.marked : null);
+
+                    if (markedObj && typeof markedObj.parse === 'function') {
+                        try {
+                            if (typeof markedObj.use === 'function') {
+                                markedObj.use({ breaks: true, gfm: true });
+                            }
+                            rendered = markedObj.parse(rendered);
+                        } catch (e) {
+                            console.warn('marked.parse error, using fallback:', e);
+                            rendered = formatMarkdownFallback(rendered);
+                        }
+                    } else if (typeof markedObj === 'function') {
+                        try {
+                            rendered = markedObj(rendered);
+                        } catch (e) {
+                            rendered = formatMarkdownFallback(rendered);
+                        }
+                    } else {
+                        rendered = formatMarkdownFallback(rendered);
+                    }
+
+                    let safe = rendered;
+                    const purifyObj = (typeof DOMPurify !== 'undefined') ? DOMPurify : (typeof window !== 'undefined' ? window.DOMPurify : null);
+                    if (purifyObj && typeof purifyObj.sanitize === 'function') {
+                        try {
+                            safe = purifyObj.sanitize(rendered, {
+                                USE_PROFILES: { html: true }
+                            });
+                        } catch (e) {
+                            console.warn('DOMPurify error:', e);
+                        }
+                    }
+
+                    const timeHtml = timestamp ? `<div class="message-time">${formatMessageTime(timestamp)}</div>` : '';
+                    return `
+                        <div class="ai-message ai-markdown">
+                            <div class="message-content">${safe}</div>
+                            ${timeHtml}
+                        </div>
+                    `;
+                }
+
+                function renderInitialGreeting() {
+                    const greetingText = (translations && translations.greeting)
+                        ? translations.greeting
+                        : "Hello! I'm your inventory assistant. How can I help you?";
+                    return `
+                        <div class="ai-message" id="ai-initial-greeting">
+                            <div class="message-content">${greetingText}</div>
+                        </div>
+                    `;
+                }
+
+                let isHistoryLoaded = false;
+                let isLoadingHistory = false;
+
+                // Load and hydrate chat history from the database
+                function loadChatHistory(smoothScroll = true) {
+                    if (isLoadingHistory) return;
+                    isLoadingHistory = true;
+
+                    $.ajax({
+                        url: '/api/AI/history',
+                        type: 'GET',
+                        cache: false,
+                        success: function (data) {
+                            isLoadingHistory = false;
+                            isHistoryLoaded = true;
+
+                            const logs = Array.isArray(data) ? data : (data && (data.data || data.history || []));
+                            const messagesContainer = $('#ai-chat-messages');
+
+                            if (logs && logs.length > 0) {
+                                messagesContainer.empty();
+                                logs.forEach(function (log) {
+                                    const userQuery = log.userQuery || log.userMessage || log.message || log.question;
+                                    const aiResponse = log.aiResponse || log.response;
+                                    const timestamp = log.createdAt || log.timestamp;
+
+                                    if (userQuery) {
+                                        messagesContainer.append(renderUserMessage(userQuery, timestamp));
+                                    }
+                                    if (aiResponse) {
+                                        messagesContainer.append(renderAIMessage(aiResponse, timestamp));
+                                    }
+                                });
+                            } else {
+                                messagesContainer.html(renderInitialGreeting());
+                            }
+
+                            scrollChatToBottom(smoothScroll);
+                        },
+                        error: function (xhr) {
+                            isLoadingHistory = false;
+                            console.error('Failed to load chat history:', xhr);
+                            if (!$('#ai-chat-messages').children().length) {
+                                $('#ai-chat-messages').html(renderInitialGreeting());
+                            }
+                        }
+                    });
+                }
 
                 // Toggle AI Chatbot with smooth animations
                 function toggleChat(open) {
@@ -913,14 +1351,39 @@
                     if (shouldOpen) {
                         chatWindow.addClass('is-open');
                         chatButton.addClass('chat-is-open');
+                        try {
+                            sessionStorage.setItem('ai_chat_open', 'true');
+                        } catch (e) { }
+
+                        if (!isHistoryLoaded) {
+                            loadChatHistory(true);
+                        } else {
+                            setTimeout(function () {
+                                scrollChatToBottom(true);
+                            }, 100);
+                        }
+
                         setTimeout(function () {
                             $('#ai-chat-input').focus();
                         }, 250);
                     } else {
                         chatWindow.removeClass('is-open');
                         chatButton.removeClass('chat-is-open');
+                        try {
+                            sessionStorage.setItem('ai_chat_open', 'false');
+                        } catch (e) { }
                     }
                 }
+
+                // Initial history hydration
+                loadChatHistory(false);
+
+                // Restore open state across navigations if previously opened
+                try {
+                    if (sessionStorage.getItem('ai_chat_open') === 'true') {
+                        toggleChat(true);
+                    }
+                } catch (e) { }
 
                 // Open / close on FAB click
                 $('#ai-chat-button').on('click', function (e) {
@@ -932,6 +1395,46 @@
                 $('#ai-chat-close').on('click', function (e) {
                     e.stopPropagation();
                     toggleChat(false);
+                });
+
+                // Clear history button click
+                $('#ai-chat-clear').on('click', async function (e) {
+                    e.stopPropagation();
+
+                    const confirmMsg = (translations && translations.clearConfirm)
+                        ? translations.clearConfirm
+                        : 'Are you sure you want to clear the chat history?';
+
+                    const dialogTrans = window.AppDialogTranslations || {};
+                    const confirmed = await window.appConfirm(confirmMsg, {
+                        title: translations && translations.title ? translations.title : (dialogTrans.info || 'AI Inventory Assistant'),
+                        type: 'warning',
+                        confirmText: translations && translations.confirm ? translations.confirm : (dialogTrans.confirm || 'Confirm'),
+                        cancelText: translations && translations.cancel ? translations.cancel : (dialogTrans.cancel || 'Cancel'),
+                        isDestructive: true
+                    });
+
+                    if (!confirmed) {
+                        return;
+                    }
+
+                    const clearBtn = $(this);
+                    clearBtn.prop('disabled', true);
+
+                    $.ajax({
+                        url: '/api/AI/clear',
+                        type: 'POST',
+                        success: function () {
+                            clearBtn.prop('disabled', false);
+                            $('#ai-chat-messages').html(renderInitialGreeting());
+                            scrollChatToBottom(false);
+                        },
+                        error: function (xhr) {
+                            clearBtn.prop('disabled', false);
+                            console.error('Failed to clear chat history:', xhr);
+                            window.appAlert('Failed to clear chat history. Please try again.', { type: 'danger' });
+                        }
+                    });
                 });
 
                 // Close when clicking outside chat window
@@ -957,15 +1460,12 @@
 
                 // Send with Enter
                 $('#ai-chat-input').keypress(function (e) {
-
                     if (e.which === 13) {
                         sendAIMessage();
                     }
-
                 });
 
                 function sendAIMessage() {
-
                     const input = $('#ai-chat-input');
                     const message = input.val().trim();
 
@@ -973,12 +1473,13 @@
                         return;
                     }
 
+                    // Remove initial greeting if visible
+                    $('#ai-initial-greeting').remove();
+
+                    const now = new Date().toISOString();
+
                     // Show user message
-                    $('#ai-chat-messages').append(`
-                        <div class="user-message">
-                            ${message}
-                        </div>
-                    `);
+                    $('#ai-chat-messages').append(renderUserMessage(message, now));
 
                     input.val('');
 
@@ -999,50 +1500,31 @@
                     // Loading message
                     const loadingMessage = $(`
                         <div class="ai-message" id="ai-loading">
-                            ${loadingText}
+                            <i class="fas fa-spinner fa-spin mr-2"></i> ${loadingText}
                         </div>
                     `);
 
                     $('#ai-chat-messages').append(loadingMessage);
-
-                    scrollChatToBottom();
+                    scrollChatToBottom(true);
 
                     // Call C# API
                     $.ajax({
-
                         url: '/api/AI/chat',
                         type: 'POST',
                         contentType: 'application/json',
-
                         data: JSON.stringify({
                             message: message
                         }),
-
                         success: function (data) {
-
                             $('#ai-loading').remove();
 
-                            // Convert Markdown response to HTML
-                            const renderedResponse = marked.parse(
-                                data.response || ''
-                            );
+                            const responseText = data.response || data.aiResponse || '';
+                            const createdAt = data.createdAt || new Date().toISOString();
 
-                            // Sanitize generated HTML
-                            const safeResponse = DOMPurify.sanitize(
-                                renderedResponse
-                            );
-
-                            $('#ai-chat-messages').append(`
-                                <div class="ai-message ai-markdown">
-                                    ${safeResponse}
-                                </div>
-                            `);
-
-                            scrollChatToBottom();
+                            $('#ai-chat-messages').append(renderAIMessage(responseText, createdAt));
+                            scrollChatToBottom(true);
                         },
-
                         error: function (xhr) {
-
                             $('#ai-loading').remove();
 
                             $('#ai-chat-messages').append(`
@@ -1051,21 +1533,10 @@
                                 </div>
                             `);
 
-                            console.error(xhr);
-
-                            scrollChatToBottom();
+                            console.error('Chat error:', xhr);
+                            scrollChatToBottom(true);
                         }
-
                     });
-                }
-
-                function scrollChatToBottom() {
-
-                    const messages = $('#ai-chat-messages');
-
-                    messages.scrollTop(
-                        messages[0].scrollHeight
-                    );
                 }
 
             });

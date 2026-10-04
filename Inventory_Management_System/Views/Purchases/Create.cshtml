@@ -164,11 +164,11 @@
 
     <script>
         $(document).ready(function () {
-            const selectProductText = '@Loc["SelectProduct"]';
-            const selectSupplierFirstText = '@Loc["SelectSupplierForOrder"]';
-            const duplicateAlertText = '@Loc["DuplicateProductInOrder"]' || 'You cannot select the same product more than once.';
-            const atLeastOneItemText = '@Loc["AtLeastOneItemRequired"]' || 'At least one product item is required.';
-            const pleaseSelectSupplierText = '@Loc["PleaseSelectSupplierFirst"]' || 'Please select a supplier first.';
+            const selectProductText = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Loc["SelectProduct"].Value))';
+            const selectSupplierFirstText = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Loc["SelectSupplierForOrder"].Value))';
+            const duplicateAlertText = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Loc["DuplicateProductInOrder"].Value))' || 'You cannot select the same product more than once.';
+            const atLeastOneItemText = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Loc["AtLeastOneItemRequired"].Value))' || 'At least one product item is required.';
+            const pleaseSelectSupplierText = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Loc["PleaseSelectSupplierFirst"].Value))' || 'Please select a supplier first.';
 
             // 1. Calculate row subtotal
             function calculateRowSubtotal(row) {
@@ -243,7 +243,7 @@
                     });
 
                     if (isDuplicate) {
-                        alert(duplicateAlertText);
+                        appAlert(duplicateAlertText, { type: 'warning' });
                         select.val('');
                         currentRow.find('.cost-input, .unit-cost-input').val('0.00');
                         calculateRowSubtotal(currentRow);
@@ -344,7 +344,7 @@
                         updateDuplicateOptions();
                     },
                     error: function () {
-                        alert('Failed to load products for the selected supplier.');
+                        appAlert('Failed to load products for the selected supplier.', { type: 'danger' });
                     }
                 });
             });
@@ -353,7 +353,7 @@
             function addNewRow() {
                 const supplierId = $('#SupplierID').val();
                 if (!supplierId || supplierId === '0') {
-                    alert(pleaseSelectSupplierText);
+                    appAlert(pleaseSelectSupplierText, { type: 'warning' });
                     $('#SupplierID').focus();
                     return;
                 }
@@ -403,7 +403,7 @@
                     updateDuplicateOptions();
                     calculateTotals();
                 } else {
-                    alert(atLeastOneItemText);
+                    appAlert(atLeastOneItemText, { type: 'warning' });
                 }
             });
 
@@ -411,7 +411,7 @@
             $('#purchaseForm').on('submit', function (e) {
                 const supplierId = $('#SupplierID').val();
                 if (!supplierId || supplierId === '0') {
-                    alert(pleaseSelectSupplierText);
+                    appAlert(pleaseSelectSupplierText, { type: 'warning' });
                     $('#SupplierID').focus();
                     e.preventDefault();
                     return false;
@@ -425,21 +425,21 @@
                     const qty = parseFloat($(this).find('.qty-input, .quantity-input').val()) || 0;
 
                     if (!prodId || prodId === '0' || prodId === '') {
-                        alert('Please select a valid product for all rows.');
+                        appAlert('Please select a valid product for all rows.', { type: 'warning' });
                         $(this).find('.product-select').focus();
                         hasError = true;
                         return false;
                     }
 
                     if (selected.includes(prodId)) {
-                        alert(duplicateAlertText);
+                        appAlert(duplicateAlertText, { type: 'warning' });
                         hasError = true;
                         return false;
                     }
                     selected.push(prodId);
 
                     if (qty <= 0) {
-                        alert('Quantity must be greater than zero.');
+                        appAlert('Quantity must be greater than zero.', { type: 'warning' });
                         $(this).find('.qty-input, .quantity-input').focus();
                         hasError = true;
                         return false;

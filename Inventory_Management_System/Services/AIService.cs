@@ -1,11 +1,3 @@
-using System;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Inventory_Management_System.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace Inventory_Management_System.Services
 {
     public class AIService : IAIService
@@ -13,15 +5,18 @@ namespace Inventory_Management_System.Services
         private readonly ApplicationDbContext _context;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private readonly IStringLocalizer<SharedResource> _localizer;
 
         public AIService(
             ApplicationDbContext context,
             HttpClient httpClient,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IStringLocalizer<SharedResource> localizer)
         {
             _context = context;
             _httpClient = httpClient;
             _configuration = configuration;
+            _localizer = localizer;
         }
 
         // =====================================================
@@ -149,26 +144,20 @@ namespace Inventory_Management_System.Services
                     clearly state that no matching products were found.
                     Do not say that the information is unavailable.
 
-                30. For smart restock recommendations, clearly show:
-                    - Product
-                    - Current Stock
-                    - Units Sold
-                    - Sales Velocity
-                    - Projected Demand
-                    - Recommended Reorder Quantity
-                    - Priority
-                    - Reason
-
-                31. Never invent a reorder quantity.
-                    Use the RecommendedReorderQuantity calculated by the system.
-
-                32. Clearly distinguish between:
-                    - Immediate
-                    - High
-                    - Planned
-                    - Monitor
-                    - No Immediate Action
-
+                30. For smart restock recommendations, demand forecasting, and replenishment planning:
+                    - Rank products primarily based on sales velocity (UnitsSold / days) and actual transaction volume (total units sold from SaleItems).
+                    - Prioritize fast-moving items with high sales velocity and low days of stock coverage.
+                    - Clearly show:
+                      * Product Name
+                      * Current Stock
+                      * Units Sold (from sales history)
+                      * Sales Velocity (units/day)
+                      * Projected Demand (for planning period)
+                      * Recommended Reorder Quantity
+                      * Priority (Immediate, High, Planned, Monitor)
+                      * Reason strictly grounded in actual sales data vs stock level
+                31. Keep all recommendations strictly grounded in real database figures. Never invent sales numbers, velocity, or reorder quantities. Use the exact calculated values.
+                32. If a product has zero sales history, do not prioritize it as high restock demand over items with proven sales velocity.
                 33. If no products require restocking, say:
                     "No products currently require restocking based on the available inventory data."
 
@@ -252,7 +241,8 @@ namespace Inventory_Management_System.Services
                 },
 
                 temperature = 0.2,
-                max_completion_tokens = 400,
+                max_completion_tokens = 1024,
+                max_tokens = 1024,
                 include_reasoning = false,
                 stream = false
             };
@@ -290,7 +280,7 @@ namespace Inventory_Management_System.Services
 
                 Console.WriteLine(responseJson);
 
-                return $"Groq API error: {response.StatusCode}";
+                return GetLocalizedEmptyResponse();
             }
 
             using var document =
@@ -303,27 +293,22 @@ namespace Inventory_Management_System.Services
                     .GetProperty("content")
                     .GetString();
 
-            var finalResponse =
-                aiResponse?.Trim()
-                ?? "No response generated.";
-
-            // =====================================================
-            // SAVE CHAT LOG
-            // =====================================================
-            var chatLog = new AIChatLog
+            if (string.IsNullOrWhiteSpace(aiResponse))
             {
-                UserQuery = userQuery,
-                AIResponse = finalResponse,
-                CreatedAt = DateTime.Now
-            };
+                return GetLocalizedEmptyResponse();
+            }
 
-            _context.AIChatLogs.Add(chatLog);
+            return aiResponse.Trim();
+        }
 
-            await _context.SaveChangesAsync();
-
-            Console.WriteLine("STEP 5 - Response saved");
-
-            return finalResponse;
+        private string GetLocalizedEmptyResponse()
+        {
+            var localized = _localizer?["AIChatEmptyResponse"]?.Value;
+            if (!string.IsNullOrWhiteSpace(localized) && localized != "AIChatEmptyResponse")
+            {
+                return localized;
+            }
+            return "I'm sorry, I couldn't generate a response. Please try rephrasing your question.";
         }
 
         // =====================================================
@@ -786,8 +771,6 @@ namespace Inventory_Management_System.Services
                 "demand vs stock",
                 "demand versus stock",
                 "projected stock",
-                "stock forecast",
-                "forecast stock",
                 "dead stock",
                 "unsold stock",
                 "restock priority",
@@ -1251,8 +1234,25 @@ namespace Inventory_Management_System.Services
                 query,
                 "smart restock",
                 "restock recommendation",
+                "restock recommendations",
+                "restock suggestion",
+                "restock suggestions",
                 "restocking recommendation",
+                "restock",
+                "restocking",
+                "forecast",
+                "forecasting",
+                "demand forecast",
+                "demand forecasting",
+                "stock forecast",
+                "forecast stock",
+                "restock demand",
+                "restock advice",
+                "fast moving items",
+                "fast-moving items",
                 "reorder recommendation",
+                "reorder suggestions",
+                "reorder suggestion",
                 "recommended reorder",
                 "recommended order",
                 "how much should we order",
@@ -1263,6 +1263,7 @@ namespace Inventory_Management_System.Services
                 "which products should we restock",
                 "which products need restocking",
                 "products that need restocking",
+                "products to restock",
                 "restock quantity",
                 "reorder quantity",
                 "suggested order quantity",
@@ -1614,18 +1615,22 @@ namespace Inventory_Management_System.Services
                             p =>
                                 p.ShouldRestock &&
                                 p.RecommendedReorderQuantity > 0)
-                        .OrderBy(
+                        .OrderByDescending(
                             p =>
-                                p.Priority ==
-                                    "Immediate" ? 1 :
-                                p.Priority ==
-                                    "High" ? 2 :
-                                p.Priority ==
-                                    "Planned" ? 3 : 4)
+                                p.UnitsSold > 0)
+                        .ThenByDescending(
+                            p =>
+                                p.SalesVelocity)
+                        .ThenByDescending(
+                            p =>
+                                p.UnitsSold)
                         .ThenBy(
                             p =>
                                 p.ExpectedCoverageDays ??
                                 decimal.MaxValue)
+                        .ThenBy(
+                            p =>
+                                p.CurrentStock)
                         .ToList();
 
                 // -------------------------------------------------
@@ -1638,6 +1643,9 @@ namespace Inventory_Management_System.Services
                                 !p.ShouldRestock ||
                                 p.RecommendedReorderQuantity == 0)
                         .OrderByDescending(
+                            p =>
+                                p.SalesVelocity)
+                        .ThenByDescending(
                             p =>
                                 p.UnitsSold)
                         .ToList();

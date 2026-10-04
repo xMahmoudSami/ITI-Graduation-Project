@@ -382,4 +382,7 @@
   <data name="Theme_Light" xml:space="preserve"><value>Modo Claro</value></data>
   <data name="Theme_Toggle" xml:space="preserve"><value>Alternar tema</value></data>
   <data name="NoResultsFound" xml:space="preserve"><value>No se encontraron resultados</value></data>
+  <data name="ClearChatHistory" xml:space="preserve"><value>Borrar historial</value></data>
+  <data name="ClearChatConfirm" xml:space="preserve"><value>¿Estás seguro de que deseas borrar todo el historial de chat?</value></data>
+  <data name="AIChatEmptyResponse" xml:space="preserve"><value>Lo siento, no pude generar una respuesta. Por favor, intenta reformular tu pregunta.</value></data>
 </root>

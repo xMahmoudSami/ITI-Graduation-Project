@@ -382,4 +382,7 @@
   <data name="Theme_Light" xml:space="preserve"><value>Modalità Chiara</value></data>
   <data name="Theme_Toggle" xml:space="preserve"><value>Cambia tema</value></data>
   <data name="NoResultsFound" xml:space="preserve"><value>Nessun risultato trovato</value></data>
+  <data name="ClearChatHistory" xml:space="preserve"><value>Cancella cronologia</value></data>
+  <data name="ClearChatConfirm" xml:space="preserve"><value>Sei sicuro di voler cancellare l'intera cronologia della chat?</value></data>
+  <data name="AIChatEmptyResponse" xml:space="preserve"><value>Spiacente, non è stato possibile generare una risposta. Prova a riformulare la domanda.</value></data>
 </root>

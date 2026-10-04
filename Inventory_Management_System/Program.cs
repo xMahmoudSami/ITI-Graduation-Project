@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc.Razor;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // ── 1. Localization Services ────────────────────────────────────────────────

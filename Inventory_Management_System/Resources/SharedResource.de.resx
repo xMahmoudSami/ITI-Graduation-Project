@@ -382,4 +382,7 @@
   <data name="Theme_Light" xml:space="preserve"><value>Heller Modus</value></data>
   <data name="Theme_Toggle" xml:space="preserve"><value>Design umschalten</value></data>
   <data name="NoResultsFound" xml:space="preserve"><value>Keine Ergebnisse gefunden</value></data>
+  <data name="ClearChatHistory" xml:space="preserve"><value>Verlauf löschen</value></data>
+  <data name="ClearChatConfirm" xml:space="preserve"><value>Möchten Sie wirklich den gesamten Chat-Verlauf löschen?</value></data>
+  <data name="AIChatEmptyResponse" xml:space="preserve"><value>Entschuldigung, ich konnte keine Antwort generieren. Bitte formulieren Sie Ihre Frage um.</value></data>
 </root>

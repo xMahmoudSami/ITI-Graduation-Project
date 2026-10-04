@@ -382,4 +382,7 @@
   <data name="Theme_Light" xml:space="preserve"><value>Mode Clair</value></data>
   <data name="Theme_Toggle" xml:space="preserve"><value>Basculer le thème</value></data>
   <data name="NoResultsFound" xml:space="preserve"><value>Aucun résultat trouvé</value></data>
+  <data name="ClearChatHistory" xml:space="preserve"><value>Effacer l'historique</value></data>
+  <data name="ClearChatConfirm" xml:space="preserve"><value>Êtes-vous sûr de vouloir effacer tout l'historique du chat ?</value></data>
+  <data name="AIChatEmptyResponse" xml:space="preserve"><value>Désolé, je n&apos;ai pas pu générer de réponse. Veuillez reformuler votre question.</value></data>
 </root>

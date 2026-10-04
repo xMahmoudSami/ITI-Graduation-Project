@@ -382,4 +382,7 @@
   <data name="Theme_Light" xml:space="preserve"><value>الوضع الفاتح</value></data>
   <data name="Theme_Toggle" xml:space="preserve"><value>تبديل المظهر</value></data>
   <data name="NoResultsFound" xml:space="preserve"><value>لا توجد نتائج</value></data>
+  <data name="ClearChatHistory" xml:space="preserve"><value>مسح سجل المحادثة</value></data>
+  <data name="ClearChatConfirm" xml:space="preserve"><value>هل أنت متأكد من مسح جميع رسائل المحادثة؟</value></data>
+  <data name="AIChatEmptyResponse" xml:space="preserve"><value>عذراً، لم أتمكن من إنشاء إجابة. يرجى محاولة إعادة صياغة سؤالك.</value></data>
 </root>
