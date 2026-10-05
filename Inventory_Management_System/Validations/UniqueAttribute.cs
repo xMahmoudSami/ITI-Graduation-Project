@@ -1,5 +1,3 @@
-﻿using Inventory_Management_System.Models;
-
 namespace InventoryManagementSystem.Models
 {
     public class UniqueAttribute : ValidationAttribute

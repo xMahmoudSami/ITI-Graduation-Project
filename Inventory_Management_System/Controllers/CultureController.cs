@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc;
-
 namespace Inventory_Management_System.Controllers
 {
     /// <summary>

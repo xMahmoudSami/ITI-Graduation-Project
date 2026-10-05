@@ -1,10 +1,3 @@
-using System.Text;
-using Inventory_Management_System.Models;
-using Inventory_Management_System.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-
 namespace Inventory_Management_System.Controllers
 {
     [Route("Reports")]

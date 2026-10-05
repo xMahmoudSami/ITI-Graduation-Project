@@ -377,4 +377,12 @@
   <data name="DuplicateProductInOrder" xml:space="preserve"><value>You cannot add the same product more than once.</value></data>
   <data name="AtLeastOneItemRequired" xml:space="preserve"><value>At least one product item is required.</value></data>
   <data name="PleaseSelectSupplierFirst" xml:space="preserve"><value>Please select a supplier first.</value></data>
+  <data name="Theme" xml:space="preserve"><value>Theme</value></data>
+  <data name="Theme_Dark" xml:space="preserve"><value>Dark Mode</value></data>
+  <data name="Theme_Light" xml:space="preserve"><value>Light Mode</value></data>
+  <data name="Theme_Toggle" xml:space="preserve"><value>Toggle Theme</value></data>
+  <data name="NoResultsFound" xml:space="preserve"><value>No results found</value></data>
+  <data name="ClearChatHistory" xml:space="preserve"><value>Clear chat history</value></data>
+  <data name="ClearChatConfirm" xml:space="preserve"><value>Are you sure you want to clear the chat history?</value></data>
+  <data name="AIChatEmptyResponse" xml:space="preserve"><value>I&apos;m sorry, I couldn&apos;t generate a response. Please try rephrasing your question.</value></data>
 </root>

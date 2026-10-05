@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
 namespace Inventory_Management_System.ViewModels
 {
     public class SaleListItemViewModel

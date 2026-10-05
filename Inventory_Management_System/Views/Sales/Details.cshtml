@@ -1,7 +1,8 @@
 @model Inventory_Management_System.ViewModels.SaleDetailsViewModel
 
 @{
-    ViewData["Title"] = $"{Loc["Invoice"]} {Model.InvoiceNumber}";
+    ViewData["Title"] = $"{Loc["Invoice"].Value} {Model.InvoiceNumber}";
+    ViewData["DocumentTitle"] = Model.InvoiceNumber;
 }
 
 <!-- Breadcrumbs (Hidden when printing) -->
@@ -25,7 +26,7 @@
         <a asp-action="Index" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left mr-1"></i> @Loc["BackToSales"]
         </a>
-        <button type="button" class="btn btn-primary px-3 shadow-sm" onclick="window.print();">
+        <button type="button" class="btn btn-primary px-3 shadow-sm" onclick="triggerPrint('@Model.InvoiceNumber', event);">
             <i class="fas fa-print mr-1"></i> @Loc["PrintInvoice"]
         </button>
         <a asp-action="Delete" asp-route-id="@Model.SaleID" class="btn btn-outline-danger" title="@Loc["Delete"]">
@@ -35,10 +36,10 @@
 </div>
 
 <!-- Invoice Card (Print-ready) -->
-<div class="card shadow-sm mb-4 invoice-card" style="background: #111827; border: 1px solid #1F2937;">
+<div class="card shadow-sm mb-4 invoice-card" data-print-title="@Model.InvoiceNumber">
     <div class="card-body p-4 p-md-5">
         <!-- Invoice Header Row -->
-        <div class="row align-items-start border-bottom pb-4 mb-4" style="border-color: #1F2937 !important;">
+        <div class="row align-items-start border-bottom pb-4 mb-4">
             <div class="col-sm-6">
                 <div class="d-flex align-items-center mb-2">
                     <div class="invoice-logo mr-3">
@@ -56,7 +57,7 @@
             </div>
             <div class="col-sm-6 text-sm-right mt-3 mt-sm-0">
                 <h3 class="font-weight-bold text-primary mb-1">@Loc["Invoice"]</h3>
-                <h5 class="text-white font-weight-bold mb-1"><code>@Model.InvoiceNumber</code></h5>
+                <h5 class="text-white font-weight-bold mb-1"><code class="sku">@Model.InvoiceNumber</code></h5>
                 <div class="small mb-2 text-slate-400">
                     <strong>@Loc["Date"]:</strong> @Model.SaleDate.ToString("MMMM dd, yyyy")
                 </div>
@@ -72,7 +73,7 @@
         <div class="row mb-5">
             <div class="col-md-6 mb-3 mb-md-0">
                 <h6 class="text-uppercase font-weight-bold text-primary small mb-2">@Loc["BilledTo"]</h6>
-                <div class="p-3 rounded" style="background: #1a2234; border: 1px solid #1F2937;">
+                <div class="p-3 rounded invoice-info-panel">
                     <h5 class="font-weight-bold text-white mb-1">
                         <i class="fas fa-user-circle text-primary mr-1"></i> @Model.CustomerInfo
                     </h5>
@@ -81,7 +82,7 @@
             </div>
             <div class="col-md-6">
                 <h6 class="text-uppercase font-weight-bold text-primary small mb-2">@Loc["TransactionDetails"]</h6>
-                <div class="p-3 rounded" style="background: #1a2234; border: 1px solid #1F2937;">
+                <div class="p-3 rounded invoice-info-panel">
                     <div class="d-flex justify-content-between mb-1">
                         <span class="small text-slate-400">@Loc["InternalOrderID"]</span>
                         <span class="font-weight-bold text-white">#@Model.SaleID</span>
@@ -100,7 +101,7 @@
 
         <!-- Line Items Table -->
         <div class="table-responsive mb-4">
-            <table class="table table-bordered align-middle mb-0" style="background: #111827;">
+            <table class="table table-bordered align-middle mb-0 invoice-table">
                 <thead class="thead-light">
                     <tr>
                         <th style="width: 5%;" class="text-center py-2 px-3">#</th>
@@ -116,18 +117,18 @@
                     {
                         var item = Model.Items[i];
                         <tr>
-                            <td class="text-center font-weight-bold text-slate-400 py-2 px-3 align-middle">@(i + 1)</td>
-                            <td class="py-2 px-3 align-middle">
-                                <div class="font-weight-bold text-white">
+                            <td class="text-center font-weight-bold text-slate-400 py-2 px-3 align-middle item-index">@(i + 1)</td>
+                            <td class="py-2 px-3 align-middle product-name-col">
+                                <div class="font-weight-bold text-white product-name">
                                     @item.ProductName
                                 </div>
                             </td>
-                            <td class="py-2 px-3 align-middle">
-                                <code style="background: #1e293b; color: #a5b4fc; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px;">@item.SKU</code>
+                            <td class="py-2 px-3 align-middle sku-col">
+                                <code class="sku">@item.SKU</code>
                             </td>
-                            <td class="text-center font-weight-bold text-white py-2 px-3 align-middle">@item.Quantity</td>
-                            <td class="text-right font-weight-bold text-white py-2 px-3 align-middle">$@item.UnitPrice.ToString("N2")</td>
-                            <td class="text-right font-weight-bold text-success py-2 px-3 align-middle">$@item.Subtotal.ToString("N2")</td>
+                            <td class="text-center font-weight-bold text-white py-2 px-3 align-middle quantity">@item.Quantity</td>
+                            <td class="text-right font-weight-bold text-white py-2 px-3 align-middle unit-price">$@item.UnitPrice.ToString("N2")</td>
+                            <td class="text-right font-weight-bold text-success py-2 px-3 align-middle subtotal">$@item.Subtotal.ToString("N2")</td>
                         </tr>
                     }
                 </tbody>
@@ -137,7 +138,7 @@
         <!-- Totals & Notes Section -->
         <div class="row align-items-end mt-4">
             <div class="col-md-7 mb-3 mb-md-0">
-                <div class="p-3 rounded text-slate-400 small" style="background: #1a2234; border: 1px solid #1F2937;">
+                <div class="p-3 rounded text-slate-400 small invoice-info-panel">
                     <h6 class="font-weight-bold text-white mb-1">@Loc["TermsAndInventoryNotes"]</h6>
                     <ul class="pl-3 mb-0">
                         <li>@Loc["InvoiceTermsNote1"]</li>
@@ -147,7 +148,7 @@
                 </div>
             </div>
             <div class="col-md-5">
-                <div class="rounded p-3" style="background: #1a2234; border: 1px solid #1F2937;">
+                <div class="rounded p-3 invoice-totals-panel">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-slate-400">@Loc["Subtotal"]:</span>
                         <span class="font-weight-bold text-white">$@Model.TotalAmount.ToString("N2")</span>
@@ -156,7 +157,7 @@
                         <span class="text-slate-400">@Loc["Tax"] (0.00%):</span>
                         <span class="font-weight-bold text-white">$0.00</span>
                     </div>
-                    <hr class="my-2" style="border-color: #334155;" />
+                    <hr class="my-2" />
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="font-weight-bold text-white mb-0">@Loc["GrandTotal"]:</h5>
                         <h4 class="font-weight-bold text-success mb-0">$@Model.TotalAmount.ToString("N2")</h4>
@@ -166,7 +167,7 @@
         </div>
 
         <!-- Bottom Sign-off (for printable receipts) -->
-        <div class="mt-5 pt-4 border-top text-center text-slate-400 small" style="border-color: #1F2937 !important;">
+        <div class="mt-5 pt-4 border-top text-center text-slate-400 small">
             <p class="mb-1 font-weight-bold text-slate-300">@Loc["ThankYouForYourBusiness"]</p>
             <p class="mb-0">@Loc["PoweredByIMS"]</p>
         </div>
